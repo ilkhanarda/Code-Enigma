@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from './components/public/navbar.jsx';
-import Footer from './components/public/footer.jsx';
 
 const centerImages = [
   "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=400",
@@ -69,7 +66,7 @@ function StatusBadge({ status }) {
     "Kilitli":      "text-slate-400 bg-slate-50 border border-slate-200",
   };
   return (
-    <span className={`text-[10px] font-semibold tracking-widest uppercase px-2 py-0.75 rounded-sm ${styles[status]}`}>
+    <span className={`text-[10px] font-semibold tracking-widest uppercase px-2 py-[3px] rounded-sm ${styles[status]}`}>
       {status}
     </span>
   );
@@ -95,10 +92,6 @@ export default function MathLearningPlatform() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
-        html {
-          scroll-behavior: smooth;
-          scroll-padding-top: 72px;
-        }
         * { font-family: 'IBM Plex Mono', monospace; }
 
         @keyframes spin-ring {
@@ -187,19 +180,37 @@ export default function MathLearningPlatform() {
         }
       `}</style>
 
-      <Navbar />
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 flex items-center justify-between px-10 h-[64px] bg-white border-b border-slate-200 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="logo-hex w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-tighter">C:E</div>
+          <div>
+            <p className="font-bold text-[15px] tracking-tight text-[#111827]">Code:Enigma</p>
+            <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-[1px]">Uzaktan Eğitim Platformu</p>
+          </div>
+        </div>
+        <nav className="hidden md:flex gap-8">
+          {["Ana Sayfa","Sistem İşleyişi","Öğrenim Modülleri","Görev Takibi"].map((item) => (
+            <a key={item} href="#" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">{item}</a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <button className="text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors px-4 py-2 bg-transparent border-none cursor-pointer">Giriş Yap</button>
+          <button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-medium px-5 py-2 rounded-md border-none cursor-pointer transition-colors">Kayıt Ol</button>
+        </div>
+      </header>
 
       <main>
         {/* HERO */}
-        <section id="anasayfa" className="relative grid grid-cols-1 md:grid-cols-2 items-center min-h-[calc(100vh-64px)] px-25 bg-white overflow-hidden">
+        <section className="relative grid grid-cols-1 md:grid-cols-2 items-center min-h-[calc(100vh-64px)] px-10 bg-white overflow-hidden">
           <div className="absolute inset-0 pointer-events-none"
             style={{ backgroundImage:"radial-gradient(circle, #cbd5e1 1px, transparent 1px)", backgroundSize:"28px 28px", opacity:0.5 }} />
-          <div className="absolute top-0 right-0 w-150 h-150 pointer-events-none"
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none"
             style={{ background:"radial-gradient(circle at 80% 20%, rgba(37,99,235,0.07) 0%, transparent 65%)" }} />
 
           <div className="relative z-10 pr-8 py-16 hero-animate">
-            <div className="ißnline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-1.25 rounded-full mb-7">
-              <div className="pulse-dot w-1.25 h-1.25 rounded-full bg-blue-500" />
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-[5px] rounded-full mb-7">
+              <div className="pulse-dot w-[5px] h-[5px] rounded-full bg-blue-500" />
               <span className="text-[10px] font-semibold tracking-[2px] uppercase text-blue-600">Akademik Gelişim Programı</span>
             </div>
 
@@ -209,12 +220,14 @@ export default function MathLearningPlatform() {
               Eğitimi
             </h2>
 
-            <p className="text-[14px] leading-[1.8] font-light text-slate-500 max-w-110 mb-9">
+            <p className="text-[14px] leading-[1.8] font-light text-slate-500 max-w-[440px] mb-9">
               Öğrencinin anlık durumunu analiz eden, eksik kazanımları tespit ederek kişiselleştirilmiş çalışma programları sunan yeni nesil eğitim yönetim sistemi.
             </p>
 
             <div className="flex flex-wrap gap-3 items-center mb-12">
-              <Link to="/dashboard"className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-medium px-7 py-3 rounded-md border-none cursor-pointer transition-all hover:-translate-y-px flex items-center gap-2 shadow-md shadow-blue-200 no-underline">Sisteme Giriş Yap <span>→</span></Link>
+              <button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-medium px-7 py-3 rounded-md border-none cursor-pointer transition-all hover:-translate-y-px flex items-center gap-2 shadow-md shadow-blue-200">
+                Sisteme Giriş Yap <span>→</span>
+              </button>
               <button className="text-[13px] font-medium text-slate-600 hover:text-[#111827] border border-slate-200 hover:border-slate-300 bg-white px-6 py-3 rounded-md cursor-pointer transition-all">
                 Platformu İncele
               </button>
@@ -226,7 +239,7 @@ export default function MathLearningPlatform() {
                   {i > 0 && <div className="w-px h-8 bg-slate-200" />}
                   <div>
                     <div className="font-bold text-[22px] tracking-tight text-[#111827]">{s.num}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{s.label}</div>
+                    <div className="text-[11px] text-slate-400 mt-[2px]">{s.label}</div>
                   </div>
                 </React.Fragment>
               ))}
@@ -234,7 +247,7 @@ export default function MathLearningPlatform() {
           </div>
 
           {/* ORBIT — UNCHANGED */}
-          <div className="orbit-container relative flex h-150 w-full items-center justify-center">
+          <div className="orbit-container relative flex h-[600px] w-full items-center justify-center">
             <div className="orbit-tilt-plane">
               <div className="orbit-ring ring-3">
                 <div className="orbit-item-wrapper" style={{top:"50%",left:"100%",width:60,height:60,fontSize:26}}>{orbitMathIcons[4]}</div>
@@ -262,7 +275,7 @@ export default function MathLearningPlatform() {
         </section>
 
         {/* SİSTEM */}
-        <section id="sistem" className="px-25 py-20 bg-[#F8F9FB] border-t border-slate-100">
+        <section id="sistem" className="px-10 py-20 bg-[#F8F9FB] border-t border-slate-100">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-5 h-px bg-blue-400" />
             <span className="text-[10px] font-semibold tracking-[2.5px] uppercase text-blue-500">Sistem Mimarisi</span>
@@ -286,7 +299,7 @@ export default function MathLearningPlatform() {
         </section>
 
         {/* MODÜLLER */}
-        <section id="moduller" className="px-25 py-20 bg-white border-t border-slate-100">
+        <section id="moduller" className="px-10 py-20 bg-white border-t border-slate-100">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-5 h-px bg-blue-400" />
             <span className="text-[10px] font-semibold tracking-[2.5px] uppercase text-blue-500">Öğrenim Modülleri</span>
@@ -302,13 +315,13 @@ export default function MathLearningPlatform() {
                 <div className="p-8">
                   <div className="absolute top-6 right-6 font-bold text-[56px] leading-none select-none pointer-events-none"
                     style={{color:m.accent, opacity:0.06}}>{m.num}</div>
-                  <div className="inline-block text-[10px] font-semibold tracking-[2px] uppercase px-2 py-1 rounded mb-5"
+                  <div className="inline-block text-[10px] font-semibold tracking-[2px] uppercase px-2 py-[4px] rounded mb-5"
                     style={{color:m.accent, background:m.accentBg}}>{m.phase}</div>
                   <h4 className="font-bold text-[17px] tracking-[-0.2px] text-[#111827] mb-3">{m.title}</h4>
                   <p className="text-[13px] text-slate-400 leading-[1.75] mb-6">{m.desc}</p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {m.tags.map((t) => (
-                      <span key={t} className="text-[10px] font-medium tracking-[0.5px] px-2 py-0.75 rounded-full border"
+                      <span key={t} className="text-[10px] font-medium tracking-[0.5px] px-2 py-[3px] rounded-full border"
                         style={{color:m.accent, borderColor:m.accentBg, background:m.accentBg}}>{t}</span>
                     ))}
                   </div>
@@ -321,7 +334,7 @@ export default function MathLearningPlatform() {
         </section>
 
         {/* GÖREVLER */}
-        <section id="gorevler" className="px-25 py-20 bg-[#F8F9FB] border-t border-slate-100">
+        <section id="gorevler" className="px-10 py-20 bg-[#F8F9FB] border-t border-slate-100">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-5 h-px bg-blue-400" />
             <span className="text-[10px] font-semibold tracking-[2.5px] uppercase text-blue-500">Görev Takibi</span>
@@ -356,7 +369,7 @@ export default function MathLearningPlatform() {
                     <span className="text-slate-500 font-medium">{p.label}</span>
                     <span className="font-semibold" style={{color:p.color}}>{p.value}%</span>
                   </div>
-                  <div className="h-1 bg-slate-100 rounded-full relative">
+                  <div className="h-[4px] bg-slate-100 rounded-full relative">
                     <div className="prog-fill h-full rounded-full relative"
                       style={{width:`${p.value}%`, background:p.color, color:p.color}} />
                   </div>
@@ -377,7 +390,15 @@ export default function MathLearningPlatform() {
           </div>
         </section>
       </main>
-      <Footer />
+
+      {/* FOOTER */}
+      <footer className="flex items-center justify-between px-10 py-6 border-t border-slate-100 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="logo-hex w-7 h-7 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[9px] tracking-tighter">C:E</div>
+          <span className="font-semibold text-[14px] text-[#111827]">Code:Enigma</span>
+        </div>
+        <p className="text-[11px] text-slate-400">© {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi. Tüm hakları saklıdır.</p>
+      </footer>
     </div>
   );
 }
