@@ -12,21 +12,19 @@ export default function Navbar() {
       <Link to="/" className="flex flex-col items-center gap-2 no-underline">
         <div className="flex items-center gap-3">
           <div className="logo-hex w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-tighter">C:E</div>
-            <div>
-              <p className="font-bold text-[15px] tracking-tight text-[#111827]">Code:Enigma</p>
-              <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-px">Uzaktan Eğitim Platformu</p>
+          <div>
+            <p className="font-bold text-[15px] tracking-tight text-[#111827]">Code:Enigma</p>
+            <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-px">Uzaktan Eğitim Platformu</p>
+          </div>
         </div>
-      </div>
-            </Link>
-
-      
+      </Link>
 
       <nav className="hidden md:flex gap-8">
         <a href="#anasayfa" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Ana Sayfa</a>
         <a href="#sistem" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Sistem İşleyişi</a>
         <a href="#moduller" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Öğrenim Modülleri</a>
         <a href="#gorevler" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Görev Takibi</a>
-        <Link to="/Video2" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Video</Link>
+        <Link to="/Video" className="nav-link text-[12px] font-medium text-slate-500 hover:text-[#111827] transition-colors no-underline">Video</Link>
       </nav>
 
       <div className="flex items-center gap-2">

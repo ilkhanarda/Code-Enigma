@@ -198,8 +198,8 @@ export default function MathLearningPlatform() {
             style={{ background:"radial-gradient(circle at 80% 20%, rgba(37,99,235,0.07) 0%, transparent 65%)" }} />
 
           <div className="relative z-10 pr-8 py-16 hero-animate">
-            <div className="ißnline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-1.25 rounded-full mb-7">
-              <div className="pulse-dot w-1.25 h-1.25 rounded-full bg-blue-500" />
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-[5px] rounded-full mb-7">
+              <div className="pulse-dot w-[5px] h-[5px] rounded-full bg-blue-500" />
               <span className="text-[10px] font-semibold tracking-[2px] uppercase text-blue-600">Akademik Gelişim Programı</span>
             </div>
 

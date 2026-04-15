@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 
 const CHAPTERS = [
@@ -213,9 +213,7 @@ const TOTAL = 265;
 const OPTS_LABELS = ["A", "B", "C", "D", "E"];
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-const getChapter = (time) =>
-  CHAPTERS.find((chapter) => time >= chapter.start && time < chapter.end) ||
-  CHAPTERS[CHAPTERS.length - 1];
+const getChapter = (time) => CHAPTERS.find((chapter) => time >= chapter.start && time < chapter.end) || CHAPTERS[CHAPTERS.length - 1];
 
 const styles = {
   app: {
@@ -256,6 +254,9 @@ const styles = {
   },
   logoHex: {
     clipPath: "polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)",
+  },
+  fadein: {
+    animation: "fadein 0.35s ease both",
   },
   pulseDot: {
     animation: "pulse-dot 2s ease-in-out infinite",
@@ -390,6 +391,7 @@ function ChapterTimeline({ currentTime, duration, onSeek }) {
         </div>
       ) : null}
 
+
       <div
         ref={ref}
         style={{ display: "flex", gap: 3, cursor: "pointer", userSelect: "none" }}
@@ -475,18 +477,7 @@ function ChapterTimeline({ currentTime, duration, onSeek }) {
   );
 }
 
-function Controls({
-  playing,
-  currentTime,
-  duration,
-  volume,
-  muted,
-  onPlay,
-  onSeek,
-  onVolume,
-  onMute,
-  onFullscreen,
-}) {
+function Controls({ playing, currentTime, duration, volume, muted, onPlay, onSeek, onVolume, onMute, onFullscreen }) {
   const chapter = getChapter(currentTime);
 
   return (
@@ -499,18 +490,7 @@ function Controls({
       <ChapterTimeline currentTime={currentTime} duration={duration} onSeek={onSeek} />
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
-        <button
-          onClick={onPlay}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#fff",
-            cursor: "pointer",
-            display: "flex",
-            padding: 3,
-            borderRadius: 4,
-          }}
-        >
+        <button onClick={onPlay} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", display: "flex", padding: 3, borderRadius: 4 }}>
           {playing ? (
             <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16" rx="1" />
@@ -523,17 +503,7 @@ function Controls({
           )}
         </button>
 
-        <button
-          onClick={onMute}
-          style={{
-            background: "none",
-            border: "none",
-            color: "rgba(255,255,255,0.6)",
-            cursor: "pointer",
-            display: "flex",
-            padding: 3,
-          }}
-        >
+        <button onClick={onMute} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", display: "flex", padding: 3 }}>
           {muted || volume === 0 ? (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 5L6 9H2v6h4l5 4V5z" />
@@ -561,13 +531,7 @@ function Controls({
           }}
         />
 
-        <span
-          style={{
-            fontSize: 11,
-            color: "rgba(255,255,255,0.5)",
-            fontFamily: '"IBM Plex Mono", monospace',
-          }}
-        >
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontFamily: '"IBM Plex Mono", monospace' }}>
           <span style={{ color: "#fff" }}>{fmt(currentTime)}</span> / {fmt(duration)}
         </span>
 
@@ -589,17 +553,7 @@ function Controls({
           {chapter.phase}
         </div>
 
-        <button
-          onClick={onFullscreen}
-          style={{
-            background: "none",
-            border: "none",
-            color: "rgba(255,255,255,0.5)",
-            cursor: "pointer",
-            display: "flex",
-            padding: 3,
-          }}
-        >
+        <button onClick={onFullscreen} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", padding: 3 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
           </svg>
@@ -624,16 +578,7 @@ function ChapterSidebar({ currentTime, onSeek }) {
         gap: 4,
       }}
     >
-      <div
-        style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: "1.8px",
-          textTransform: "uppercase",
-          color: "#94a3b8",
-          padding: "4px 6px 8px",
-        }}
-      >
+      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: "#94a3b8", padding: "4px 6px 8px" }}>
         İçindekiler
       </div>
 
@@ -655,44 +600,18 @@ function ChapterSidebar({ currentTime, onSeek }) {
               transition: "all 0.2s",
             }}
           >
-            <div
-              style={{
-                height: 3,
-                background: isDone ? chapter.accent : isActive ? chapter.accent : "#e2e8f0",
-                transition: "background 0.3s",
-              }}
-            />
+            <div style={{ height: 3, background: isDone ? chapter.accent : isActive ? chapter.accent : "#e2e8f0", transition: "background 0.3s" }} />
             <div style={{ padding: "8px 10px 10px" }}>
-              <div
-                style={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: "1.5px",
-                  textTransform: "uppercase",
-                  color: isActive ? chapter.accent : "#cbd5e1",
-                  marginBottom: 3,
-                }}
-              >
+              <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", color: isActive ? chapter.accent : "#cbd5e1", marginBottom: 3 }}>
                 {chapter.phase}
               </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? "#111827" : "#64748b",
-                  lineHeight: 1.4,
-                }}
-              >
+              <div style={{ fontSize: 11, fontWeight: isActive ? 600 : 400, color: isActive ? "#111827" : "#64748b", lineHeight: 1.4 }}>
                 {chapter.title}
               </div>
               <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 3 }}>
                 {fmt(chapter.start)}–{fmt(chapter.end)}
               </div>
-              {isDone && (
-                <div style={{ fontSize: 9, color: chapter.accent, marginTop: 4, fontWeight: 600 }}>
-                  ✓ Tamamlandı
-                </div>
-              )}
+              {isDone && <div style={{ fontSize: 9, color: chapter.accent, marginTop: 4, fontWeight: 600 }}>✓ Tamamlandı</div>}
             </div>
           </div>
         );
@@ -704,9 +623,7 @@ function ChapterSidebar({ currentTime, onSeek }) {
 function TabSummary({ chapter }) {
   return (
     <div style={{ padding: "16px 0", animation: "fadein 0.35s ease both" }}>
-      <p style={{ fontSize: 12, lineHeight: 1.85, color: "#475569", fontWeight: 300 }}>
-        {chapter.summary}
-      </p>
+      <p style={{ fontSize: 12, lineHeight: 1.85, color: "#475569", fontWeight: 300 }}>{chapter.summary}</p>
     </div>
   );
 }
@@ -732,25 +649,9 @@ function TabQuestion({ chapter }) {
   const isCorrect = selected === question.correct;
 
   return (
-    <div
-      style={{
-        padding: "16px 0",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        animation: "fadein 0.35s ease both",
-      }}
-    >
+    <div style={{ padding: "16px 0", display: "flex", flexDirection: "column", gap: 10, animation: "fadein 0.35s ease both" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "1.8px",
-            textTransform: "uppercase",
-            color: "#94a3b8",
-          }}
-        >
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: "#94a3b8" }}>
           Soru {questionIndex + 1} / {questions.length}
         </span>
 
@@ -778,27 +679,8 @@ function TabQuestion({ chapter }) {
         </div>
       </div>
 
-      <div
-        style={{
-          background: "#F8F9FB",
-          border: "1px solid #e2e8f0",
-          borderLeft: `3px solid ${chapter.accent}`,
-          borderRadius: 8,
-          padding: "12px 14px",
-        }}
-      >
-        <div
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "1.8px",
-            textTransform: "uppercase",
-            color: "#94a3b8",
-            marginBottom: 8,
-          }}
-        >
-          Soru
-        </div>
+      <div style={{ background: "#F8F9FB", border: "1px solid #e2e8f0", borderLeft: `3px solid ${chapter.accent}`, borderRadius: 8, padding: "12px 14px" }}>
+        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>Soru</div>
         <p style={{ fontSize: 12, color: "#111827", lineHeight: 1.7, fontWeight: 500 }}>{question.q}</p>
       </div>
 
@@ -834,29 +716,13 @@ function TabQuestion({ chapter }) {
               <span style={{ fontSize: 11, lineHeight: 1.55, flex: 1 }}>{option.slice(3)}</span>
 
               {answered && index === question.correct && (
-                <svg
-                  style={{ marginLeft: "auto", flexShrink: 0 }}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#059669"
-                  strokeWidth="2.5"
-                >
+                <svg style={{ marginLeft: "auto", flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
 
               {answered && index === selected && !isCorrect && index !== question.correct && (
-                <svg
-                  style={{ marginLeft: "auto", flexShrink: 0 }}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#DC2626"
-                  strokeWidth="2.5"
-                >
+                <svg style={{ marginLeft: "auto", flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -923,18 +789,7 @@ function TabQuestion({ chapter }) {
             </button>
           ) : (
             <div className="solution-box">
-              <div
-                style={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: "1.8px",
-                  textTransform: "uppercase",
-                  color: "#D97706",
-                  marginBottom: 8,
-                }}
-              >
-                Çözüm
-              </div>
+              <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: "#D97706", marginBottom: 8 }}>Çözüm</div>
               {question.solution}
             </div>
           )}
@@ -996,25 +851,9 @@ function TabFlashcards({ chapter }) {
   const card = cards[index];
 
   return (
-    <div
-      style={{
-        padding: "16px 0",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        animation: "fadein 0.35s ease both",
-      }}
-    >
+    <div style={{ padding: "16px 0", display: "flex", flexDirection: "column", gap: 10, animation: "fadein 0.35s ease both" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "1.5px",
-            textTransform: "uppercase",
-            color: "#94a3b8",
-          }}
-        >
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", color: "#94a3b8" }}>
           {index + 1} / {cards.length}
         </span>
 
@@ -1067,18 +906,7 @@ function TabFlashcards({ chapter }) {
               textAlign: "center",
             }}
           >
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "1.8px",
-                textTransform: "uppercase",
-                color: "#94a3b8",
-                marginBottom: 8,
-              }}
-            >
-              Kavram
-            </div>
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>Kavram</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{card.front}</div>
             <div style={{ fontSize: 9, color: "#cbd5e1", marginTop: 10 }}>Çevirmek için tıkla →</div>
           </div>
@@ -1102,21 +930,8 @@ function TabFlashcards({ chapter }) {
               textAlign: "center",
             }}
           >
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "1.8px",
-                textTransform: "uppercase",
-                color: chapter.accent,
-                marginBottom: 8,
-              }}
-            >
-              Tanım
-            </div>
-            <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.65, fontWeight: 400 }}>
-              {card.back}
-            </div>
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "1.8px", textTransform: "uppercase", color: chapter.accent, marginBottom: 8 }}>Tanım</div>
+            <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.65, fontWeight: 400 }}>{card.back}</div>
           </div>
         </div>
       </div>
@@ -1176,37 +991,15 @@ function ContentPanel({ chapter, visible }) {
           gap: 12,
         }}
       >
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            background: "#EFF6FF",
-            borderRadius: 10,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <div style={{ width: 44, height: 44, background: "#EFF6FF", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2">
             <polygon points="5,3 19,12 5,21" />
           </svg>
         </div>
 
         <div style={{ textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: 11,
-              color: "#374151",
-              fontWeight: 600,
-              letterSpacing: "0.3px",
-              marginBottom: 4,
-            }}
-          >
-            Panel Kapalı
-          </p>
-          <p style={{ fontSize: 10, color: "#94a3b8", lineHeight: 1.6, maxWidth: 140 }}>
-            Videoyu durdurunca içerik paneli açılır
-          </p>
+          <p style={{ fontSize: 11, color: "#374151", fontWeight: 600, letterSpacing: "0.3px", marginBottom: 4 }}>Panel Kapalı</p>
+          <p style={{ fontSize: 10, color: "#94a3b8", lineHeight: 1.6, maxWidth: 140 }}>Videoyu durdurunca içerik paneli açılır</p>
         </div>
       </div>
     );
@@ -1219,36 +1012,13 @@ function ContentPanel({ chapter, visible }) {
   ];
 
   return (
-    <div
-      style={{
-        width: 300,
-        minWidth: 300,
-        background: "#fff",
-        borderLeft: "1px solid #e2e8f0",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
+    <div style={{ width: 300, minWidth: 300, background: "#fff", borderLeft: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid #e2e8f0", background: chapter.accentBg }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
           <div style={{ width: 16, height: 2, background: chapter.accent, borderRadius: 1 }} />
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: chapter.accent }}>
-            {chapter.phase}
-          </span>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: chapter.accent }}>{chapter.phase}</span>
         </div>
-        <h2
-          style={{
-            fontWeight: 700,
-            fontSize: 15,
-            color: "#111827",
-            letterSpacing: "-0.3px",
-            lineHeight: 1.3,
-            margin: 0,
-          }}
-        >
-          {chapter.title}
-        </h2>
+        <h2 style={{ fontWeight: 700, fontSize: 15, color: "#111827", letterSpacing: "-0.3px", lineHeight: 1.3, margin: 0 }}>{chapter.title}</h2>
         <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
           {fmt(chapter.start)} – {fmt(chapter.end)}
         </div>
@@ -1293,17 +1063,7 @@ function ContentPanel({ chapter, visible }) {
           { value: chapter.flashcards.length, label: "Kart" },
           { value: fmt(chapter.end - chapter.start), label: "Süre" },
         ].map((stat) => (
-          <div
-            key={stat.label}
-            style={{
-              flex: 1,
-              background: "#F8F9FB",
-              border: "1px solid #e2e8f0",
-              borderRadius: 6,
-              padding: "8px",
-              textAlign: "center",
-            }}
-          >
+          <div key={stat.label} style={{ flex: 1, background: "#F8F9FB", border: "1px solid #e2e8f0", borderRadius: 6, padding: "8px", textAlign: "center" }}>
             <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{stat.value}</div>
             <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 1 }}>{stat.label}</div>
           </div>
@@ -1313,7 +1073,7 @@ function ContentPanel({ chapter, visible }) {
   );
 }
 
-export default function Video() {
+export default function Video2() {
   const containerRef = useRef(null);
   const tickRef = useRef(null);
   const hideTimer = useRef(null);
@@ -1371,17 +1131,10 @@ export default function Video() {
         <header style={styles.header}>
           <Link to="/" className="flex flex-col items-center gap-2 no-underline">
             <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-tighter"
-                style={styles.logoHex}
-              >
-                C:E
-              </div>
+                <div className="w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-tighter" style={styles.logoHex}>C:E</div>              
               <div>
                 <p className="font-bold text-[15px] tracking-tight text-[#111827]">Code:Enigma</p>
-                <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-px">
-                  Uzaktan Eğitim Platformu
-                </p>
+                <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-px">Uzaktan Eğitim Platformu</p>
               </div>
             </div>
           </Link>
@@ -1393,30 +1146,15 @@ export default function Video() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div
-              style={{
-                ...styles.pulseDot,
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: playing ? "#059669" : "#94a3b8",
-              }}
-            />
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-                color: playing ? "#059669" : "#94a3b8",
-              }}
-            >
+            <div style={{ ...styles.pulseDot, width: 5, height: 5, borderRadius: "50%", background: playing ? "#059669" : "#94a3b8" }} />
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: playing ? "#059669" : "#94a3b8" }}>
               {playing ? "Oynatılıyor" : "Durduruldu"}
             </span>
           </div>
         </header>
 
         <div style={styles.main}>
+
           <DashboardNavbar />
 
           <ChapterSidebar currentTime={currentTime} onSeek={setCurrentTime} />
@@ -1489,38 +1227,13 @@ export default function Video() {
                   transition: "border-color 0.4s",
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    letterSpacing: "2px",
-                    textTransform: "uppercase",
-                    color: currentChapter.accent,
-                    marginBottom: 12,
-                  }}
-                >
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: currentChapter.accent, marginBottom: 12 }}>
                   {currentChapter.phase} — {currentChapter.title}
                 </div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 18,
-                    color: "#f1f5f9",
-                    marginBottom: 14,
-                    letterSpacing: "-0.3px",
-                    lineHeight: 1.3,
-                  }}
-                >
+                <div style={{ fontWeight: 700, fontSize: 18, color: "#f1f5f9", marginBottom: 14, letterSpacing: "-0.3px", lineHeight: 1.3 }}>
                   {currentChapter.title}
                 </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.45)",
-                    lineHeight: 1.8,
-                    fontWeight: 300,
-                  }}
-                >
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.8, fontWeight: 300 }}>
                   {currentChapter.summary.slice(0, 140)}…
                 </div>
               </div>
@@ -1590,20 +1303,7 @@ export default function Video() {
 
         <footer style={styles.footer}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div
-              style={{
-                ...styles.logoHex,
-                width: 22,
-                height: 22,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#2563EB",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 8,
-              }}
-            >
+            <div style={{ ...styles.logoHex, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "#2563EB", color: "#fff", fontWeight: 700, fontSize: 8 }}>
               C:E
             </div>
             <span style={{ fontWeight: 600, fontSize: 12, color: "#111827" }}>Code:Enigma</span>
@@ -1617,15 +1317,7 @@ export default function Video() {
             ].map((item) => {
               return (
                 <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div
-                    style={{
-                      width: 36,
-                      height: 3,
-                      background: "#e2e8f0",
-                      borderRadius: 2,
-                      overflow: "hidden",
-                    }}
-                  >
+                  <div style={{ width: 36, height: 3, background: "#e2e8f0", borderRadius: 2, overflow: "hidden" }}>
                     <div style={{ width: `${item.value}%`, height: "100%", background: item.color }} />
                   </div>
                   <span style={{ fontSize: 9, color: "#64748b" }}>
@@ -1636,9 +1328,7 @@ export default function Video() {
             })}
           </div>
 
-          <p style={{ fontSize: 10, color: "#94a3b8", margin: 0 }}>
-            © {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi
-          </p>
+          <p style={{ fontSize: 10, color: "#94a3b8", margin: 0 }}>© {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi</p>
         </footer>
       </div>
     </>
