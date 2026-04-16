@@ -425,7 +425,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F9FB] text-[#111827]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap');
         * { font-family: 'IBM Plex Mono', monospace; }
         .logo-hex { clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
       `}</style>

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useUser } from "../../context/UserContext.jsx";
 
 const NAV_ITEMS = [
   { icon: "⌂",  label: "Panel",        to: "/dashboard" },
@@ -39,6 +40,7 @@ function NavItem({ icon, label, to, active }) {
 
 export default function DashboardNavbar() {
   const location = useLocation();
+  const { user } = useUser();
 
   return (
     <aside className="sticky top-0 flex h-screen w-[88px] flex-col items-center justify-between border-r border-slate-100 bg-white px-2 py-4 shadow-[4px_0_24px_rgba(15,23,42,.05)]">
@@ -66,21 +68,21 @@ export default function DashboardNavbar() {
         <div className="flex w-full flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-2 py-3">
           <div className="relative">
             <div className="flex h-11 w-11 items-center justify-center rounded-full border-[2.5px] border-white bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-[21px] shadow-md shadow-blue-100">
-              🦊
+              {user.avatar}
             </div>
             {/* Online dot */}
             <span className="absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400" />
           </div>
           <div className="text-center">
-            <div className="text-[10px] font-semibold leading-tight text-[#111827]">İlkhan</div>
-            <div className="text-[8px] font-medium text-slate-400">Sv. 12</div>
+            <div className="text-[10px] font-semibold leading-tight text-[#111827]">{user.name}</div>
+            <div className="text-[8px] font-medium text-slate-400">Sv. {user.level}</div>
           </div>
         </div>
 
         {/* Coin chip */}
         <div className="flex w-full flex-col items-center gap-0.5 rounded-xl border border-amber-200/70 bg-gradient-to-b from-amber-50 to-yellow-50 px-2 py-2.5 shadow-sm">
           <span className="text-base leading-none">🪙</span>
-          <span className="text-[12px] font-bold tracking-tight text-amber-900">1.240</span>
+          <span className="text-[12px] font-bold tracking-tight text-amber-900">{user.coins.toLocaleString("tr-TR")}</span>
           <span className="text-[7.5px] font-semibold uppercase tracking-[1px] text-amber-500">Coin</span>
         </div>
 

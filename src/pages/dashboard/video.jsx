@@ -265,8 +265,6 @@ const styles = {
 function GlobalStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
-
       * , *::before, *::after { box-sizing: border-box; }
       html, body, #root { margin: 0; padding: 0; height: 100%; }
       ::-webkit-scrollbar { width: 4px; }

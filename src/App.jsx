@@ -94,7 +94,6 @@ export default function MathLearningPlatform() {
     <div className="min-h-screen bg-[#F8F9FB] text-[#111827] overflow-x-hidden">
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
         html {
           scroll-behavior: smooth;
           scroll-padding-top: 72px;

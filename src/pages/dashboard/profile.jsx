@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../../components/public/navbar.jsx';
+import DashboardNavbar from '../../components/dashboard/dashboard-navbar.jsx';
 
 const initialTasks = [
   { id: 1, title: '1 ders tamamla', xp: 50, done: true },
@@ -200,7 +200,6 @@ export default function Profile1() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
 
         *{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
@@ -275,9 +274,9 @@ export default function Profile1() {
         }
       `}</style>
 
-
-        
-      <div style={{ minHeight: '100vh', background: '#F8F9FB', color: '#111827' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#F8F9FB', color: '#111827' }}>
+        <DashboardNavbar />
+        <div style={{ flex: 1, minWidth: 0 }}>
         <header
           style={{
             position: 'sticky',
@@ -881,7 +880,8 @@ export default function Profile1() {
           </div>
           <p style={{ fontSize: 10, color: '#94a3b8' }}>© 2025 Açık ve Uzaktan Eğitim Projesi. Tüm hakları saklıdır.</p>
         </footer>
-        
+
+        </div>
       </div>
     </>
   );
