@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
+import { useUser } from "../../context/UserContext.jsx";
 
 /* ═══════════════════════════════════════
    DATA
@@ -417,17 +418,61 @@ function TaskRow({ task, onToggle }) {
 ═══════════════════════════════════════ */
 export default function Dashboard() {
   const [tasks, setTasks] = useState(dailyTasks);
+  const [toasts, setToasts] = useState([]);
+  const { addCoins, addXp } = useUser();
   const doneTasks = tasks.filter((t) => t.done).length;
 
-  const toggleTask = (id) =>
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  const toggleTask = (id) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        const next = { ...t, done: !t.done };
+        if (next.done && !t.done) {
+          addXp(t.xp);
+          addCoins(Math.round(t.xp / 2));
+          const toastId = Date.now() + Math.random();
+          setToasts((ts) => [...ts, { id: toastId, xp: t.xp, coins: Math.round(t.xp / 2) }]);
+          setTimeout(() => {
+            setToasts((ts) => ts.filter((x) => x.id !== toastId));
+          }, 1800);
+        } else if (!next.done && t.done) {
+          addXp(-t.xp);
+          addCoins(-Math.round(t.xp / 2));
+        }
+        return next;
+      })
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] text-[#111827]">
       <style>{`
         * { font-family: 'IBM Plex Mono', monospace; }
         .logo-hex { clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
+        @keyframes xp-rise {
+          0%   { opacity: 0; transform: translateY(8px) scale(.92); }
+          15%  { opacity: 1; transform: translateY(0) scale(1); }
+          80%  { opacity: 1; transform: translateY(-6px) scale(1); }
+          100% { opacity: 0; transform: translateY(-28px) scale(.96); }
+        }
+        .xp-toast { animation: xp-rise 1.8s cubic-bezier(.2,.8,.2,1) forwards; }
       `}</style>
+
+      {/* ── XP TOASTS ── */}
+      <div className="pointer-events-none fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-2">
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className="xp-toast flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-4 py-2.5 shadow-lg shadow-emerald-100/70"
+          >
+            <span className="text-base">✨</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-emerald-600">+{t.xp} XP</span>
+              <span className="text-[9px] font-semibold text-amber-600">+{t.coins} 🪙 Coin</span>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <div className="flex min-h-screen">
         <DashboardNavbar />
