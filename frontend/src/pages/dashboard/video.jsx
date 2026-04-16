@@ -265,6 +265,8 @@ const styles = {
 function GlobalStyles() {
   return (
     <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+
       * , *::before, *::after { box-sizing: border-box; }
       html, body, #root { margin: 0; padding: 0; height: 100%; }
       ::-webkit-scrollbar { width: 4px; }
@@ -281,8 +283,47 @@ function GlobalStyles() {
         50% { opacity: 0.4; transform: scale(0.7); }
       }
 
+      @keyframes ai-pill-border {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+      }
+
       .chapter-card { transition: box-shadow 0.2s, transform 0.2s; }
       .chapter-card:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.10); transform: translateY(-1px); }
+
+      .ai-mode-pill {
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1.5px solid transparent;
+        border-radius: 999px;
+        color: #1f2937;
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 700;
+        font-size: 10px;
+        cursor: pointer;
+        white-space: nowrap;
+        background:
+          linear-gradient(#ffffff, #ffffff) padding-box,
+          linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335, #4285f4) border-box;
+        background-size: 100% 100%, 200% 100%;
+        animation: ai-pill-border 4s linear infinite;
+        box-shadow: 0 10px 24px rgba(66, 133, 244, 0.10);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      }
+
+      .ai-mode-pill:hover {
+        transform: translateY(-1px);
+        filter: saturate(1.08);
+        box-shadow: 0 14px 28px rgba(66, 133, 244, 0.14);
+      }
+
+      .ai-mode-pill svg {
+        color: #5f6368;
+      }
 
       input[type=range] {
         -webkit-appearance: none;
@@ -699,12 +740,344 @@ function ChapterSidebar({ currentTime, onSeek }) {
   );
 }
 
-function TabSummary({ chapter }) {
+function TabSummary({
+  chapter,
+  aiMode,
+  onCloseAi,
+  messages,
+  setMessages,
+  input,
+  setInput,
+  loading,
+  setLoading,
+}) {
+  const messagesRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (aiMode && messagesRef.current) {
+      messagesRef.current.scrollTo({
+        top: messagesRef.current.scrollHeight,
+        behavior: messages.length > 0 ? "smooth" : "auto",
+      });
+    }
+  }, [aiMode, messages, loading]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    const userMsg = { role: "user", content: text };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: text,
+          history: nextMessages.slice(0, -1),
+          chapter: {
+            phase: chapter.phase,
+            title: chapter.title,
+            summary: chapter.summary,
+          },
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.reply || "AI isteği başarısız oldu.");
+      }
+
+      const reply = data.reply || "Bir hata oluştu.";
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: error?.message || "Bağlantı hatası. Lütfen tekrar deneyin.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  if (!aiMode) {
+    return (
+      <div style={{ padding: "16px 0", animation: "fadein 0.35s ease both" }}>
+        <p style={{ fontSize: 12, lineHeight: 1.85, color: "#475569", fontWeight: 300 }}>
+          {chapter.summary}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: "16px 0", animation: "fadein 0.35s ease both" }}>
-      <p style={{ fontSize: 12, lineHeight: 1.85, color: "#475569", fontWeight: 300 }}>
-        {chapter.summary}
-      </p>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        animation: "fadein 0.3s ease both",
+        paddingTop: 12,
+      }}
+    >
+      {/* Geri + başlık */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+        <button
+          onClick={onCloseAi}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "2px 4px",
+            color: "#94a3b8",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 10,
+            fontFamily: '"IBM Plex Mono", monospace',
+            fontWeight: 600,
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="15,18 9,12 15,6" />
+          </svg>
+          Özete Dön
+        </button>
+        <div style={{ flex: 1 }} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            fontSize: 9,
+            fontWeight: 700,
+            color: "#7C3AED",
+            letterSpacing: "1.2px",
+            textTransform: "uppercase",
+          }}
+        >
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "#7C3AED",
+              animation: "pulse-dot 2s ease-in-out infinite",
+            }}
+          />
+          Enigma AI
+        </div>
+      </div>
+
+      {/* Mesaj alanı */}
+      <div
+        ref={messagesRef}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          paddingBottom: 8,
+          minHeight: 0,
+        }}
+      >
+        {messages.length === 0 && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "24px 12px",
+              color: "#94a3b8",
+              fontSize: 11,
+              lineHeight: 1.7,
+            }}
+          >
+            <div style={{ fontSize: 22, marginBottom: 8 }}>🔍</div>
+            <div style={{ fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
+              Bu bölüm hakkında soru sor
+            </div>
+            <div style={{ fontSize: 10 }}>
+              {chapter.phase} — {chapter.title} konusunda sana yardımcı olabilirim.
+            </div>
+          </div>
+        )}
+
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: msg.role === "user" ? "flex-end" : "flex-start",
+              animation: "fadein 0.25s ease both",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "88%",
+                padding: "9px 12px",
+                borderRadius: msg.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px",
+                background: msg.role === "user" ? "#7C3AED" : "#F1F5F9",
+                color: msg.role === "user" ? "#fff" : "#1e293b",
+                fontSize: 11,
+                lineHeight: 1.65,
+                fontFamily: '"IBM Plex Mono", monospace',
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}
+            >
+              {msg.content}
+            </div>
+            <div
+              style={{
+                fontSize: 9,
+                color: "#cbd5e1",
+                marginTop: 3,
+                paddingLeft: msg.role === "assistant" ? 2 : 0,
+                paddingRight: msg.role === "user" ? 2 : 0,
+              }}
+            >
+              {msg.role === "user" ? "Sen" : "Enigma AI"}
+            </div>
+          </div>
+        ))}
+
+        {loading && (
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+            <div
+              style={{
+                padding: "9px 14px",
+                borderRadius: "12px 12px 12px 3px",
+                background: "#F1F5F9",
+                display: "flex",
+                gap: 4,
+                alignItems: "center",
+              }}
+            >
+              {[0, 1, 2].map((n) => (
+                <div
+                  key={n}
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: "50%",
+                    background: "#7C3AED",
+                    opacity: 0.5,
+                    animation: `pulse-dot 1.2s ease-in-out ${n * 0.2}s infinite`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Giriş alanı */}
+      <div
+        style={{
+          borderTop: "1px solid #e2e8f0",
+          paddingTop: 10,
+          paddingBottom: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            alignItems: "flex-end",
+            background: "#F8F9FB",
+            border: "1.5px solid #e2e8f0",
+            borderRadius: 12,
+            padding: "6px 8px 6px 12px",
+            transition: "border-color 0.15s",
+          }}
+          onFocusCapture={(e) => { e.currentTarget.style.borderColor = "#7C3AED88"; }}
+          onBlurCapture={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              e.target.style.height = "auto";
+              e.target.style.height = Math.min(e.target.scrollHeight, 96) + "px";
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Bir soru sor…"
+            rows={1}
+            style={{
+              flex: 1,
+              background: "none",
+              border: "none",
+              outline: "none",
+              resize: "none",
+              fontFamily: '"IBM Plex Mono", monospace',
+              fontSize: 11,
+              color: "#1e293b",
+              lineHeight: 1.6,
+              padding: 0,
+              maxHeight: 96,
+              overflow: "auto",
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!input.trim() || loading}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: "50%",
+              background: input.trim() && !loading ? "#7C3AED" : "#e2e8f0",
+              border: "none",
+              cursor: input.trim() && !loading ? "pointer" : "not-allowed",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              transition: "background 0.15s",
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !loading ? "#fff" : "#94a3b8"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+
+        <p
+          style={{
+            fontSize: 8,
+            color: "#a2aab4",
+            margin: 0,
+            textAlign: "center",
+            lineHeight: 1.5,
+            letterSpacing: "0.1px",
+          }}
+        >
+          Enigma AI hata yapabilir. Lütfen cevapları iki defa kontrol edin.
+        </p>
+      </div>
     </div>
   );
 }
@@ -1152,160 +1525,248 @@ function TabFlashcards({ chapter }) {
   );
 }
 
-function ContentPanel({ chapter, visible }) {
+const TAB_COLORS = {
+  summary: { active: "#2563EB", activeBg: "#EFF6FF", label: "Özet" },
+  question: { active: "#7C3AED", activeBg: "#F5F3FF", label: "Soru" },
+  flashcards: { active: "#059669", activeBg: "#ECFDF5", label: "Kartlar" },
+};
+
+function ContentPanel({ chapter, visible, onToggle }) {
   const [tab, setTab] = useState("summary");
+  const [aiMode, setAiMode] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const isAiSummary = tab === "summary" && aiMode;
 
   useEffect(() => {
     setTab("summary");
+    setAiMode(false);
   }, [chapter?.id]);
 
-  if (!visible) {
-    return (
-      <div
+  const tabs = [
+    { id: "summary", label: "Özet" },
+    { id: "question", label: "Soru" },
+    { id: "flashcards", label: "Kartlar" },
+  ];
+
+  return (
+    <div style={{ position: "relative", display: "flex", alignItems: "stretch", flexShrink: 0, height: "100%" }}>
+      {/* Toggle Button — sol kenarda dikey ortada */}
+      <button
+        onClick={onToggle}
+        title={visible ? "Paneli Kapat" : "Paneli Aç"}
         style={{
-          width: 300,
-          minWidth: 300,
+          position: "absolute",
+          left: -18,
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 20,
+          width: 18,
+          height: 52,
           background: "#fff",
-          borderLeft: "1px solid #e2e8f0",
+          border: "1px solid #e2e8f0",
+          borderRight: "none",
+          borderRadius: "6px 0 0 6px",
+          cursor: "pointer",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 12,
+          boxShadow: "-2px 0 8px rgba(0,0,0,0.07)",
+          padding: 0,
+          color: "#64748b",
+          transition: "background 0.15s, color 0.15s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "#EFF6FF"; e.currentTarget.style.color = "#2563EB"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#64748b"; }}
+      >
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          style={{ transition: "transform 0.3s", transform: visible ? "rotate(0deg)" : "rotate(180deg)" }}
+        >
+          <polyline points="9,18 15,12 9,6" />
+        </svg>
+      </button>
+
+      {/* Panel — slide animasyonuyla */}
+      <div
+        style={{
+          width: visible ? 360 : 0,
+          height: "100%",
+          minWidth: 0,
+          overflow: "hidden",
+          transition: "width 0.32s cubic-bezier(0.4,0,0.2,1)",
+          display: "flex",
+          flexDirection: "row",
         }}
       >
         <div
           style={{
-            width: 44,
-            height: 44,
-            background: "#EFF6FF",
-            borderRadius: 10,
+            width: 360,
+            height: "100%",
+            minWidth: 360,
+            background: "#fff",
+            borderLeft: "1px solid #e2e8f0",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: "column",
+            overflow: "hidden",
+            minHeight: 0,
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2">
-            <polygon points="5,3 19,12 5,21" />
-          </svg>
-        </div>
-
-        <div style={{ textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: 11,
-              color: "#374151",
-              fontWeight: 600,
-              letterSpacing: "0.3px",
-              marginBottom: 4,
-            }}
-          >
-            Panel Kapalı
-          </p>
-          <p style={{ fontSize: 10, color: "#94a3b8", lineHeight: 1.6, maxWidth: 140 }}>
-            Videoyu durdurunca içerik paneli açılır
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const tabs = [
-    { id: "summary", label: "Özet", icon: "◈" },
-    { id: "question", label: "Soru", icon: "⌖" },
-    { id: "flashcards", label: "Kartlar", icon: "◎" },
-  ];
-
-  return (
-    <div
-      style={{
-        width: 300,
-        minWidth: 300,
-        background: "#fff",
-        borderLeft: "1px solid #e2e8f0",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid #e2e8f0", background: chapter.accentBg }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-          <div style={{ width: 16, height: 2, background: chapter.accent, borderRadius: 1 }} />
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: chapter.accent }}>
-            {chapter.phase}
-          </span>
-        </div>
-        <h2
-          style={{
-            fontWeight: 700,
-            fontSize: 15,
-            color: "#111827",
-            letterSpacing: "-0.3px",
-            lineHeight: 1.3,
-            margin: 0,
-          }}
-        >
-          {chapter.title}
-        </h2>
-        <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
-          {fmt(chapter.start)} – {fmt(chapter.end)}
-        </div>
-      </div>
-
-      <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fff" }}>
-        {tabs.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setTab(item.id)}
-            style={{
-              flex: 1,
-              padding: "10px 4px",
-              background: "none",
-              border: "none",
-              borderBottom: tab === item.id ? `2px solid ${chapter.accent}` : "2px solid transparent",
-              color: tab === item.id ? chapter.accent : "#94a3b8",
-              fontFamily: '"IBM Plex Mono", monospace',
-              fontWeight: 700,
-              fontSize: 9,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              transition: "color 0.15s,border-color 0.15s",
-            }}
-          >
-            <div style={{ fontSize: 14, marginBottom: 2 }}>{item.icon}</div>
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 20px" }}>
-        {tab === "summary" && <TabSummary chapter={chapter} key={chapter.id} />}
-        {tab === "question" && <TabQuestion chapter={chapter} key={chapter.id} />}
-        {tab === "flashcards" && <TabFlashcards chapter={chapter} key={chapter.id} />}
-      </div>
-
-      <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0", display: "flex", gap: 10 }}>
-        {[
-          { value: chapter.questions.length, label: "Soru" },
-          { value: chapter.flashcards.length, label: "Kart" },
-          { value: fmt(chapter.end - chapter.start), label: "Süre" },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            style={{
-              flex: 1,
-              background: "#F8F9FB",
-              border: "1px solid #e2e8f0",
-              borderRadius: 6,
-              padding: "8px",
-              textAlign: "center",
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{stat.value}</div>
-            <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 1 }}>{stat.label}</div>
+          {/* Panel başlık */}
+          <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid #e2e8f0", background: chapter.accentBg }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+              <div style={{ width: 16, height: 2, background: chapter.accent, borderRadius: 1 }} />
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: chapter.accent }}>
+                {chapter.phase}
+              </span>
+            </div>
+            <h2
+              style={{
+                fontWeight: 700,
+                fontSize: 15,
+                color: "#111827",
+                letterSpacing: "-0.3px",
+                lineHeight: 1.3,
+                margin: 0,
+              }}
+            >
+              {chapter.title}
+            </h2>
+            <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
+              {fmt(chapter.start)} – {fmt(chapter.end)}
+            </div>
           </div>
-        ))}
+
+          {/* Pill Tab Butonları */}
+          <div style={{ padding: "12px 14px", borderBottom: "1px solid #e2e8f0", background: "#fff", display: "flex", gap: 6 }}>
+            {tabs.map((item) => {
+              const isActive = tab === item.id;
+              const colors = TAB_COLORS[item.id];
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setTab(item.id)}
+                  style={{
+                    flex: 1,
+                    padding: "7px 8px",
+                    borderRadius: 999,
+                    border: `1.5px solid ${isActive ? colors.active : "#e2e8f0"}`,
+                    background: isActive ? colors.activeBg : "#F8F9FB",
+                    color: isActive ? colors.active : "#94a3b8",
+                    fontFamily: '"IBM Plex Mono", monospace',
+                    fontWeight: 700,
+                    fontSize: 10,
+                    letterSpacing: "0.04em",
+                    cursor: "pointer",
+                    transition: "all 0.18s",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              padding: "0 20px",
+              overflowY: isAiSummary ? "hidden" : "auto",
+              display: isAiSummary ? "flex" : "block",
+            }}
+          >
+            {tab === "summary" && (
+              <TabSummary
+                chapter={chapter}
+                aiMode={aiMode}
+                onCloseAi={() => setAiMode(false)}
+                messages={messages}
+                setMessages={setMessages}
+                input={input}
+                setInput={setInput}
+                loading={loading}
+                setLoading={setLoading}
+              />
+            )}
+            {tab === "question" && <TabQuestion chapter={chapter} key={chapter.id} />}
+            {tab === "flashcards" && <TabFlashcards chapter={chapter} key={chapter.id} />}
+          </div>
+
+          <div style={{ padding: "14px 20px 0", background: "#fff" }}>
+            <button
+              onClick={() => { setAiMode(true); setTab("summary"); }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 14px",
+                borderRadius: 999,
+                border: `1.5px solid ${aiMode ? "#7C3AED" : "#7C3AED44"}`,
+                background: aiMode ? "#7C3AED" : "#F5F3FF",
+                color: aiMode ? "#fff" : "#7C3AED",
+                fontFamily: '"IBM Plex Mono", monospace',
+                fontWeight: 700,
+                fontSize: 10,
+                cursor: "pointer",
+                width: "100%",
+                justifyContent: "center",
+                transition: "background 0.18s, border-color 0.18s, color 0.18s",
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <circle cx="10" cy="10" r="7" />
+                <line x1="15.5" y1="15.5" x2="21" y2="21" />
+              </svg>
+              AI Modu
+            </button>
+          </div>
+
+          <div
+            style={{
+              height: 18,
+              background: "#fff",
+              borderTop: "1px solid rgba(255,255,255,0)",
+            }}
+          />
+
+          {/* Stat kutucukları */}
+          <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", gap: 8 }}>
+              {[
+                { value: chapter.questions.length, label: "Soru", color: TAB_COLORS.question.active, bg: TAB_COLORS.question.activeBg },
+                { value: chapter.flashcards.length, label: "Kart", color: TAB_COLORS.flashcards.active, bg: TAB_COLORS.flashcards.activeBg },
+                { value: fmt(chapter.end - chapter.start), label: "Süre", color: TAB_COLORS.summary.active, bg: TAB_COLORS.summary.activeBg },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  style={{
+                    flex: 1,
+                    background: stat.bg,
+                    border: `1px solid ${stat.color}33`,
+                    borderRadius: 8,
+                    padding: "8px 6px",
+                    textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 14, color: stat.color }}>{stat.value}</div>
+                  <div style={{ fontSize: 9, color: stat.color, opacity: 0.7, marginTop: 1 }}>{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1348,7 +1809,13 @@ export default function Video() {
   const handlePlayToggle = () => {
     const nextPlaying = !playing;
     setPlaying(nextPlaying);
-    setPanelOpen(!nextPlaying);
+    if (nextPlaying) {
+      // video başladı → paneli kapat
+      setPanelOpen(false);
+    } else {
+      // video durdu → paneli aç
+      setPanelOpen(true);
+    }
   };
 
   const showControls = () => {
@@ -1583,7 +2050,7 @@ export default function Video() {
             </div>
           </div>
 
-          <ContentPanel chapter={currentChapter} visible={panelOpen} />
+          <ContentPanel chapter={currentChapter} visible={panelOpen} onToggle={() => setPanelOpen((prev) => !prev)} />
         </div>
 
         <footer style={styles.footer}>
