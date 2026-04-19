@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
+import Logo from "../../assets/logo.jsx";
 
 const NAV_ITEMS = [
-  { icon: "⌂",  label: "Panel",        to: "/dashboard" },
+  { icon: "🏠",  label: "Panel",        to: "/dashboard" },
   { icon: "📘", label: "Konular",       to: "/topics"    },
   { icon: "📝", label: "Testler",       to: "/test"     },
   { icon: "⚠️", label: "Eksiklerim",   to: "/gaps"      },
@@ -49,18 +50,7 @@ export default function DashboardNavbar() {
       <div className="flex w-full flex-col items-center gap-4">
 
         {/* Logo */}
-        <Link to="/" className="flex flex-col items-center gap-1.5 no-underline group" aria-label="Code:Enigma Ana Sayfa">
-          <div
-            className="flex h-9 w-9 items-center justify-center bg-[#2563EB] text-[10px] font-bold tracking-tighter text-white transition-transform duration-200 group-hover:scale-105"
-            style={{ clipPath: "polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)" }}
-          >
-            C:E
-          </div>
-          <span className="text-center text-[7.5px] font-bold uppercase tracking-[2.5px] text-slate-300">
-            Enigma
-          </span>
-        </Link>
-
+       <Logo size="mg" />
         {/* Divider */}
         <div className="h-px w-10 bg-slate-100" />
 

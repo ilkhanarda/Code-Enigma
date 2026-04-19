@@ -47,6 +47,8 @@ const weeklyTasks = [
   { title: "Grup Çalışması: Karma test çözümü",       status: "Devam Ediyor", points: "100" },
   { title: "Haftalık Kazanım Değerlendirme Sınavı",  status: "Kilitli",      points: "75"  },
   { title: "Hız Testi: Denklemler",                  status: "Kilitli",      points: "120" },
+  { title: "Problem Çözümü: Yüzdeler tekrar seti",   status: "Kilitli",      points: "90"  },
+  { title: "Mini Deneme: Temel Geometri",            status: "Kilitli",      points: "110" },
 ];
 
 const progressItems = [
@@ -140,8 +142,8 @@ export default function MathLearningPlatform() {
         }
         .ring-1 { width:320px;height:320px; animation:spin-ring 30s linear infinite; }
         .ring-1 .orbit-item-wrapper { animation:spin-item-reverse 30s linear infinite; }
-        .ring-2 { width:520px;height:520px; animation:spin-ring-ccw 45s linear infinite; }
-        .ring-2 .orbit-item-wrapper { animation:spin-item-ccw-reverse 45s linear infinite; }
+        .ring-2 { width:520px;height:520px; animation:spin-ring-ccw 50s linear infinite; }
+        .ring-2 .orbit-item-wrapper { animation:spin-item-ccw-reverse 50s linear infinite; }
         .ring-3 { width:820px;height:820px; animation:spin-ring-ccw 70s linear infinite; }
         .ring-3 .orbit-item-wrapper { animation:spin-item-ccw-reverse 70s linear infinite; }
 
@@ -171,7 +173,7 @@ export default function MathLearningPlatform() {
         .nav-link:hover::after { transform:scaleX(1); }
 
         .feature-card { transition:box-shadow 0.2s, transform 0.2s; }
-        .feature-card:hover { box-shadow:0 8px 32px rgba(37,99,235,0.10); transform:translateY(-2px); }
+        .feature-card:hover { border: 1px solid #b3c1e0; box-shadow:0 8px 32px rgba(37,99,235,0.10); transform:translateY(-2px); }
 
         .module-card { transition:box-shadow 0.25s, transform 0.2s; }
         .module-card:hover { box-shadow:0 12px 40px rgba(0,0,0,0.10); transform:translateY(-4px); }

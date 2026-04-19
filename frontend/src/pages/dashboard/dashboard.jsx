@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { useUser } from "../../context/UserContext.jsx";
+import DashboardWidgets from "./widgets.jsx";
 
 /* ═══════════════════════════════════════
    DATA
@@ -15,7 +16,6 @@ const suggestedTopics = [
     instructor: "Dr. Ayşe Kaya",
     color: "#2563EB",
     bg: "#EFF6FF",
-    icon: "◈",
   },
   {
     title: "Sayı Basamakları",
@@ -26,7 +26,6 @@ const suggestedTopics = [
     instructor: "Mert Demir",
     color: "#7C3AED",
     bg: "#F5F3FF",
-    icon: "⌖",
   },
   {
     title: "Rasyonel Sayılar",
@@ -37,7 +36,6 @@ const suggestedTopics = [
     instructor: "Dr. Zeynep Alp",
     color: "#059669",
     bg: "#ECFDF5",
-    icon: "◎",
   },
   {
     title: "Denklemler",
@@ -48,7 +46,6 @@ const suggestedTopics = [
     instructor: "Burak Yıldız",
     color: "#D97706",
     bg: "#FFFBEB",
-    icon: "◫",
   },
   {
     title: "Eşitsizlikler",
@@ -59,7 +56,6 @@ const suggestedTopics = [
     instructor: "Dr. Selin Taş",
     color: "#DC2626",
     bg: "#FEF2F2",
-    icon: "⬡",
   },
   {
     title: "Fonksiyonlar",
@@ -70,7 +66,6 @@ const suggestedTopics = [
     instructor: "Dr. Ayşe Kaya",
     color: "#2563EB",
     bg: "#EFF6FF",
-    icon: "◉",
   },
   {
     title: "Problem Çözme",
@@ -81,7 +76,6 @@ const suggestedTopics = [
     instructor: "Mert Demir",
     color: "#7C3AED",
     bg: "#F5F3FF",
-    icon: "◈",
   },
   {
     title: "Geometri",
@@ -92,7 +86,6 @@ const suggestedTopics = [
     instructor: "Burak Yıldız",
     color: "#059669",
     bg: "#ECFDF5",
-    icon: "⌘",
   },
 ];
 
@@ -101,18 +94,6 @@ const dailyTasks = [
   { id: 2, title: "10 soru çöz",                xp: 80,  done: true  },
   { id: 3, title: "Eksik kazanım testini aç",   xp: 40,  done: false },
   { id: 4, title: "20 dakika tekrar yap",       xp: 60,  done: false },
-];
-
-const goals = [
-  { label: "Günlük",   value: "3 / 4 tamamlandı", progress: 75, color: "#2563EB" },
-  { label: "Haftalık", value: "5 / 7 görev",      progress: 71, color: "#7C3AED" },
-  { label: "Aylık",   value: "2 / 3 modül",      progress: 66, color: "#059669" },
-];
-
-const seasonalEvents = [
-  { title: "Bahar Sprinti",  meta: "7 gün kaldı · +500 XP ödül",     color: "#D97706", bg: "#FFFBEB", icon: "🌸" },
-  { title: "Haftalık Lig",   meta: "Şu an #4 sıralamadasın",         color: "#2563EB", bg: "#EFF6FF", icon: "⚔️" },
-  { title: "Rozet Avı",      meta: "2 rozet daha kazanırsan açılır", color: "#7C3AED", bg: "#F5F3FF", icon: "🏅" },
 ];
 
 const notifications = [
@@ -164,9 +145,8 @@ const notifications = [
 ];
 
 const headerStats = [
-  { value: "14",  label: "Aktif Ders",  color: "#2563EB" },
+  { value: "8",  label: "Aktif Ders",  color: "#2563EB" },
   { value: "%84", label: "Başarı",      color: "#059669" },
-  { value: "3/4", label: "Görev",       color: "#D97706" },
 ];
 
 /* ═══════════════════════════════════════
@@ -187,9 +167,9 @@ function ProgressBar({ value, color, h = "h-1.5" }) {
 function SectionLabel({ text, color = "#2563EB" }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-px w-5 rounded" style={{ background: color }} />
+      <div className="h-px w-5 rounded-full" style={{ background: color }} />
       <span
-        className="text-[10px] font-bold uppercase tracking-[2.5px]"
+        className="text-[20px] font-bold uppercase tracking-[2.5px]"
         style={{ color }}
       >
         {text}
@@ -321,95 +301,95 @@ function NotificationDropdown() {
 ═══════════════════════════════════════ */
 function TopicCard({ topic }) {
   return (
-    <article className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(15,23,42,.08)]">
-      {/* Top row: icon + badge */}
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
+      <div
+        className="relative h-[88px] border-b border-slate-100"
+        style={{
+          background: `linear-gradient(135deg, ${topic.color}24 0%, ${topic.color}12 52%, #F8FAFC 100%)`,
+        }}
+      >
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-[16px] transition-transform duration-200 group-hover:scale-110"
-          style={{ background: topic.bg, color: topic.color }}
-        >
-          {topic.icon}
+          className="absolute inset-x-0 top-0 h-full opacity-90"
+          style={{
+            background: `radial-gradient(circle at top right, ${topic.color}22, transparent 42%)`,
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-[13px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
+              {topic.title}
+            </h2>
+            <p className="mt-1 text-[9px] font-medium text-slate-400">
+              {topic.sub}
+            </p>
+          </div>
         </div>
-        <span
-          className="mt-0.5 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[1.4px]"
-          style={{ background: topic.bg, color: topic.color }}
-        >
-          {topic.badge}
-        </span>
-      </div>
 
-      {/* Title + sub */}
-      <h2 className="text-[14px] font-bold tracking-tight text-[#111827] leading-snug">
-        {topic.title}
-      </h2>
-      <p className="mt-1 text-[10px] font-medium text-slate-400">{topic.sub}</p>
-
-      {/* Progress */}
-      <div className="my-4">
-        <div className="mb-1.5 flex justify-between">
-          <span className="text-[9px] font-semibold uppercase tracking-[1px] text-slate-400">İlerleme</span>
-          <span className="text-[9px] font-bold" style={{ color: topic.color }}>{topic.progress}%</span>
+        <div className="mt-3.5">
+          <div className="mb-2 flex items-center justify-between gap-2.5">
+            <span className="text-[8px] font-semibold uppercase tracking-[0.9px] text-slate-400">
+              İlerleme
+            </span>
+            <span className="text-[8px] font-bold" style={{ color: topic.color }}>
+              %{topic.progress}
+            </span>
+          </div>
+          <ProgressBar value={topic.progress} color={topic.color} h="h-1" />
         </div>
-        <ProgressBar value={topic.progress} color={topic.color} h="h-1" />
-      </div>
 
-      {/* Meta row */}
-      <div className="mt-auto flex items-center gap-3 text-[9px] text-slate-300">
-        <span title="Eğitmen">👤 {topic.instructor}</span>
-        <span className="ml-auto">🕒 {topic.lastSeen}</span>
-      </div>
+        <div className="mt-3.5 w-full text-[9px] font-semibold">
+          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-[7px] uppercase tracking-[1px] text-slate-400">
+                  Eğitmen
+                </div>
+                <div className="mt-0.5 truncate text-[9px] text-slate-600">
+                  {topic.instructor}
+                </div>
+              </div>
 
-      {/* Divider + CTA */}
-      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-        <span className="text-[9px] font-semibold uppercase tracking-[1.4px] text-slate-300">
-          LMS Modülü
-        </span>
-        <button
-          className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all duration-150 hover:shadow-sm"
-          style={{ color: topic.color, background: topic.bg }}
-        >
-          Aç <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
-        </button>
+              <div className="min-w-0 text-right">
+                <div className="text-[7px] uppercase tracking-[1px] text-slate-400">
+                  Son Giriş
+                </div>
+                <div className="mt-0.5 whitespace-nowrap text-[9px] text-slate-600">
+                  {topic.lastSeen}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3.5 border-t border-slate-200 pt-3.5">
+          <div className="flex items-center justify-between gap-2.5">
+            <span
+              className="inline-flex rounded-full px-2.5 py-1 text-[7.5px] font-bold uppercase tracking-[1px]"
+              style={{
+                color: topic.color,
+                background: topic.bg,
+              }}
+            >
+              {topic.badge}
+            </span>
+
+            <button
+              className="inline-flex min-w-[88px] items-center justify-center rounded-full border px-3.5 py-1.5 text-[9px] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              style={{
+                color: topic.color,
+                background: topic.bg,
+                borderColor: `${topic.color}40`,
+              }}
+            >
+              Aç
+            </button>
+          </div>
+        </div>
       </div>
     </article>
-  );
-}
-
-/* ═══════════════════════════════════════
-   TASK ROW
-═══════════════════════════════════════ */
-function TaskRow({ task, onToggle }) {
-  return (
-    <div
-      onClick={onToggle}
-      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-2.5 transition-all duration-150
-        ${task.done
-          ? "border-emerald-200 bg-emerald-50"
-          : "border-slate-100 bg-white hover:border-blue-200 hover:bg-blue-50/40"
-        }`}
-    >
-      {/* Checkbox */}
-      <div
-        className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-[1.5px] transition-all duration-200
-          ${task.done ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}
-      >
-        {task.done && (
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        )}
-      </div>
-
-      {/* Label */}
-      <span className={`flex-1 text-[11px] leading-snug transition-all ${task.done ? "text-emerald-700 line-through" : "text-slate-600"}`}>
-        {task.title}
-      </span>
-
-      {/* XP */}
-      <span className={`text-[10px] font-bold ${task.done ? "text-emerald-500" : "text-slate-300"}`}>
-        +{task.xp} XP
-      </span>
-    </div>
   );
 }
 
@@ -419,7 +399,7 @@ function TaskRow({ task, onToggle }) {
 export default function Dashboard() {
   const [tasks, setTasks] = useState(dailyTasks);
   const [toasts, setToasts] = useState([]);
-  const { addCoins, addXp } = useUser();
+  const { user, addCoins, addXp } = useUser();
   const doneTasks = tasks.filter((t) => t.done).length;
 
   const toggleTask = (id) => {
@@ -485,18 +465,12 @@ export default function Dashboard() {
 
               {/* Left: greeting */}
               <div>
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="h-px w-5 bg-blue-400 rounded" />
-                  <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-blue-500">
-                    Code:Enigma Paneli
-                  </span>
-                </div>
+                <p className="mt-1 text-[11px] text-slate-400">
+                  {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+                </p>
                 <h1 className="text-[26px] font-bold tracking-[-0.4px] text-[#111827] leading-tight">
                   Hoşgeldin, İlkhan Arda 👋
                 </h1>
-                <p className="mt-1 text-[11px] text-slate-400">
-                  Bugün {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })} — devam et, harika gidiyorsun!
-                </p>
               </div>
 
               {/* Right: stats + notification */}
@@ -505,7 +479,7 @@ export default function Dashboard() {
                 {headerStats.map((s) => (
                   <div
                     key={s.label}
-                    className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 min-w-[72px]"
+                    className="flex gap-1 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 min-w-[72px]"
                   >
                     <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>
                       {s.value}
@@ -521,93 +495,42 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Overall progress ribbon */}
-            <div className="mt-4 flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-2.5">
-              <span className="text-[10px] font-semibold text-slate-400 whitespace-nowrap">
-                Günlük ilerleme
-              </span>
-              <div className="flex-1">
-                <ProgressBar
-                  value={Math.round((doneTasks / tasks.length) * 100)}
-                  color="linear-gradient(90deg,#2563EB,#059669)"
-                  h="h-1.5"
-                />
-              </div>
-              <span className="text-[10px] font-bold text-[#2563EB] whitespace-nowrap">
-                {doneTasks}/{tasks.length} görev
-              </span>
-            </div>
           </header>
 
           {/* ══ MAIN ══ */}
           <main className="flex-1 px-8 py-7 overflow-x-hidden">
-            <div className="grid grid-cols-1 gap-7 xl:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="mb-7">
+              <DashboardWidgets
+                tasks={tasks}
+                onToggleTask={toggleTask}
+                doneTasks={doneTasks}
+                user={user}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-7">
 
               {/* ─ LEFT: Topics ─ */}
-              <section className="min-w-0">
+              <section className="min-w-0 xl:pt-1">
 
                 {/* Section header — flows naturally from greeting */}
                 <div className="mb-5 flex items-end justify-between gap-4">
                   <div>
-                    <SectionLabel text="Önerilen Konular" />
-                    <p className="mt-2 text-[11px] text-slate-400">
-                      Analizine göre seçildi · {suggestedTopics.length} konu
-                    </p>
+                    <SectionLabel text="Ders Özeti" />
                   </div>
-                  <button className="flex-shrink-0 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-[10px] font-bold text-slate-500 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-[#2563EB]">
-                    Tümünü Gör →
-                  </button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
                   {suggestedTopics.map((topic) => (
                     <TopicCard key={topic.title} topic={topic} />
                   ))}
                 </div>
               </section>
 
+          
               {/* ─ RIGHT: Sidebar widgets ─ */}
-              <aside className="flex flex-col gap-5">
-
-                {/* Daily Tasks */}
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 transition-shadow hover:shadow-lg hover:shadow-blue-50/50">
-                  <div className="mb-1 flex items-center justify-between">
-                    <SectionLabel text="Günlük Görevler" />
-                    <span className="text-[9px] font-bold text-slate-400">
-                      {doneTasks}/{tasks.length}
-                    </span>
-                  </div>
-                  <ProgressBar
-                    value={Math.round((doneTasks / tasks.length) * 100)}
-                    color="#2563EB"
-                    h="h-1"
-                  />
-                  <div className="mt-4 flex flex-col gap-2">
-                    {tasks.map((t) => (
-                      <TaskRow key={t.id} task={t} onToggle={() => toggleTask(t.id)} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Goals */}
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 transition-shadow hover:shadow-lg hover:shadow-purple-50/50">
-                  <div className="mb-4">
-                    <SectionLabel text="Hedefler" color="#7C3AED" />
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    {goals.map((g) => (
-                      <div key={g.label}>
-                        <div className="mb-1.5 flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-slate-600">{g.label}</span>
-                          <span className="text-[10px] font-bold" style={{ color: g.color }}>{g.value}</span>
-                        </div>
-                        <ProgressBar value={g.progress} color={g.color} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Seasonal Events */}
+              {/*
+              <aside className="flex flex-col gap-5 xl:pt-1">
                 <div className="rounded-2xl border border-slate-100 bg-white p-5 transition-shadow hover:shadow-lg hover:shadow-amber-50/50">
                   <div className="mb-4">
                     <SectionLabel text="Sezonluk Etkinlik" color="#D97706" />
@@ -632,7 +555,6 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Quick links */}
                 <div className="rounded-2xl border border-slate-100 bg-white p-5">
                   <div className="mb-4">
                     <SectionLabel text="Hızlı Erişim" color="#059669" />
@@ -657,9 +579,10 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-
-              </aside>
+              </aside> 
+                          */}
             </div>
+
           </main>
 
           {/* ══ FOOTER ══ */}

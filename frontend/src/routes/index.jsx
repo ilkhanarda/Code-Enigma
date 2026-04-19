@@ -4,6 +4,7 @@ import CommandPalette from '../components/command-palette.jsx'
 
 const App        = lazy(() => import('../App.jsx'))
 const Absent     = lazy(() => import('../pages/absent.jsx'))
+const Auth       = lazy(() => import('../pages/public/auth.jsx'))
 const Profile    = lazy(() => import('../pages/dashboard/profile.jsx'))
 const Video      = lazy(() => import('../pages/dashboard/video.jsx'))
 const Dashboard  = lazy(() => import('../pages/dashboard/dashboard.jsx'))
@@ -40,6 +41,8 @@ const router = createBrowserRouter(
       element: <RootLayout />,
       children: [
         { path: '/',          element: <App /> },
+        { path: '/login',     element: <Auth /> },
+        { path: '/register',  element: <Auth /> },
         { path: '/absent',    element: <Absent /> },
         { path: '/profile',   element: <Profile /> },
         { path: '/video',     element: <Video /> },

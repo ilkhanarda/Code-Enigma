@@ -265,7 +265,7 @@ const styles = {
 function GlobalStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
       * , *::before, *::after { box-sizing: border-box; }
       html, body, #root { margin: 0; padding: 0; height: 100%; }
@@ -288,41 +288,150 @@ function GlobalStyles() {
         100% { background-position: 200% 50%; }
       }
 
+      @keyframes ai-pill-shimmer {
+        0% { transform: translateX(-135%) skewX(-18deg); opacity: 0; }
+        18% { opacity: 0; }
+        45% { opacity: 0.85; }
+        100% { transform: translateX(150%) skewX(-18deg); opacity: 0; }
+      }
+
+      @keyframes ai-pill-glow {
+        0%, 100% { opacity: 0.48; transform: scale(0.985); }
+        50% { opacity: 0.82; transform: scale(1.015); }
+      }
+
+      @keyframes ai-sparkle-breathe {
+        0%, 100% { transform: scale(1); opacity: 0.92; filter: drop-shadow(0 0 0 rgba(99,102,241,0)); }
+        50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 8px rgba(34,211,238,0.28)); }
+      }
+
       .chapter-card { transition: box-shadow 0.2s, transform 0.2s; }
       .chapter-card:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.10); transform: translateY(-1px); }
 
       .ai-mode-pill {
+        position: relative;
         width: 100%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border: 1.5px solid transparent;
+        gap: 0;
+        padding: 1.5px;
+        border: none;
         border-radius: 999px;
-        color: #1f2937;
-        font-family: "IBM Plex Mono", monospace;
-        font-weight: 700;
-        font-size: 10px;
         cursor: pointer;
-        white-space: nowrap;
-        background:
-          linear-gradient(#ffffff, #ffffff) padding-box,
-          linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335, #4285f4) border-box;
-        background-size: 100% 100%, 200% 100%;
-        animation: ai-pill-border 4s linear infinite;
-        box-shadow: 0 10px 24px rgba(66, 133, 244, 0.10);
-        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        background: linear-gradient(115deg, #22d3ee 0%, #3b82f6 22%, #8b5cf6 48%, #ec4899 72%, #67e8f9 100%);
+        background-size: 220% 220%;
+        animation: ai-pill-border 6s linear infinite;
+        box-shadow: 0 10px 24px rgba(76, 110, 245, 0.12);
+        transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, filter 220ms ease;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .ai-mode-pill::before {
+        content: "";
+        position: absolute;
+        inset: -10%;
+        border-radius: inherit;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.42), rgba(255,255,255,0) 58%);
+        opacity: 0.45;
+        animation: ai-pill-glow 3.4s ease-in-out infinite;
+        pointer-events: none;
       }
 
       .ai-mode-pill:hover {
-        transform: translateY(-1px);
-        filter: saturate(1.08);
-        box-shadow: 0 14px 28px rgba(66, 133, 244, 0.14);
+        transform: translateY(-2px);
+        filter: saturate(1.12) brightness(1.02);
+        box-shadow:
+          0 14px 32px rgba(76, 110, 245, 0.18),
+          0 0 0 4px rgba(125, 211, 252, 0.08);
       }
 
-      .ai-mode-pill svg {
-        color: #5f6368;
+      .ai-mode-pill:active {
+        transform: translateY(0) scale(0.985);
+        box-shadow: 0 7px 18px rgba(76, 110, 245, 0.12);
+      }
+
+      .ai-mode-pill__inner {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 8px 15px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        color: #111827;
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-weight: 500;
+        font-size: 12px;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+        overflow: hidden;
+      }
+
+      .ai-mode-pill__inner::after {
+        content: "";
+        position: absolute;
+        top: -20%;
+        left: 0;
+        width: 42%;
+        height: 140%;
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.82), rgba(255,255,255,0));
+        animation: ai-pill-shimmer 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+        pointer-events: none;
+      }
+
+      .ai-mode-pill__icon-wrap {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(59,130,246,0.13), rgba(236,72,153,0.10) 55%, rgba(34,211,238,0.16));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        flex-shrink: 0;
+      }
+
+      .ai-mode-pill__icon-wrap::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border-radius: inherit;
+        background: radial-gradient(circle, rgba(255,255,255,0.72), rgba(255,255,255,0) 72%);
+        opacity: 0.75;
+      }
+
+      .ai-mode-pill__icon {
+        position: relative;
+        z-index: 1;
+        color: #4f46e5;
+        animation: ai-sparkle-breathe 2.6s ease-in-out infinite;
+      }
+
+      .ai-mode-pill__label {
+        position: relative;
+        z-index: 1;
+      }
+
+      .ai-mode-pill.is-active {
+        box-shadow:
+          0 14px 34px rgba(76, 110, 245, 0.2),
+          0 0 0 4px rgba(168, 85, 247, 0.08);
+      }
+
+      .ai-mode-pill.is-active .ai-mode-pill__inner {
+        background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(245,247,250,0.96));
+      }
+
+      .ai-mode-pill.is-active .ai-mode-pill__icon {
+        color: #7c3aed;
+        animation-duration: 2.2s;
       }
 
       input[type=range] {
@@ -1707,29 +1816,18 @@ function ContentPanel({ chapter, visible, onToggle }) {
           <div style={{ padding: "14px 20px 0", background: "#fff" }}>
             <button
               onClick={() => { setAiMode(true); setTab("summary"); }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 14px",
-                borderRadius: 999,
-                border: `1.5px solid ${aiMode ? "#7C3AED" : "#7C3AED44"}`,
-                background: aiMode ? "#7C3AED" : "#F5F3FF",
-                color: aiMode ? "#fff" : "#7C3AED",
-                fontFamily: '"IBM Plex Mono", monospace',
-                fontWeight: 700,
-                fontSize: 10,
-                cursor: "pointer",
-                width: "100%",
-                justifyContent: "center",
-                transition: "background 0.18s, border-color 0.18s, color 0.18s",
-              }}
+              className={`ai-mode-pill${aiMode ? " is-active" : ""}`}
+              aria-pressed={aiMode}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <circle cx="10" cy="10" r="7" />
-                <line x1="15.5" y1="15.5" x2="21" y2="21" />
-              </svg>
-              AI Modu
+              <span className="ai-mode-pill__inner">
+                <span className="ai-mode-pill__icon-wrap" aria-hidden="true">
+                  <svg className="ai-mode-pill__icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.8l1.76 5.13 5.24 1.82-5.24 1.82L12 16.7l-1.76-5.13L5 9.75l5.24-1.82L12 2.8z" />
+                    <path d="M18.2 14.4l.78 2.27 2.32.8-2.32.8-.78 2.27-.78-2.27-2.32-.8 2.32-.8.78-2.27z" opacity="0.82" />
+                  </svg>
+                </span>
+                <span className="ai-mode-pill__label">AI Modu</span>
+              </span>
             </button>
           </div>
 
