@@ -1,21 +1,22 @@
 import { useMemo, useState } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
+import Icon from "../../components/ui/icons8-icon.jsx";
 
 const ALL_TOPICS = [
-  { title: "Temel Kavramlar",     category: "Cebir",        level: "Başlangıç", progress: 84, items: 12, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "◈", trend: "up" },
-  { title: "Sayı Basamakları",    category: "Aritmetik",    level: "Orta",      progress: 72, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "⌖", trend: "up" },
-  { title: "Rasyonel Sayılar",    category: "Sayı Teorisi", level: "Orta",      progress: 91, items: 14, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "◎", trend: "flat" },
-  { title: "Denklemler",          category: "Cebir",        level: "Orta",      progress: 48, items: 6,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "◫", trend: "down" },
-  { title: "Eşitsizlikler",       category: "Cebir",        level: "İleri",     progress: 20, items: 19, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "⬡", trend: "up" },
-  { title: "Fonksiyonlar",        category: "Analiz",       level: "İleri",     progress: 66, items: 11, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "◉", trend: "up" },
-  { title: "Problem Çözme",       category: "Karma",        level: "Orta",      progress: 35, items: 5,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "◈", trend: "flat" },
-  { title: "Geometri",            category: "Uzay",         level: "Orta",      progress: 58, items: 7,  instructor: "Burak Yıldız",   color: "#059669", bg: "#ECFDF5", icon: "⌘", trend: "up" },
-  { title: "Limit ve Süreklilik", category: "Analiz",       level: "İleri",     progress: 12, items: 9,  instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "∞", trend: "flat" },
-  { title: "Türev",               category: "Analiz",       level: "İleri",     progress: 0,  items: 15, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "∂", trend: "flat" },
-  { title: "İntegral",            category: "Analiz",       level: "İleri",     progress: 0,  items: 13, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "∫", trend: "flat" },
-  { title: "Olasılık",            category: "İstatistik",   level: "Orta",      progress: 44, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "%", trend: "up" },
-  { title: "İstatistik Temelleri",category: "İstatistik",   level: "Başlangıç", progress: 55, items: 10, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "μ", trend: "flat" },
-  { title: "Logaritma",           category: "Cebir",        level: "İleri",     progress: 38, items: 7,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "ln", trend: "down" },
+  { title: "Temel Kavramlar",     category: "Cebir",        level: "Başlangıç", progress: 84, items: 12, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "goals", trend: "up" },
+  { title: "Sayı Basamakları",    category: "Aritmetik",    level: "Orta",      progress: 72, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "stats", trend: "up" },
+  { title: "Rasyonel Sayılar",    category: "Sayı Teorisi", level: "Orta",      progress: 91, items: 14, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "journey", trend: "flat" },
+  { title: "Denklemler",          category: "Cebir",        level: "Orta",      progress: 48, items: 6,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "tasks", trend: "down" },
+  { title: "Eşitsizlikler",       category: "Cebir",        level: "İleri",     progress: 20, items: 19, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "module", trend: "up" },
+  { title: "Fonksiyonlar",        category: "Analiz",       level: "İleri",     progress: 66, items: 11, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "target", trend: "up" },
+  { title: "Problem Çözme",       category: "Karma",        level: "Orta",      progress: 35, items: 5,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "goals", trend: "flat" },
+  { title: "Geometri",            category: "Uzay",         level: "Orta",      progress: 58, items: 7,  instructor: "Burak Yıldız",   color: "#059669", bg: "#ECFDF5", icon: "module", trend: "up" },
+  { title: "Limit ve Süreklilik", category: "Analiz",       level: "İleri",     progress: 12, items: 9,  instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "infinity", trend: "flat" },
+  { title: "Türev",               category: "Analiz",       level: "İleri",     progress: 0,  items: 15, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "derivative", trend: "flat" },
+  { title: "İntegral",            category: "Analiz",       level: "İleri",     progress: 0,  items: 13, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "integral", trend: "flat" },
+  { title: "Olasılık",            category: "İstatistik",   level: "Orta",      progress: 44, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "percent", trend: "up" },
+  { title: "İstatistik Temelleri",category: "İstatistik",   level: "Başlangıç", progress: 55, items: 10, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "chart", trend: "flat" },
+  { title: "Logaritma",           category: "Cebir",        level: "İleri",     progress: 38, items: 7,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "module", trend: "down" },
 ];
 
 const CATEGORIES = ["Tümü", "Cebir", "Aritmetik", "Analiz", "Sayı Teorisi", "İstatistik", "Uzay", "Karma"];
@@ -52,9 +53,9 @@ function SectionLabel({ text, color = "#2563EB" }) {
 
 function TrendChip({ trend }) {
   const map = {
-    up:   { icon: "↗", color: "#059669", bg: "#ECFDF5", label: "Yükseliyor" },
-    down: { icon: "↘", color: "#DC2626", bg: "#FEF2F2", label: "Düşüyor" },
-    flat: { icon: "→", color: "#64748B", bg: "#F1F5F9", label: "Sabit" },
+    up:   { icon: "next", color: "#059669", bg: "#ECFDF5", label: "Yükseliyor" },
+    down: { icon: "previous", color: "#DC2626", bg: "#FEF2F2", label: "Düşüyor" },
+    flat: { icon: "minus", color: "#64748B", bg: "#F1F5F9", label: "Sabit" },
   };
   const t = map[trend];
   return (
@@ -62,7 +63,8 @@ function TrendChip({ trend }) {
       className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-[1px]"
       style={{ background: t.bg, color: t.color }}
     >
-      <span>{t.icon}</span>{t.label}
+      <Icon name={t.icon} size={11} color={t.color} />
+      {t.label}
     </span>
   );
 }
@@ -76,7 +78,7 @@ function TopicCard({ t }) {
           className="flex h-10 w-10 items-center justify-center rounded-xl text-[16px] transition-transform duration-200 group-hover:scale-110"
           style={{ background: t.bg, color: t.color }}
         >
-          {t.icon}
+          <Icon name={t.icon} size={16} color={t.color} />
         </div>
         <TrendChip trend={t.trend} />
       </div>
@@ -93,8 +95,8 @@ function TopicCard({ t }) {
       </div>
 
       <div className="mt-auto flex items-center gap-3 text-[9px] text-slate-300">
-        <span title="Eğitmen">👤 {t.instructor}</span>
-        <span className="ml-auto">📚 {t.items} içerik</span>
+        <span className="inline-flex items-center gap-1" title="Eğitmen"><Icon name="instructor" size={12} color="#94a3b8" /> {t.instructor}</span>
+        <span className="ml-auto inline-flex items-center gap-1"><Icon name="book_stack" size={12} color="#94a3b8" /> {t.items} içerik</span>
       </div>
 
       <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
@@ -103,7 +105,7 @@ function TopicCard({ t }) {
           className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all duration-150 hover:shadow-sm"
           style={{ color: t.color, background: t.bg }}
         >
-          {started ? "Devam Et" : "Başla"} <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+          {started ? "Devam Et" : "Başla"} <Icon name="next" size={12} color={t.color} className="transition-transform duration-150 group-hover:translate-x-0.5" />
         </button>
       </div>
     </article>
@@ -160,7 +162,7 @@ export default function Topics() {
                   <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-blue-500">Konu Kütüphanesi</span>
                 </div>
                 <h1 className="text-[26px] font-bold tracking-[-0.4px] leading-tight">
-                  Konular 📘
+                  <span className="inline-flex items-center gap-1">Konular <Icon name="topics" size={16} color="#2563EB" /></span>
                 </h1>
                 <p className="mt-1 text-[11px] text-slate-400">
                   Toplam {ALL_TOPICS.length} konu · {stats.started} başlanmış · {stats.done} tamamlanmış · ortalama %{stats.avg}
@@ -184,9 +186,7 @@ export default function Topics() {
             {/* Search + Sort */}
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <div className="flex flex-1 min-w-[240px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 focus-within:border-blue-300">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-                </svg>
+                <Icon name="search" size={14} color="#94a3b8" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -194,7 +194,7 @@ export default function Topics() {
                   className="flex-1 bg-transparent text-[11px] outline-none placeholder:text-slate-400"
                 />
                 {query && (
-                  <button onClick={() => setQuery("")} className="text-[10px] font-bold text-slate-300 hover:text-slate-500">✕</button>
+                  <button onClick={() => setQuery("")} className="inline-flex items-center text-[10px] font-bold text-slate-300 hover:text-slate-500"><Icon name="close" size={10} color="#94a3b8" /></button>
                 )}
                 <kbd className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold text-slate-400">Ctrl+K</kbd>
               </div>
@@ -250,14 +250,14 @@ export default function Topics() {
                   onClick={() => { setCat("Tümü"); setLevel("Tümü"); setQuery(""); }}
                   className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-bold text-slate-500 transition-all hover:border-blue-200 hover:text-[#2563EB]"
                 >
-                  Filtreleri Temizle ✕
+                  <span className="inline-flex items-center gap-1">Filtreleri Temizle <Icon name="close" size={10} color="#64748b" /></span>
                 </button>
               )}
             </div>
 
             {filtered.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center">
-                <div className="mb-3 text-4xl">🔍</div>
+                <div className="mb-3 flex justify-center"><Icon name="search" size={32} color="#94a3b8" /></div>
                 <p className="text-[12px] font-semibold text-slate-500">Sonuç bulunamadı</p>
                 <p className="mt-1 text-[10px] text-slate-400">Farklı bir arama veya filtre dene.</p>
               </div>

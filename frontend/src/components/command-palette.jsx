@@ -1,26 +1,25 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import Icon from "./ui/icons8-icon.jsx";
 
 const COMMANDS = [
-  { id: "home",       label: "Ana Sayfa",           hint: "Public",     icon: "⌂",  to: "/",          kind: "Sayfa" },
-  { id: "dashboard",  label: "Panel",               hint: "Dashboard",  icon: "▦",  to: "/dashboard", kind: "Sayfa" },
-  { id: "topics",     label: "Konular",             hint: "Kütüphane",  icon: "📘", to: "/topics",    kind: "Sayfa" },
-  { id: "test",       label: "Testler",             hint: "Güvenirlik", icon: "📝", to: "/test",      kind: "Sayfa" },
-  { id: "gaps",       label: "Eksiklerim",          hint: "Analiz",     icon: "⚠️", to: "/gaps",      kind: "Sayfa" },
-  { id: "video",      label: "Video Dersler",       hint: "İzleme",     icon: "▶",  to: "/video",     kind: "Sayfa" },
-  { id: "profile",    label: "Profil",              hint: "Hesap",      icon: "👤", to: "/profile",   kind: "Sayfa" },
-  { id: "settings",   label: "Ayarlar",             hint: "Sistem",     icon: "⚙️", to: "/settings",  kind: "Sayfa" },
-  { id: "absent",     label: "Devamsızlık",         hint: "Durum",      icon: "📋", to: "/absent",    kind: "Sayfa" },
-
-  { id: "t-algebra",  label: "Temel Kavramlar",     hint: "Cebir",      icon: "◈",  to: "/topics",    kind: "Konu" },
-  { id: "t-digits",   label: "Sayı Basamakları",    hint: "Aritmetik",  icon: "⌖",  to: "/topics",    kind: "Konu" },
-  { id: "t-rational", label: "Rasyonel Sayılar",    hint: "Sayı Teorisi", icon: "◎", to: "/topics",  kind: "Konu" },
-  { id: "t-eq",       label: "Denklemler",          hint: "Cebir",      icon: "◫",  to: "/topics",    kind: "Konu" },
-  { id: "t-ineq",     label: "Eşitsizlikler",       hint: "Canlı",      icon: "⬡",  to: "/topics",    kind: "Konu" },
-  { id: "t-func",     label: "Fonksiyonlar",        hint: "Analiz",     icon: "◉",  to: "/topics",    kind: "Konu" },
-  { id: "t-geom",     label: "Geometri",            hint: "Uzay",       icon: "⌘",  to: "/topics",    kind: "Konu" },
-
-  { id: "q-guv",      label: "Güvenirlik Testi",    hint: "Psikoloji",  icon: "🧠", to: "/test",      kind: "Test" },
+  { id: "home", label: "Ana Sayfa", hint: "Public", icon: "home", to: "/", kind: "Sayfa" },
+  { id: "dashboard", label: "Panel", hint: "Dashboard", icon: "dashboard", to: "/dashboard", kind: "Sayfa" },
+  { id: "topics", label: "Konular", hint: "Kütüphane", icon: "topics", to: "/topics", kind: "Sayfa" },
+  { id: "test", label: "Testler", hint: "Güvenirlik", icon: "test", to: "/test", kind: "Sayfa" },
+  { id: "gaps", label: "Eksiklerim", hint: "Analiz", icon: "warning", to: "/gaps", kind: "Sayfa" },
+  { id: "video", label: "Video Dersler", hint: "İzleme", icon: "video", to: "/video", kind: "Sayfa" },
+  { id: "profile", label: "Profil", hint: "Hesap", icon: "profile", to: "/profile", kind: "Sayfa" },
+  { id: "settings", label: "Ayarlar", hint: "Sistem", icon: "settings", to: "/settings", kind: "Sayfa" },
+  { id: "absent", label: "Devamsızlık", hint: "Durum", icon: "tasks", to: "/absent", kind: "Sayfa" },
+  { id: "t-algebra", label: "Temel Kavramlar", hint: "Cebir", icon: "goals", to: "/topics", kind: "Konu" },
+  { id: "t-digits", label: "Sayı Basamakları", hint: "Aritmetik", icon: "stats", to: "/topics", kind: "Konu" },
+  { id: "t-rational", label: "Rasyonel Sayılar", hint: "Sayı Teorisi", icon: "journey", to: "/topics", kind: "Konu" },
+  { id: "t-eq", label: "Denklemler", hint: "Cebir", icon: "tasks", to: "/topics", kind: "Konu" },
+  { id: "t-ineq", label: "Eşitsizlikler", hint: "Canlı", icon: "module", to: "/topics", kind: "Konu" },
+  { id: "t-func", label: "Fonksiyonlar", hint: "Analiz", icon: "target", to: "/topics", kind: "Konu" },
+  { id: "t-geom", label: "Geometri", hint: "Uzay", icon: "module", to: "/topics", kind: "Konu" },
+  { id: "q-guv", label: "Güvenirlik Testi", hint: "Psikoloji", icon: "brain", to: "/test", kind: "Test" },
 ];
 
 function normalize(s) {
@@ -107,10 +106,7 @@ export default function CommandPalette() {
       <div className="w-full max-w-[580px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
         {/* Search input */}
         <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
+          <Icon name="search" size={16} color="#94a3b8" />
           <input
             ref={inputRef}
             value={query}
@@ -151,7 +147,11 @@ export default function CommandPalette() {
                           isActive ? "bg-[#2563EB] text-white" : "bg-slate-100 text-slate-500"
                         }`}
                       >
-                        {c.icon}
+                        <Icon
+                          name={c.icon}
+                          size={13}
+                          color={isActive ? "#ffffff" : "#64748b"}
+                        />
                       </span>
                       <span className={`flex-1 text-[12px] font-semibold ${isActive ? "text-[#111827]" : "text-slate-700"}`}>
                         {c.label}

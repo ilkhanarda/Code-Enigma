@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './components/public/navbar.jsx';
 import Footer from './components/public/footer.jsx';
+import Icon from './components/ui/icons8-icon.jsx';
 
 const centerImages = [
   "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=400",
@@ -13,12 +14,12 @@ const centerImages = [
 const orbitMathIcons = ["∑", "π", "∫", "√", "∆", "∞", "Ω", "λ", "σ", "∇"];
 
 const features = [
-  { num: "01", icon: "◈", title: "Tanışma ve Adaptasyon",      desc: "Sisteme giriş sürecinde kapsamlı seviye analizi yapılarak öğrencinin başlangıç noktası belirlenir." },
-  { num: "02", icon: "⌖", title: "Dinamik Seviye Belirleme",   desc: "Performans verilerine göre anlık güncellenen kişiselleştirilmiş öğrenme rotası oluşturulur." },
-  { num: "03", icon: "◎", title: "Gelişim Odaklı Görevler",    desc: "Haftalık hedeflere göre atanan görevler, eksik kazanımların kapatılmasına öncelik verir." },
-  { num: "04", icon: "⬡", title: "Etkileşimli Ortak Çalışma", desc: "Grup bazlı analitik problem çözme seansları ile iş birlikli öğrenme deneyimi sunulur." },
-  { num: "05", icon: "◉", title: "Performans Sistemi",          desc: "Sürekli gelişim takibi ve motivasyon mekanizmaları ile öğrenci bağlılığı en üst düzeyde tutulur." },
-  { num: "06", icon: "◫", title: "Kazanım Değerlendirme",       desc: "Kazanım bazlı detaylı analitik raporlar ile öğrenci, veli ve öğretmen bilgilendirilir." },
+  { num: "01", icon: "goals", title: "Tanışma ve Adaptasyon", desc: "Sisteme giriş sürecinde kapsamlı seviye analizi yapılarak öğrencinin başlangıç noktası belirlenir." },
+  { num: "02", icon: "stats", title: "Dinamik Seviye Belirleme", desc: "Performans verilerine göre anlık güncellenen kişiselleştirilmiş öğrenme rotası oluşturulur." },
+  { num: "03", icon: "journey", title: "Gelişim Odaklı Görevler", desc: "Haftalık hedeflere göre atanan görevler, eksik kazanımların kapatılmasına öncelik verir." },
+  { num: "04", icon: "users", title: "Etkileşimli Ortak Çalışma", desc: "Grup bazlı analitik problem çözme seansları ile iş birlikli öğrenme deneyimi sunulur." },
+  { num: "05", icon: "chart", title: "Performans Sistemi", desc: "Sürekli gelişim takibi ve motivasyon mekanizmaları ile öğrenci bağlılığı en üst düzeyde tutulur." },
+  { num: "06", icon: "test", title: "Kazanım Değerlendirme", desc: "Kazanım bazlı detaylı analitik raporlar ile öğrenci, veli ve öğretmen bilgilendirilir." },
 ];
 
 const modules = [
@@ -215,7 +216,7 @@ export default function MathLearningPlatform() {
             </p>
 
             <div className="flex flex-wrap gap-3 items-center mb-12">
-              <Link to="/dashboard"className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-medium px-7 py-3 rounded-md border-none cursor-pointer transition-all hover:-translate-y-px flex items-center gap-2 shadow-md shadow-blue-200 no-underline">Sisteme Giriş Yap <span>→</span></Link>
+              <Link to="/dashboard"className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-medium px-7 py-3 rounded-md border-none cursor-pointer transition-all hover:-translate-y-px flex items-center gap-2 shadow-md shadow-blue-200 no-underline">Sisteme Giriş Yap <Icon name="next" size={14} color="#ffffff" /></Link>
               <button className="text-[13px] font-medium text-slate-600 hover:text-[#111827] border border-slate-200 hover:border-slate-300 bg-white px-6 py-3 rounded-md cursor-pointer transition-all">
                 Platformu İncele
               </button>
@@ -276,7 +277,9 @@ export default function MathLearningPlatform() {
             {features.map((f) => (
               <div key={f.num} className="feature-card bg-white border border-slate-100 rounded-xl p-7">
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-base">{f.icon}</div>
+                  <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-base">
+                    <Icon name={f.icon} size={18} color="#2563EB" />
+                  </div>
                   <span className="text-[11px] font-semibold text-slate-300 tracking-[1.5px]">{f.num}</span>
                 </div>
                 <h4 className="font-semibold text-[13px] text-[#111827] mb-2 leading-snug">{f.title}</h4>
@@ -314,7 +317,7 @@ export default function MathLearningPlatform() {
                     ))}
                   </div>
                   <button className="flex items-center gap-2 text-[12px] font-semibold pt-5 w-full bg-transparent border-t border-slate-100 border-b-0 border-l-0 border-r-0 cursor-pointer transition-all"
-                    style={{color:m.accent}}>İçerikleri Görüntüle <span>→</span></button>
+                    style={{color:m.accent}}>İçerikleri Görüntüle <Icon name="next" size={13} color={m.accent} /></button>
                 </div>
               </div>
             ))}

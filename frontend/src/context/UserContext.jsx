@@ -1,8 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const MOCK_USER = {
   name: "İlkhan",
-  avatar: "🦊",
+  avatar: "avatar_fox",
   level: 12,
   coins: 1240,
   streak: 7,

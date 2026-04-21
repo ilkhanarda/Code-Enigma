@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
+import Icon from "../../components/ui/icons8-icon.jsx";
 
 const GAPS = [
   { topic: "Denklemler",         category: "Cebir",     severity: "Kritik", score: 48, missed: 12, total: 24, lastTest: "3 gün önce", suggested: "Mini Test 3 + 2 video", color: "#DC2626", bg: "#FEF2F2" },
@@ -12,12 +13,12 @@ const GAPS = [
 ];
 
 const STUDY_PLAN = [
-  { day: "Pazartesi", focus: "Eşitsizlikler",   duration: "45 dk", type: "Video + Mini Test", color: "#DC2626", bg: "#FEF2F2", icon: "⬡" },
-  { day: "Salı",      focus: "Denklemler",      duration: "60 dk", type: "Problem Çözümü",    color: "#DC2626", bg: "#FEF2F2", icon: "◫" },
-  { day: "Çarşamba",  focus: "Limit",           duration: "40 dk", type: "Kavram Dersi",      color: "#D97706", bg: "#FFFBEB", icon: "∞" },
-  { day: "Perşembe",  focus: "Logaritma",       duration: "35 dk", type: "Kural + Uygulama",  color: "#D97706", bg: "#FFFBEB", icon: "ln" },
-  { day: "Cuma",      focus: "Problem Çözme",   duration: "50 dk", type: "Karma Set",         color: "#D97706", bg: "#FFFBEB", icon: "◈" },
-  { day: "Cumartesi", focus: "Tekrar Testi",    duration: "30 dk", type: "Deneme Sınavı",     color: "#2563EB", bg: "#EFF6FF", icon: "📝" },
+  { day: "Pazartesi", focus: "Eşitsizlikler",   duration: "45 dk", type: "Video + Mini Test", color: "#DC2626", bg: "#FEF2F2", icon: "warning" },
+  { day: "Salı",      focus: "Denklemler",      duration: "60 dk", type: "Problem Çözümü",    color: "#DC2626", bg: "#FEF2F2", icon: "tasks" },
+  { day: "Çarşamba",  focus: "Limit",           duration: "40 dk", type: "Kavram Dersi",      color: "#D97706", bg: "#FFFBEB", icon: "infinity" },
+  { day: "Perşembe",  focus: "Logaritma",       duration: "35 dk", type: "Kural + Uygulama",  color: "#D97706", bg: "#FFFBEB", icon: "module" },
+  { day: "Cuma",      focus: "Problem Çözme",   duration: "50 dk", type: "Karma Set",         color: "#D97706", bg: "#FFFBEB", icon: "goals" },
+  { day: "Cumartesi", focus: "Tekrar Testi",    duration: "30 dk", type: "Deneme Sınavı",     color: "#2563EB", bg: "#EFF6FF", icon: "test" },
 ];
 
 const SEVERITY_ORDER = { "Kritik": 0, "Yüksek": 1, "Orta": 2, "Hafif": 3 };
@@ -113,7 +114,7 @@ export default function Gaps() {
                   <div className="h-px w-5 bg-amber-400 rounded" />
                   <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-amber-500">Analiz Raporu</span>
                 </div>
-                <h1 className="text-[26px] font-bold tracking-[-0.4px] leading-tight">Eksiklerim ⚠️</h1>
+                <h1 className="inline-flex items-center gap-2 text-[26px] font-bold tracking-[-0.4px] leading-tight">Eksiklerim <Icon name="warning" size={22} color="#DC2626" /></h1>
                 <p className="mt-1 text-[11px] text-slate-400">
                   Son 30 günün verisine göre hazırlandı · {GAPS.length} odak alanı tespit edildi
                 </p>
@@ -173,7 +174,7 @@ export default function Gaps() {
                   ))}
                   {sortedGaps.length === 0 && (
                     <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center">
-                      <div className="mb-2 text-3xl">🎯</div>
+                      <div className="mb-2 flex justify-center"><Icon name="target" size={30} color="#94a3b8" /></div>
                       <p className="text-[11px] font-semibold text-slate-500">Bu kategoride eksik yok</p>
                     </div>
                   )}
@@ -195,7 +196,7 @@ export default function Gaps() {
                           className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[14px]"
                           style={{ background: p.bg, color: p.color }}
                         >
-                          {p.icon}
+                          <Icon name={p.icon} size={16} color={p.color} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
@@ -255,7 +256,9 @@ export default function Gaps() {
 
                   {/* Recommendation */}
                   <div className="mt-4 rounded-xl p-3.5" style={{ background: selected.bg }}>
-                    <div className="text-[9px] font-bold uppercase tracking-[1.4px]" style={{ color: selected.color }}>💡 Öneri</div>
+                    <div className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[1.4px]" style={{ color: selected.color }}>
+                      <Icon name="idea" size={11} color={selected.color} /> Öneri
+                    </div>
                     <p className="mt-1 text-[11px] leading-relaxed" style={{ color: selected.color }}>{selected.suggested}</p>
                   </div>
 
@@ -263,7 +266,7 @@ export default function Gaps() {
                     className="mt-4 w-full rounded-xl py-2.5 text-[11px] font-bold text-white transition-all hover:shadow-md"
                     style={{ background: selected.color }}
                   >
-                    Çalışmaya Başla →
+                    <span className="inline-flex items-center gap-1">Çalışmaya Başla <Icon name="next" size={12} color="#ffffff" /></span>
                   </button>
                 </div>
 
@@ -273,10 +276,10 @@ export default function Gaps() {
                     <SectionLabel text="Genel İpuçları" color="#059669" />
                   </div>
                   <ul className="flex flex-col gap-2.5 text-[11px] text-slate-600">
-                    <li className="flex gap-2"><span>✅</span><span>Günde 25 dk hedefli çalışma, dağınık 2 saatten etkili.</span></li>
-                    <li className="flex gap-2"><span>🔁</span><span>Kritik konuları 48 saatte bir tekrar et (spacing).</span></li>
-                    <li className="flex gap-2"><span>🧠</span><span>Yanlışları defterine yazıp açıklamayı ekle.</span></li>
-                    <li className="flex gap-2"><span>📊</span><span>Haftada bir deneme ile skorunu izle.</span></li>
+                    <li className="flex gap-2"><Icon name="check_circle" size={13} color="#059669" /><span>Günde 25 dk hedefli çalışma, dağınık 2 saatten etkili.</span></li>
+                    <li className="flex gap-2"><Icon name="repeat" size={13} color="#64748b" /><span>Kritik konuları 48 saatte bir tekrar et (spacing).</span></li>
+                    <li className="flex gap-2"><Icon name="brain" size={13} color="#2563EB" /><span>Yanlışları defterine yazıp açıklamayı ekle.</span></li>
+                    <li className="flex gap-2"><Icon name="chart" size={13} color="#059669" /><span>Haftada bir deneme ile skorunu izle.</span></li>
                   </ul>
                 </div>
               </aside>

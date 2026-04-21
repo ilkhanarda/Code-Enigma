@@ -1,11 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 
 export default function Navbar() {
-
-    const formatCoin = (value) => new Intl.NumberFormat('tr-TR').format(value);
-    const [coins] = useState(1240);
-    const [selectedAvatar] = useState('🦊');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-25 h-16 bg-white border-b border-slate-200 shadow-sm backdrop-blur-md bg-opacity-95">

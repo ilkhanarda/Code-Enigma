@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { useUser } from "../../context/UserContext.jsx";
 import DashboardWidgets from "./widgets.jsx";
+import Icon from "../../components/ui/icons8-icon.jsx";
+
 
 /* ═══════════════════════════════════════
    DATA
@@ -103,7 +105,7 @@ const notifications = [
     desc: "Denklemler — Mini Test 3 artık aktif.",
     time: "5 dk önce",
     unread: true,
-    icon: "📝",
+    icon: "test",
     accent: "#2563EB",
   },
   {
@@ -112,7 +114,7 @@ const notifications = [
     desc: "Eşitsizlikler dersi bugün 19:00'da başlıyor.",
     time: "1 saat önce",
     unread: true,
-    icon: "📡",
+    icon: "live",
     accent: "#DC2626",
   },
   {
@@ -121,7 +123,7 @@ const notifications = [
     desc: "Bu haftaki performans özetin görüntülenebilir.",
     time: "3 saat önce",
     unread: true,
-    icon: "📊",
+    icon: "chart",
     accent: "#059669",
   },
   {
@@ -130,16 +132,16 @@ const notifications = [
     desc: "Yeni içerik kataloğu 15 Mart'tan itibaren aktif.",
     time: "1 gün önce",
     unread: false,
-    icon: "📢",
+    icon: "announcement",
     accent: "#D97706",
   },
   {
     id: 5, type: "badge",
     title: "Yeni rozet kazandın!",
-    desc: "7 günlük çalışma serisini tamamladın. 🔥",
+    desc: "7 günlük çalışma serisini tamamladın.",
     time: "2 gün önce",
     unread: false,
-    icon: "🏆",
+    icon: "trophy",
     accent: "#7C3AED",
   },
 ];
@@ -216,10 +218,7 @@ function NotificationDropdown() {
         aria-label="Bildirimler"
         aria-expanded={open}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
+        <Icon name="notifications" size={16} color={open ? "#2563EB" : "#64748B"} />
         {unreadCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#DC2626] text-[8px] font-bold text-white ring-2 ring-white">
             {unreadCount}
@@ -264,7 +263,7 @@ function NotificationDropdown() {
                   className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl text-sm"
                   style={{ background: n.accent + "18" }}
                 >
-                  {n.icon}
+                  <Icon name={n.icon} size={14} color={n.accent} />
                 </div>
 
                 {/* Content */}
@@ -287,7 +286,7 @@ function NotificationDropdown() {
           {/* Footer */}
           <div className="border-t border-slate-100 px-4 py-2.5 text-center">
             <button className="text-[10px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">
-              Tüm bildirimleri gör →
+              <span className="inline-flex items-center gap-1">Tüm bildirimleri gör <Icon name="next" size={12} color="#2563EB" /></span>
             </button>
           </div>
         </div>
@@ -303,7 +302,7 @@ function TopicCard({ topic }) {
   return (
     <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
       <div
-        className="relative h-[88px] border-b border-slate-100"
+        className="relative h-[96px] border-b border-slate-100"
         style={{
           background: `linear-gradient(135deg, ${topic.color}24 0%, ${topic.color}12 52%, #F8FAFC 100%)`,
         }}
@@ -316,47 +315,50 @@ function TopicCard({ topic }) {
         />
       </div>
 
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-[13px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
+          <div className="min-w-0 flex-1">
+            <span className="inline-flex rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.8px] text-slate-500">
+              Ders Modülü
+            </span>
+            <h2 className="mt-2 text-[18px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
               {topic.title}
             </h2>
-            <p className="mt-1 text-[9px] font-medium text-slate-400">
+            <p className="mt-1.5 text-[13px] font-medium text-slate-500">
               {topic.sub}
             </p>
           </div>
         </div>
 
-        <div className="mt-3.5">
+        <div className="mt-4">
           <div className="mb-2 flex items-center justify-between gap-2.5">
-            <span className="text-[8px] font-semibold uppercase tracking-[0.9px] text-slate-400">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.9px] text-slate-400">
               İlerleme
             </span>
-            <span className="text-[8px] font-bold" style={{ color: topic.color }}>
+            <span className="text-[13px] font-bold" style={{ color: topic.color }}>
               %{topic.progress}
             </span>
           </div>
-          <ProgressBar value={topic.progress} color={topic.color} h="h-1" />
+          <ProgressBar value={topic.progress} color={topic.color} h="h-1.5" />
         </div>
 
-        <div className="mt-3.5 w-full text-[9px] font-semibold">
-          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+        <div className="mt-4 w-full">
+          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <div className="text-[7px] uppercase tracking-[1px] text-slate-400">
+                <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
                   Eğitmen
                 </div>
-                <div className="mt-0.5 truncate text-[9px] text-slate-600">
+                <div className="mt-1 truncate text-[13px] font-semibold text-slate-700">
                   {topic.instructor}
                 </div>
               </div>
 
               <div className="min-w-0 text-right">
-                <div className="text-[7px] uppercase tracking-[1px] text-slate-400">
+                <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
                   Son Giriş
                 </div>
-                <div className="mt-0.5 whitespace-nowrap text-[9px] text-slate-600">
+                <div className="mt-1 whitespace-nowrap text-[13px] font-semibold text-slate-700">
                   {topic.lastSeen}
                 </div>
               </div>
@@ -364,10 +366,10 @@ function TopicCard({ topic }) {
           </div>
         </div>
 
-        <div className="mt-3.5 border-t border-slate-200 pt-3.5">
+        <div className="mt-4 border-t border-slate-200 pt-4">
           <div className="flex items-center justify-between gap-2.5">
             <span
-              className="inline-flex rounded-full px-2.5 py-1 text-[7.5px] font-bold uppercase tracking-[1px]"
+              className="inline-flex rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.9px]"
               style={{
                 color: topic.color,
                 background: topic.bg,
@@ -377,14 +379,14 @@ function TopicCard({ topic }) {
             </span>
 
             <button
-              className="inline-flex min-w-[88px] items-center justify-center rounded-full border px-3.5 py-1.5 text-[9px] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              className="inline-flex min-w-[108px] items-center justify-center rounded-full border px-4 py-2 text-[12px] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               style={{
                 color: topic.color,
                 background: topic.bg,
                 borderColor: `${topic.color}40`,
               }}
             >
-              Aç
+              Derse Git
             </button>
           </div>
         </div>
@@ -445,10 +447,10 @@ export default function Dashboard() {
             key={t.id}
             className="xp-toast flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-4 py-2.5 shadow-lg shadow-emerald-100/70"
           >
-            <span className="text-base">✨</span>
+            <Icon name="guarantee" size={16} color="#059669" />
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-emerald-600">+{t.xp} XP</span>
-              <span className="text-[9px] font-semibold text-amber-600">+{t.coins} 🪙 Coin</span>
+              <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-amber-600">+{t.coins} <Icon name="coin" size={10} color="#D97706" /> Coin</span>
             </div>
           </div>
         ))}
@@ -469,7 +471,7 @@ export default function Dashboard() {
                   {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
                 </p>
                 <h1 className="text-[26px] font-bold tracking-[-0.4px] text-[#111827] leading-tight">
-                  Hoşgeldin, İlkhan Arda 👋
+                  Hoşgeldin, İlkhan Arda
                 </h1>
               </div>
 
@@ -527,60 +529,6 @@ export default function Dashboard() {
                 </div>
               </section>
 
-          
-              {/* ─ RIGHT: Sidebar widgets ─ */}
-              {/*
-              <aside className="flex flex-col gap-5 xl:pt-1">
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 transition-shadow hover:shadow-lg hover:shadow-amber-50/50">
-                  <div className="mb-4">
-                    <SectionLabel text="Sezonluk Etkinlik" color="#D97706" />
-                  </div>
-                  <div className="flex flex-col gap-2.5">
-                    {seasonalEvents.map((ev) => (
-                      <div
-                        key={ev.title}
-                        className="group flex items-center gap-3 cursor-pointer rounded-xl border border-slate-100 p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-sm"
-                        style={{ background: ev.bg }}
-                      >
-                        <span className="text-xl leading-none">{ev.icon}</span>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-[11px] font-bold leading-snug" style={{ color: ev.color }}>
-                            {ev.title}
-                          </div>
-                          <div className="mt-0.5 text-[10px] text-slate-500">{ev.meta}</div>
-                        </div>
-                        <span className="text-[11px] opacity-0 transition-opacity group-hover:opacity-100" style={{ color: ev.color }}>→</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-100 bg-white p-5">
-                  <div className="mb-4">
-                    <SectionLabel text="Hızlı Erişim" color="#059669" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { label: "Performans Raporu", icon: "📊", color: "#059669", bg: "#ECFDF5" },
-                      { label: "Sertifikalarım",    icon: "🎓", color: "#2563EB", bg: "#EFF6FF" },
-                      { label: "Çalışma Takvimi",  icon: "📅", color: "#7C3AED", bg: "#F5F3FF" },
-                      { label: "Liderlik Tablosu", icon: "🏆", color: "#D97706", bg: "#FFFBEB" },
-                    ].map((link) => (
-                      <button
-                        key={link.label}
-                        className="flex flex-col items-center gap-2 rounded-xl border border-slate-100 py-3.5 text-center transition-all hover:-translate-y-0.5 hover:shadow-md"
-                        style={{ background: link.bg }}
-                      >
-                        <span className="text-lg leading-none">{link.icon}</span>
-                        <span className="text-[9px] font-bold leading-tight" style={{ color: link.color }}>
-                          {link.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </aside> 
-                          */}
             </div>
 
           </main>
@@ -603,6 +551,9 @@ export default function Dashboard() {
               </div>
               <p className="text-[10px] text-slate-400">
                 © {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi. Tüm hakları saklıdır.
+              </p>
+              <p className="text-[10px] text-slate-400">
+                Icons by <a href="https://icons8.com" target="_blank" rel="noreferrer" className="font-semibold text-slate-500 hover:text-[#2563EB]">Icons8</a>
               </p>
             </div>
           </footer>

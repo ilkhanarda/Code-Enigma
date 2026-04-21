@@ -1,13 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext.jsx";
 import Logo from "../../assets/logo.jsx";
+import Icon from "../ui/icons8-icon.jsx";
 
 const NAV_ITEMS = [
-  { icon: "🏠",  label: "Panel",        to: "/dashboard" },
-  { icon: "📘", label: "Konular",       to: "/topics"    },
-  { icon: "📝", label: "Testler",       to: "/test"     },
-  { icon: "⚠️", label: "Eksiklerim",   to: "/gaps"      },
-  { icon: "⚙️", label: "Ayarlar",      to: "/settings"  },
+  { icon: "home", label: "Panel", to: "/dashboard" },
+  { icon: "topics", label: "Konular", to: "/topics" },
+  { icon: "test", label: "Testler", to: "/test" },
+  { icon: "warning", label: "Eksiklerim", to: "/gaps" },
+  { icon: "settings", label: "Ayarlar", to: "/settings" },
 ];
 
 function NavItem({ icon, label, to, active }) {
@@ -29,9 +30,11 @@ function NavItem({ icon, label, to, active }) {
         <span className="absolute -left-2.5 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-[#2563EB]" />
       )}
 
-      <span className={`text-[17px] leading-none transition-transform duration-200 ${!active && "group-hover:scale-110"}`}>
-        {icon}
-      </span>
+      <Icon
+        name={icon}
+        size={18}
+        className={`transition-transform duration-200 ${!active ? "group-hover:scale-110" : ""}`}
+      />
       <span className={`text-[8.5px] font-bold uppercase tracking-[1.4px] leading-tight ${active ? "text-white/90" : ""}`}>
         {label}
       </span>
@@ -54,27 +57,23 @@ export default function DashboardNavbar() {
         {/* Divider */}
         <div className="h-px w-10 bg-slate-100" />
 
-        {/* User card */}
-        <div className="flex w-full flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-2 py-3">
-          <div className="relative">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full border-[2.5px] border-white bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-[21px] shadow-md shadow-blue-100">
-              {user.avatar}
+        {/* User area */}
+          <div className="flex flex-col items-center gap-1.5 rounded-xl border border-white/80 bg-white/80 px-1.5 py-2 bg-[linear-gradient(180deg,#f8fafc,#f1f5f9)] rounded-2xl border border-slate-100 shadow-sm">
+            <div className="relative">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-[2.5px] border-white bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-[20px] shadow-md shadow-blue-100">
+                <Icon name={user.avatar} size={20} />
+              </div>
+              <span className="absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400" />
             </div>
-            {/* Online dot */}
-            <span className="absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400" />
+            <div className="text-center">
+              <div className="text-[9px] font-semibold leading-tight text-[#111827]">{user.name}</div>
+              <div className="text-[8px] font-medium text-slate-400">Sv. {user.level}</div>
+            </div>
+            <div className="mt-0.5 flex items-center gap-1 rounded-lg border border-amber-200/70 bg-gradient-to-r from-amber-50 to-yellow-50 px-2 py-1">
+              <Icon name="coin" size={12} />
+              <span className="text-[9px] font-bold tracking-tight text-amber-900">{user.coins.toLocaleString("tr-TR")}</span>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-[10px] font-semibold leading-tight text-[#111827]">{user.name}</div>
-            <div className="text-[8px] font-medium text-slate-400">Sv. {user.level}</div>
-          </div>
-        </div>
-
-        {/* Coin chip */}
-        <div className="flex w-full flex-col items-center gap-0.5 rounded-xl border border-amber-200/70 bg-gradient-to-b from-amber-50 to-yellow-50 px-2 py-2.5 shadow-sm">
-          <span className="text-base leading-none">🪙</span>
-          <span className="text-[12px] font-bold tracking-tight text-amber-900">{user.coins.toLocaleString("tr-TR")}</span>
-          <span className="text-[7.5px] font-semibold uppercase tracking-[1px] text-amber-500">Coin</span>
-        </div>
 
         {/* Divider */}
         <div className="h-px w-10 bg-slate-100" />

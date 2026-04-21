@@ -1,8 +1,9 @@
 import { useState } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { useUser } from "../../context/UserContext.jsx";
+import Icon from "../../components/ui/icons8-icon.jsx";
 
-const AVATARS = ["🦊", "🐺", "🦁", "🐯", "🐨", "🐼", "🦉", "🦅", "🐙", "🦑", "🐉", "🦕"];
+const AVATARS = ["avatar_fox", "avatar_mouse", "avatar_penguin", "avatar_dog", "avatar_hamster", "avatar_chameleon", "avatar_prawn", "avatar_duck", "avatar_doge", "avatar_maneki", "avatar_dragon", "avatar_teddy_bear"];
 
 const DEFAULT_PREFS = {
   notifTasks: true,
@@ -114,7 +115,7 @@ export default function Settings() {
                   <div className="h-px w-5 bg-violet-400 rounded" />
                   <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-violet-500">Hesap Yönetimi</span>
                 </div>
-                <h1 className="text-[26px] font-bold tracking-[-0.4px] leading-tight">Ayarlar ⚙️</h1>
+                <h1 className="inline-flex items-center gap-2 text-[26px] font-bold tracking-[-0.4px] leading-tight">Ayarlar <Icon name="settings" size={22} color="#7C3AED" /></h1>
                 <p className="mt-1 text-[11px] text-slate-400">
                   Profil, bildirim, gizlilik ve görünüm tercihlerini buradan yönet
                 </p>
@@ -138,7 +139,7 @@ export default function Settings() {
                 <Card label="Profil" color="#2563EB">
                   <div className="flex items-center gap-5">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full border-[3px] border-white bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-[38px] shadow-md shadow-blue-100">
-                      {user.avatar}
+                      <Icon name={user.avatar} size={40} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <label className="text-[9px] font-bold uppercase tracking-[1.5px] text-slate-400">İsim</label>
@@ -163,7 +164,7 @@ export default function Settings() {
                               : "border-slate-100 bg-white hover:border-blue-200"
                           }`}
                         >
-                          {a}
+                          <Icon name={a} size={22} />
                         </button>
                       ))}
                     </div>
@@ -226,12 +227,12 @@ export default function Settings() {
                       <button
                         onClick={() => updatePref("dailyGoal", Math.max(1, prefs.dailyGoal - 1))}
                         className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all hover:border-violet-300 hover:text-[#7C3AED]"
-                      >−</button>
+                      ><Icon name="minus" size={12} color="#64748b" /></button>
                       <span className="min-w-[24px] text-center text-[12px] font-bold text-[#111827]">{prefs.dailyGoal}</span>
                       <button
                         onClick={() => updatePref("dailyGoal", Math.min(12, prefs.dailyGoal + 1))}
                         className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all hover:border-violet-300 hover:text-[#7C3AED]"
-                      >+</button>
+                      ><Icon name="plus" size={12} color="#64748b" /></button>
                     </div>
                   </Row>
                 </Card>
@@ -266,11 +267,11 @@ export default function Settings() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-400">Coin</span>
-                      <span className="font-bold text-amber-600">{user.coins.toLocaleString("tr-TR")} 🪙</span>
+                      <span className="inline-flex items-center gap-1 font-bold text-amber-600">{user.coins.toLocaleString("tr-TR")} <Icon name="coin" size={12} color="#D97706" /></span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-400">Seri</span>
-                      <span className="font-bold text-[#DC2626]">{user.streak} gün 🔥</span>
+                      <span className="inline-flex items-center gap-1 font-bold text-[#DC2626]">{user.streak} gün <Icon name="streak" size={12} color="#DC2626" /></span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-400">XP</span>
@@ -293,7 +294,7 @@ export default function Settings() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-100 bg-gradient-to-br from-blue-50 to-violet-50 p-5">
-                  <div className="text-[10px] font-bold uppercase tracking-[1.5px] text-[#2563EB]">💡 İpucu</div>
+                  <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[1.5px] text-[#2563EB]"><Icon name="idea" size={11} color="#2563EB" /> İpucu</div>
                   <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
                     Tüm tercihler tarayıcında yerel olarak kaydediliyor. Backend entegrasyonu sonrası hesaba taşınacak.
                   </p>

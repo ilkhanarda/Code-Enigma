@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import DashboardNavbar from '../../components/dashboard/dashboard-navbar.jsx';
+import Icon from '../../components/ui/icons8-icon.jsx';
 
 const initialTasks = [
   { id: 1, title: '1 ders tamamla', xp: 50, done: true },
@@ -11,90 +11,90 @@ const initialTasks = [
 ];
 
 const stats = [
-  { label: 'Kurslar', value: '14', sub: 'Tamamlanan kurs', progress: 70, color: '#2563EB', icon: '◈' },
-  { label: 'Dersler', value: '138', sub: 'Bitirilen ders', progress: 82, color: '#7C3AED', icon: '⌖' },
-  { label: 'Quizler', value: '312', sub: 'Çözülen quiz', progress: 60, color: '#059669', icon: '◎' },
-  { label: 'Başarı', value: '87%', sub: 'Doğru cevap oranı', progress: 87, color: '#D97706', icon: '◫' },
+  { label: 'Kurslar', value: '14', sub: 'Tamamlanan kurs', progress: 70, color: '#2563EB', icon: 'goals' },
+  { label: 'Dersler', value: '138', sub: 'Bitirilen ders', progress: 82, color: '#7C3AED', icon: 'stats' },
+  { label: 'Quizler', value: '312', sub: 'Çözülen quiz', progress: 60, color: '#059669', icon: 'journey' },
+  { label: 'Başarı', value: '87%', sub: 'Doğru cevap oranı', progress: 87, color: '#D97706', icon: 'tasks' },
 ];
 
 const badges = [
-  { icon: '🎓', title: 'İlk Ders', status: '✓ Kazanıldı', bg: '#EFF6FF', color: '#2563EB', locked: false },
-  { icon: '🔥', title: '7 Gün Seri', status: '✓ Kazanıldı', bg: '#FFFBEB', color: '#D97706', locked: false },
-  { icon: '💯', title: 'İlk 100', status: '✓ Kazanıldı', bg: '#ECFDF5', color: '#059669', locked: false },
-  { icon: '📚', title: '5 Kurs', status: '✓ Kazanıldı', bg: '#F5F3FF', color: '#7C3AED', locked: false },
-  { icon: '⚡', title: 'Hızlı Öğr.', status: '✓ Kazanıldı', bg: '#FFFBEB', color: '#D97706', locked: false },
-  { icon: '🏆', title: 'Şampiyon', status: '✓ Kazanıldı', bg: '#FEF2F2', color: '#DC2626', locked: false },
-  { icon: '🌟', title: '30 Gün', status: '✓ Kazanıldı', bg: '#EFF6FF', color: '#2563EB', locked: false },
-  { icon: '🤝', title: 'Takım Oyun.', status: '✓ Kazanıldı', bg: '#F5F3FF', color: '#7C3AED', locked: false },
-  { icon: '🔒', title: 'Mükemmel', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
-  { icon: '🔒', title: 'Sezonal', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
-  { icon: '🔒', title: 'Elmas', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
-  { icon: '🔒', title: 'Lejant', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
+  { icon: 'graduation', title: 'İlk Ders', status: 'Kazanıldı', bg: '#EFF6FF', color: '#2563EB', locked: false },
+  { icon: 'streak', title: '7 Gün Seri', status: 'Kazanıldı', bg: '#FFFBEB', color: '#D97706', locked: false },
+  { icon: 'chart', title: 'İlk 100', status: 'Kazanıldı', bg: '#ECFDF5', color: '#059669', locked: false },
+  { icon: 'book_stack', title: '5 Kurs', status: 'Kazanıldı', bg: '#F5F3FF', color: '#7C3AED', locked: false },
+  { icon: 'bolt', title: 'Hızlı Öğr.', status: 'Kazanıldı', bg: '#FFFBEB', color: '#D97706', locked: false },
+  { icon: 'trophy', title: 'Şampiyon', status: 'Kazanıldı', bg: '#FEF2F2', color: '#DC2626', locked: false },
+  { icon: 'frame_star', title: '30 Gün', status: 'Kazanıldı', bg: '#EFF6FF', color: '#2563EB', locked: false },
+  { icon: 'handshake', title: 'Takım Oyun.', status: 'Kazanıldı', bg: '#F5F3FF', color: '#7C3AED', locked: false },
+  { icon: 'lock', title: 'Mükemmel', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
+  { icon: 'lock', title: 'Sezonal', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
+  { icon: 'lock', title: 'Elmas', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
+  { icon: 'lock', title: 'Lejant', status: 'Kilitli', bg: '#F8F9FB', color: '#94A3B8', locked: true },
 ];
 
 const weeklyRanking = [
-  { rank: '🥇', avatar: '🐯', name: 'Zeynep Ç.', points: '3 420 pts', bg: '#EFF6FF' },
-  { rank: '🥈', avatar: '🐼', name: 'Rızgar O.', points: '3 180 pts', bg: '#F5F3FF' },
-  { rank: '🥉', avatar: '🦁', name: 'Rojhat T.', points: '2 990 pts', bg: '#ECFDF5' },
-  { rank: '#4', avatar: '🦊', name: 'Sen (İlkhan)', points: '2 750 pts', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
-  { rank: '#5', avatar: '🐰', name: 'Burak Y.', points: '2 620 pts', bg: '#FFFBEB' },
+  { rank: '1', rankIcon: 'medal_gold', avatar: 'avatar_tiger', name: 'Zeynep Ç.', points: '3 420 pts', bg: '#EFF6FF' },
+  { rank: '2', rankIcon: 'medal_silver', avatar: 'avatar_panda', name: 'Rızgar O.', points: '3 180 pts', bg: '#F5F3FF' },
+  { rank: '3', rankIcon: 'medal_bronze', avatar: 'avatar_lion', name: 'Rojhat T.', points: '2 990 pts', bg: '#ECFDF5' },
+  { rank: '#4', avatar: 'avatar_fox', name: 'Sen (İlkhan)', points: '2 750 pts', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
+  { rank: '#5', avatar: 'avatar_rabbit', name: 'Burak Y.', points: '2 620 pts', bg: '#FFFBEB' },
 ];
 
 const classRanking = [
-  { rank: '#1', avatar: '🦁', name: 'Rojhat Taş', points: '97 puan', bg: '#ECFDF5' },
-  { rank: '#2', avatar: '🦊', name: 'Sen (İlkhan)', points: '95 puan', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
-  { rank: '#3', avatar: '🐯', name: 'Zeynep Çiftçi', points: '93 puan', bg: '#EFF6FF' },
-  { rank: '#4', avatar: '🐼', name: 'Rızgar Ozan', points: '92 puan', bg: '#F5F3FF' },
-  { rank: '#5', avatar: '🐰', name: 'Burak Yıldız', points: '89 puan', bg: '#FFFBEB' },
+  { rank: '#1', avatar: 'avatar_lion', name: 'Rojhat Taş', points: '97 puan', bg: '#ECFDF5' },
+  { rank: '#2', avatar: 'avatar_fox', name: 'Sen (İlkhan)', points: '95 puan', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
+  { rank: '#3', avatar: 'avatar_tiger', name: 'Zeynep Çiftçi', points: '93 puan', bg: '#EFF6FF' },
+  { rank: '#4', avatar: 'avatar_panda', name: 'Rızgar Ozan', points: '92 puan', bg: '#F5F3FF' },
+  { rank: '#5', avatar: 'avatar_rabbit', name: 'Burak Yıldız', points: '89 puan', bg: '#FFFBEB' },
 ];
 
 const friendRanking = [
-  { rank: '#1', avatar: '🐯', name: 'Zeynep Çiftçi', points: '8 920 XP', bg: '#EFF6FF' },
-  { rank: '#2', avatar: '🦁', name: 'Rojhat Taş', points: '8 710 XP', bg: '#ECFDF5' },
-  { rank: '#3', avatar: '🦊', name: 'Sen (İlkhan)', points: '8 450 XP', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
-  { rank: '#4', avatar: '🐼', name: 'Rızgar Ozan', points: '8 120 XP', bg: '#F5F3FF' },
-  { rank: '#5', avatar: '🐰', name: 'Burak Yıldız', points: '7 860 XP', bg: '#FFFBEB' },
+  { rank: '#1', avatar: 'avatar_tiger', name: 'Zeynep Çiftçi', points: '8 920 XP', bg: '#EFF6FF' },
+  { rank: '#2', avatar: 'avatar_lion', name: 'Rojhat Taş', points: '8 710 XP', bg: '#ECFDF5' },
+  { rank: '#3', avatar: 'avatar_fox', name: 'Sen (İlkhan)', points: '8 450 XP', bg: 'linear-gradient(135deg,#2563EB,#7C3AED)', me: true },
+  { rank: '#4', avatar: 'avatar_panda', name: 'Rızgar Ozan', points: '8 120 XP', bg: '#F5F3FF' },
+  { rank: '#5', avatar: 'avatar_rabbit', name: 'Burak Yıldız', points: '7 860 XP', bg: '#FFFBEB' },
 ];
 
 const friendsSeed = [
-  { id: 1, avatar: '🐯', name: 'Zeynep Çiftçi', level: 'Sv.14 · 🔥 21 gün seri' },
-  { id: 2, avatar: '🐼', name: 'Rızgar Ozan', level: 'Sv.11 · 🔥 8 gün seri' },
-  { id: 3, avatar: '🦁', name: 'Rojhat Taş', level: 'Sv.13 · 🔥 15 gün seri' },
-  { id: 4, avatar: '🐰', name: 'Burak Yıldız', level: 'Sv.10 · 🔥 5 gün seri' },
+  { id: 1, avatar: 'avatar_tiger', name: 'Zeynep Çiftçi', level: 'Sv.14', streak: '21 gün seri' },
+  { id: 2, avatar: 'avatar_panda', name: 'Rızgar Ozan', level: 'Sv.11', streak: '8 gün seri' },
+  { id: 3, avatar: 'avatar_lion', name: 'Rojhat Taş', level: 'Sv.13', streak: '15 gün seri' },
+  { id: 4, avatar: 'avatar_rabbit', name: 'Burak Yıldız', level: 'Sv.10', streak: '5 gün seri' },
 ];
 
 const journey = [
-  { title: 'Temel Matematik', desc: '✓ Tamamlandı · 8 modül', status: '100%', tone: 'done' },
-  { title: 'Cebir I', desc: '✓ Tamamlandı · 12 modül', status: '100%', tone: 'done' },
-  { title: '📍 Cebir II · Aktif', desc: 'Şu an burada · 5/14 modül', status: '36%', tone: 'active' },
-  { title: 'Geometri', desc: 'Kilitli · Hedef: Cebir II bitir', status: '🔒', tone: 'locked' },
-  { title: 'Sayı Teorisi', desc: 'Kilitli', status: '🔒', tone: 'locked-soft' },
+  { title: 'Temel Matematik', desc: 'Tamamlandı · 8 modül', status: '100%', tone: 'done' },
+  { title: 'Cebir I', desc: 'Tamamlandı · 12 modül', status: '100%', tone: 'done' },
+  { title: 'Cebir II · Aktif', desc: 'Şu an burada · 5/14 modül', status: '36%', tone: 'active' },
+  { title: 'Geometri', desc: 'Kilitli · Hedef: Cebir II bitir', status: 'Kilitli', tone: 'locked' },
+  { title: 'Sayı Teorisi', desc: 'Kilitli', status: 'Kilitli', tone: 'locked-soft' },
 ];
 
 const certificates = [
-  { type: '◈ Kurs Sertifikası', title: 'Temel Matematik', meta: 'Tamamlanma: Ekim 2024', color: '#2563EB', bg: '#EFF6FF', action: '⬇ İndir' },
-  { type: '⌖ Kurs Sertifikası', title: 'Cebir I', meta: 'Tamamlanma: Kasım 2024', color: '#7C3AED', bg: '#F5F3FF', action: '⬇ İndir' },
-  { type: '◫ Etkinlik Belgesi', title: 'Sonbahar Olimpiyatı', meta: 'Katılım: Kasım 2024 · 🥈 İkincilik', color: '#D97706', bg: '#FFFBEB', action: '⬇ İndir' },
+  { type: 'Kurs Sertifikası', title: 'Temel Matematik', meta: 'Tamamlanma: Ekim 2024', color: '#2563EB', bg: '#EFF6FF', action: 'İndir' },
+  { type: 'Kurs Sertifikası', title: 'Cebir I', meta: 'Tamamlanma: Kasım 2024', color: '#7C3AED', bg: '#F5F3FF', action: 'İndir' },
+  { type: 'Etkinlik Belgesi', title: 'Sonbahar Olimpiyatı', meta: 'Katılım: Kasım 2024 · İkincilik', color: '#D97706', bg: '#FFFBEB', action: 'İndir' },
 ];
 
 const shopData = {
   avatars: [
-    { id: 'current-avatar', icon: '🦊', label: 'Mevcut', owned: true },
-    { id: 'a1', icon: '🐯', cost: 200 },
-    { id: 'a2', icon: '🦋', cost: 350 },
-    { id: 'a3', icon: '🐉', cost: 500, rare: true },
-    { id: 'a4', icon: '🦄', cost: 150 },
-    { id: 'a5', icon: '🐺', cost: 400 },
-    { id: 'a6', icon: '🦅', cost: 600, rare: true },
-    { id: 'a7', icon: '🔱', cost: 800, epic: true },
+    { id: 'current-avatar', icon: 'avatar_fox', label: 'Mevcut', owned: true },
+    { id: 'a1', icon: 'avatar_tiger', cost: 200 },
+    { id: 'a2', icon: 'avatar_butterfly', cost: 350 },
+    { id: 'a3', icon: 'avatar_dragon', cost: 500, rare: true },
+    { id: 'a4', icon: 'avatar_unicorn', cost: 150 },
+    { id: 'a5', icon: 'avatar_wolf', cost: 400 },
+    { id: 'a6', icon: 'avatar_eagle', cost: 600, rare: true },
+    { id: 'a7', icon: 'avatar_trident', cost: 800, epic: true },
   ],
   frames: [
-    { id: 'f0', icon: '⬜', label: 'Varsayılan', owned: true },
-    { id: 'f1', icon: '🌟', cost: 300 },
-    { id: 'f2', icon: '🔮', cost: 450 },
-    { id: 'f3', icon: '👑', cost: 700, rare: true },
-    { id: 'f4', icon: '🌸', cost: 250 },
-    { id: 'f5', icon: '⚡', cost: 550 },
+    { id: 'f0', icon: 'frame_default', label: 'Varsayılan', owned: true },
+    { id: 'f1', icon: 'frame_star', cost: 300 },
+    { id: 'f2', icon: 'frame_crystal', cost: 450 },
+    { id: 'f3', icon: 'crown', cost: 700, rare: true },
+    { id: 'f4', icon: 'flower', cost: 250 },
+    { id: 'f5', icon: 'bolt', cost: 550 },
   ],
   themes: [
     { id: 't0', swatch: '#F8F9FB', label: 'Mevcut', owned: true, border: true },
@@ -105,15 +105,15 @@ const shopData = {
     { id: 't5', gradient: 'linear-gradient(135deg,#7C3AED,#DB2777)', cost: 600, rare: true },
   ],
   rewards: [
-    { id: 'r1', icon: '⏱️', title: '2× XP (1 gün)', cost: 100 },
-    { id: 'r2', icon: '🛡️', title: 'Seri Koruma', cost: 200 },
-    { id: 'r3', icon: '💡', title: 'İpucu Joker', cost: 150 },
-    { id: 'r4', icon: '🎁', title: 'Mini Ödül Kutusu', cost: 500, rare: true },
+    { id: 'r1', icon: 'timer', title: '2× XP (1 gün)', cost: 100 },
+    { id: 'r2', icon: 'shield', title: 'Seri Koruma', cost: 200 },
+    { id: 'r3', icon: 'idea', title: 'İpucu Joker', cost: 150 },
+    { id: 'r4', icon: 'gift', title: 'Mini Ödül Kutusu', cost: 500, rare: true },
   ],
 };
 
-const availableAvatars = ['🦊', '🐯', '🦋', '🦄', '🐺', '🦅'];
-const availableTitles = ['⚡ Hızlı Öğrenen', '🔥 Seri Ustası', '🏆 Şampiyon', '📚 5 Kurs'];
+const availableAvatars = ['avatar_fox', 'avatar_tiger', 'avatar_butterfly', 'avatar_unicorn', 'avatar_wolf', 'avatar_eagle'];
+const availableTitles = ['Hızlı Öğrenen', 'Seri Ustası', 'Şampiyon', '5 Kurs'];
 
 const formatCoin = (value) => new Intl.NumberFormat('tr-TR').format(value);
 
@@ -145,8 +145,8 @@ export default function Profile1() {
   const [ligTab, setLigTab] = useState('haftalik');
   const [shopTab, setShopTab] = useState('avatars');
   const [coins, setCoins] = useState(1240);
-  const [selectedAvatar, setSelectedAvatar] = useState('🦊');
-  const [selectedTitle, setSelectedTitle] = useState('⚡ Hızlı Öğrenen');
+  const [selectedAvatar, setSelectedAvatar] = useState('avatar_fox');
+  const [selectedTitle, setSelectedTitle] = useState('Hızlı Öğrenen');
   const [cheeredFriends, setCheeredFriends] = useState([]);
   const [ownedItems, setOwnedItems] = useState(['current-avatar', 'f0', 't0']);
 
@@ -174,7 +174,7 @@ export default function Profile1() {
       return;
     }
 
-    const ok = window.confirm(`Bu ürünü 🪙 ${item.cost} coin ile satın almak ister misiniz?`);
+    const ok = window.confirm(`Bu ürünü ${item.cost} coin ile satın almak ister misiniz?`);
     if (!ok) return;
 
     setCoins((prev) => prev - item.cost);
@@ -182,7 +182,7 @@ export default function Profile1() {
   };
 
   const handleSave = () => {
-    window.alert('Profil kaydedildi! ✓');
+    window.alert('Profil kaydedildi.');
   };
 
   const handleAddFriend = () => {
@@ -336,7 +336,7 @@ export default function Profile1() {
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div className="coin-chip">🪙 {formatCoin(coins)}</div>
+            <div className="coin-chip"><Icon name="coin" size={14} color="#92400e" /> {formatCoin(coins)}</div>
             <div
               style={{
                 width: 34,
@@ -350,7 +350,7 @@ export default function Profile1() {
                 border: '2px solid #e2e8f0',
               }}
             >
-              {selectedAvatar}
+              <Icon name={selectedAvatar} size={18} />
             </div>
           </div>
         </header>
@@ -376,8 +376,8 @@ export default function Profile1() {
                 }}
               />
               <div style={{ position: 'absolute', top: 14, right: 20, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <div className="lig" style={{ background: '#FEF3C7', color: '#92400e', border: '1px solid #fcd34d' }}>🥇 Altın Lig</div>
-                <div className="lig" style={{ background: '#EFF6FF', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>◈ #4 Haftalık</div>
+                <div className="lig" style={{ background: '#FEF3C7', color: '#92400e', border: '1px solid #fcd34d' }}><Icon name="medal_gold" size={11} color="#92400e" /> Altın Lig</div>
+                <div className="lig" style={{ background: '#EFF6FF', color: '#1d4ed8', border: '1px solid #bfdbfe' }}><Icon name="goals" size={11} color="#1d4ed8" /> #4 Haftalık</div>
               </div>
             </div>
 
@@ -397,7 +397,7 @@ export default function Profile1() {
                     boxShadow: '0 4px 16px rgba(0,0,0,.10)',
                   }}
                 >
-                  {selectedAvatar}
+                  <Icon name={selectedAvatar} size={38} />
                 </div>
                 <div className="pulse-dot" style={{ position: 'absolute', bottom: 4, right: 4, width: 12, height: 12, borderRadius: '50%', background: '#059669', border: '2px solid #fff' }} />
               </div>
@@ -414,13 +414,15 @@ export default function Profile1() {
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 44 }}>
                 {[
-                  { value: 'Sv. 12', label: 'Seviye', color: '#2563EB' },
-                  { value: '8 450', label: 'Toplam XP', color: '#7C3AED' },
-                  { value: '🔥 12', label: 'Gün Serisi', color: '#D97706', glow: true },
-                  { value: `🪙 ${formatCoin(coins)}`, label: 'Coin', color: '#D97706' },
+                  { value: 'Sv. 12', label: 'Seviye', color: '#2563EB', icon: 'goals' },
+                  { value: '8 450', label: 'Toplam XP', color: '#7C3AED', icon: 'xp_log' },
+                  { value: '12', label: 'Gün Serisi', color: '#D97706', glow: true, icon: 'streak' },
+                  { value: formatCoin(coins), label: 'Coin', color: '#D97706', icon: 'coin' },
                 ].map((item) => (
                   <div key={item.label} className="stat-badge" style={{ minWidth: 90, animation: item.glow ? 'streak-glow 2s ease-in-out infinite' : undefined }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: item.color, letterSpacing: '-0.5px' }}>{item.value}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: item.color, letterSpacing: '-0.5px', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                      <Icon name={item.icon} size={14} color={item.color} /> {item.value}
+                    </div>
                     <div style={{ fontSize: 9, color: '#94a3b8', marginTop: 2, letterSpacing: 1, textTransform: 'uppercase' }}>{item.label}</div>
                   </div>
                 ))}
@@ -443,7 +445,9 @@ export default function Profile1() {
             {stats.map((item) => (
               <div key={item.label} className="card" style={{ padding: 20, borderTop: `3px solid ${item.color}` }}>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: item.color, marginBottom: 10 }}>
-                  {item.icon} {item.label}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <Icon name={item.icon} size={11} color={item.color} /> {item.label}
+                  </span>
                 </div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#111827', letterSpacing: '-0.5px' }}>{item.value}</div>
                 <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 3 }}>{item.sub}</div>
@@ -467,9 +471,7 @@ export default function Profile1() {
                     <div key={task.id} className={`task-row ${task.done ? 'done' : ''}`} onClick={() => toggleTask(task.id)}>
                       <div className="task-check">
                         {task.done ? (
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
+                          <Icon name="check" size={10} color="#ffffff" />
                         ) : null}
                       </div>
                       <span
@@ -494,7 +496,7 @@ export default function Profile1() {
                   {[
                     { label: 'Günlük · 20 dk çalış', value: '18/20 dk', progress: 90, color: '#2563EB' },
                     { label: 'Haftalık · 3 ders bitir', value: '2/3 ders', progress: 66, color: '#7C3AED' },
-                    { label: 'Aylık · 1 kurs tamamla', value: '1/1 ✓', progress: 100, color: '#059669' },
+                    { label: 'Aylık · 1 kurs tamamla', value: '1/1', progress: 100, color: '#059669' },
                   ].map((goal) => (
                     <div key={goal.label}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5, gap: 10 }}>
@@ -514,9 +516,14 @@ export default function Profile1() {
               <div className="badges-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
                 {badges.map((badge, index) => (
                   <div key={`${badge.title}-${index}`} className={`badge-item ${badge.locked ? 'locked' : 'bounce-in'} s${(index % 6) + 1}`}>
-                    <div className="badge-icon" style={{ background: badge.bg }}>{badge.icon}</div>
+                    <div className="badge-icon" style={{ background: badge.bg }}>
+                      <Icon name={badge.icon} size={20} color={badge.color} />
+                    </div>
                     <div style={{ fontSize: 9, fontWeight: 600, color: '#374151', lineHeight: 1.3 }}>{badge.title}</div>
-                    <div style={{ fontSize: 8, color: badge.color, fontWeight: 700 }}>{badge.status}</div>
+                    <div style={{ fontSize: 8, color: badge.color, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                      {!badge.locked ? <Icon name="check" size={8} color={badge.color} /> : null}
+                      {badge.status}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -541,12 +548,14 @@ export default function Profile1() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FFFBEB', border: '1px solid #fcd34d', borderRadius: 8, padding: '10px 14px', margin: '12px 0' }}>
-                <div style={{ fontSize: 28 }}>🥇</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28 }}>
+                  <Icon name="medal_gold" size={24} color="#D97706" />
+                </div>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#92400e' }}>Altın Lig</div>
                   <div style={{ fontSize: 9, color: '#b45309' }}>Bu haftaki sıralama: <strong>#4</strong> · 2 750 puan</div>
                 </div>
-                <div style={{ marginLeft: 'auto', fontSize: 9, color: '#b45309', fontWeight: 700 }}>↑ Elmas'a 250 puan kaldı</div>
+                <div style={{ marginLeft: 'auto', fontSize: 9, color: '#b45309', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="next" size={9} color="#b45309" /> Elmas'a 250 puan kaldı</div>
               </div>
 
               <div style={{ marginBottom: 14 }}>
@@ -556,11 +565,11 @@ export default function Profile1() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {currentRanking.map((row) => (
                   <div key={`${ligTab}-${row.rank}-${row.name}`} className={`rank-row ${row.me ? 'me' : ''}`}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: row.me ? '#2563EB' : row.rank === '🥇' ? '#D97706' : row.rank === '🥈' ? '#94a3b8' : row.rank === '🥉' ? '#b45309' : '#94a3b8', width: 22 }}>
-                      {row.rank}
+                    <span style={{ fontSize: 11, fontWeight: 700, color: row.me ? '#2563EB' : '#94a3b8', width: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {row.rankIcon ? <Icon name={row.rankIcon} size={11} color={row.me ? '#2563EB' : '#94a3b8'} /> : row.rank}
                     </span>
-                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: row.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>
-                      {row.avatar}
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: row.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon name={row.avatar} size={14} />
                     </div>
                     <span style={{ fontSize: 11, flex: 1, color: row.me ? '#1d4ed8' : '#374151', fontWeight: row.me ? 700 : 500 }}>{row.name}</span>
                     <span style={{ fontSize: 10, fontWeight: 700, color: row.me ? '#2563EB' : '#374151' }}>{row.points}</span>
@@ -573,7 +582,9 @@ export default function Profile1() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 10, flexWrap: 'wrap' }}>
                 <SectionLabel color="#059669">Arkadaşlar</SectionLabel>
                 <button onClick={handleAddFriend} style={{ background: '#EFF6FF', border: '1px solid #bfdbfe', color: '#2563EB', fontSize: 10, fontWeight: 700, padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontFamily: 'IBM Plex Mono', letterSpacing: '.5px' }}>
-                  + Arkadaş Ekle
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <Icon name="plus" size={10} color="#2563EB" /> Arkadaş Ekle
+                  </span>
                 </button>
               </div>
 
@@ -582,10 +593,12 @@ export default function Profile1() {
                   const cheered = cheeredFriends.includes(friend.id);
                   return (
                     <div key={friend.id} className="friend-row">
-                      <div style={{ fontSize: 20 }}>{friend.avatar}</div>
+                      <div style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name={friend.avatar} size={20} />
+                      </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 11, fontWeight: 600, color: '#111827' }}>{friend.name}</div>
-                        <div style={{ fontSize: 9, color: '#94a3b8' }}>{friend.level}</div>
+                        <div style={{ fontSize: 9, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 4 }}>{friend.level} · <Icon name="streak" size={10} color="#D97706" /> {friend.streak}</div>
                       </div>
                       <button
                         onClick={() => handleCheer(friend.id)}
@@ -603,7 +616,9 @@ export default function Profile1() {
                           opacity: cheered ? 0.6 : 1,
                         }}
                       >
-                        {cheered ? '👏 Gönderildi!' : '👏 Alkış'}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <Icon name="handshake" size={10} color="#059669" /> {cheered ? 'Gönderildi!' : 'Alkış'}
+                        </span>
                       </button>
                     </div>
                   );
@@ -611,7 +626,7 @@ export default function Profile1() {
               </div>
 
               <div style={{ marginTop: 16, padding: '12px 14px', background: '#F5F3FF', border: '1px solid #ddd6fe', borderRadius: 8 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#7C3AED', marginBottom: 6 }}>⌖ Takım Görevi</div>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#7C3AED', marginBottom: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="stats" size={9} color="#7C3AED" /> Takım Görevi</div>
                 <div style={{ fontSize: 11, color: '#374151', marginBottom: 8 }}>Grup: 100 soru çözün · 72/100</div>
                 <ProgressBar value={72} color="#7C3AED" />
               </div>
@@ -682,7 +697,7 @@ export default function Profile1() {
                   <div className="pulse-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#38bdf8' }} />
                   <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#38bdf8' }}>Sezonluk Etkinlik — Kış Olimpiyatı</span>
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 6 }}>❄️ Kış Matematik Olimpiyatı 2025</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 6, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="snow" size={14} color="#38bdf8" /> Kış Matematik Olimpiyatı 2025</div>
                 <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 12 }}>Bitiş: 31 Ocak · 14 gün kaldı</div>
                 <div style={{ marginBottom: 10 }}>
                   <ProgressBar value={62} color="linear-gradient(90deg,#38bdf8,#818cf8)" background="rgba(255,255,255,.1)" />
@@ -697,7 +712,7 @@ export default function Profile1() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56,189,248,.25)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56,189,248,.15)')}
                 >
-                  Etkinliğe Katıl →
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>Etkinliğe Katıl <Icon name="next" size={9} color="#38bdf8" /></span>
                 </button>
               </div>
             </div>
@@ -722,7 +737,7 @@ export default function Profile1() {
           <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             <div className="card" style={{ padding: 22 }}>
               <SectionLabel color="#D97706">Coin Shop</SectionLabel>
-              <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 14 }}>Bakiyen: <strong style={{ color: '#D97706' }}>🪙 {formatCoin(coins)}</strong></div>
+              <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 14 }}>Bakiyen: <strong style={{ color: '#D97706', display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="coin" size={10} color="#D97706" /> {formatCoin(coins)}</strong></div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 14, borderBottom: '1px solid #e2e8f0', paddingBottom: 12, flexWrap: 'wrap' }}>
                 {[
                   ['avatars', 'Avatar'],
@@ -742,8 +757,11 @@ export default function Profile1() {
                     const owned = item.owned || ownedItems.includes(item.id);
                     return (
                       <div key={item.id} className={`shop-item ${owned ? 'owned' : ''}`} onClick={() => handleBuyItem(item)}>
-                        <div style={{ fontSize: 26, marginBottom: 4 }}>{item.icon}</div>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item) }}>{owned ? item.label || '✓ Sahipsin' : `🪙 ${item.cost}`}</div>
+                        <div style={{ marginBottom: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name={item.icon} size={26} color={owned ? '#059669' : getPriceColor(item)} /></div>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item), display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          {owned ? <Icon name="check" size={9} color="#059669" /> : <Icon name="coin" size={9} color={getPriceColor(item)} />}
+                          {owned ? item.label || 'Sahipsin' : item.cost}
+                        </div>
                       </div>
                     );
                   })}
@@ -756,8 +774,11 @@ export default function Profile1() {
                     const owned = item.owned || ownedItems.includes(item.id);
                     return (
                       <div key={item.id} className={`shop-item ${owned ? 'owned' : ''}`} onClick={() => handleBuyItem(item)}>
-                        <div style={{ fontSize: 22, marginBottom: 4 }}>{item.icon}</div>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item) }}>{owned ? item.label || '✓ Sahipsin' : `🪙 ${item.cost}`}</div>
+                        <div style={{ marginBottom: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name={item.icon} size={22} color={owned ? '#059669' : getPriceColor(item)} /></div>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item), display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          {owned ? <Icon name="check" size={9} color="#059669" /> : <Icon name="coin" size={9} color={getPriceColor(item)} />}
+                          {owned ? item.label || 'Sahipsin' : item.cost}
+                        </div>
                       </div>
                     );
                   })}
@@ -780,7 +801,10 @@ export default function Profile1() {
                             margin: '0 auto 4px',
                           }}
                         />
-                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item) }}>{owned ? item.label || '✓ Sahipsin' : `🪙 ${item.cost}`}</div>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item), display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          {owned ? <Icon name="check" size={9} color="#059669" /> : <Icon name="coin" size={9} color={getPriceColor(item)} />}
+                          {owned ? item.label || 'Sahipsin' : item.cost}
+                        </div>
                       </div>
                     );
                   })}
@@ -793,10 +817,13 @@ export default function Profile1() {
                     const owned = ownedItems.includes(item.id);
                     return (
                       <div key={item.id} className={`shop-item ${owned ? 'owned' : ''}`} onClick={() => handleBuyItem(item)} style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}>
-                        <div style={{ fontSize: 20 }}>{item.icon}</div>
+                        <div style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name={item.icon} size={20} color={owned ? '#059669' : getPriceColor(item)} /></div>
                         <div>
                           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151' }}>{item.title}</div>
-                          <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item) }}>{owned ? '✓ Sahipsin' : `🪙 ${item.cost}`}</div>
+                          <div style={{ fontSize: 9, fontWeight: 700, color: owned ? '#059669' : getPriceColor(item), display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                            {owned ? <Icon name="check" size={9} color="#059669" /> : <Icon name="coin" size={9} color={getPriceColor(item)} />}
+                            {owned ? 'Sahipsin' : item.cost}
+                          </div>
                         </div>
                       </div>
                     );
@@ -813,7 +840,7 @@ export default function Profile1() {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {availableAvatars.map((avatar) => (
                     <button key={avatar} type="button" className={`av-opt ${selectedAvatar === avatar ? 'selected' : ''}`} onClick={() => setSelectedAvatar(avatar)}>
-                      {avatar}
+                      <Icon name={avatar} size={24} />
                     </button>
                   ))}
                 </div>
@@ -839,23 +866,23 @@ export default function Profile1() {
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 8 }}>Vitrin Rozetleri (3 seç)</div>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                   {[
-                    ['🎓', '#EFF6FF', '#2563EB'],
-                    ['🔥', '#FFFBEB', '#D97706'],
-                    ['💯', '#ECFDF5', '#059669'],
+                    ['graduation', '#EFF6FF', '#2563EB'],
+                    ['streak', '#FFFBEB', '#D97706'],
+                    ['chart', '#ECFDF5', '#059669'],
                   ].map(([icon, bg, border]) => (
-                    <div key={icon} style={{ width: 44, height: 44, borderRadius: 10, background: bg, border: `2px solid ${border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-                      {icon}
+                    <div key={icon} style={{ width: 44, height: 44, borderRadius: 10, background: bg, border: `2px solid ${border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon name={icon} size={20} color={border} />
                     </div>
                   ))}
                   <button type="button" onClick={() => window.alert('Rozet seçin!')} style={{ width: 44, height: 44, borderRadius: 10, background: '#F8F9FB', border: '2px dashed #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#94a3b8', cursor: 'pointer' }}>
-                    +
+                    <Icon name="plus" size={16} color="#94a3b8" />
                   </button>
                 </div>
               </div>
 
               <div style={{ background: '#F8F9FB', border: '1px solid #e2e8f0', borderRadius: 10, padding: 14, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#2563EB,#7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,.1)' }}>
-                  {selectedAvatar}
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#2563EB,#7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,.1)' }}>
+                  <Icon name={selectedAvatar} size={24} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>İlkhan Arda Akmaca</div>
@@ -878,7 +905,8 @@ export default function Profile1() {
             </div>
             <span style={{ fontWeight: 600, fontSize: 12, color: '#111827' }}>Code:Enigma</span>
           </div>
-          <p style={{ fontSize: 10, color: '#94a3b8' }}>© 2025 Açık ve Uzaktan Eğitim Projesi. Tüm hakları saklıdır.</p>
+          <p style={{ fontSize: 10, color: '#94a3b8' }}>© {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi. Tüm hakları saklıdır.</p>
+          <p style={{ fontSize: 10, color: '#94a3b8' }}>Icons by <a href="https://icons8.com" target="_blank" rel="noreferrer" style={{ fontWeight: 600, color: '#64748b' }}>Icons8</a></p>
         </footer>
 
         </div>

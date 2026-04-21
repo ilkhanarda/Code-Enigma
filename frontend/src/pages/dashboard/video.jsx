@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
+import Icon from "../../components/ui/icons8-icon.jsx";
 
 const CHAPTERS = [
   {
@@ -519,7 +520,7 @@ function ChapterTimeline({ currentTime, duration, onSeek }) {
           style={{
             position: "absolute",
             bottom: "calc(100% + 8px)",
-            left: Math.max(36, Math.min(hover.px, (ref.current?.offsetWidth || 300) - 80)),
+            left: Math.max(36, Math.min(hover.px, (hover.width || 300) - 80)),
             transform: "translateX(-40%)",
             background: "#111827",
             color: "#fff",
@@ -547,7 +548,7 @@ function ChapterTimeline({ currentTime, duration, onSeek }) {
           const px = event.clientX - rect.left;
           const ratio = px / rect.width;
           const safeRatio = Math.max(0, Math.min(1, ratio));
-          setHover({ ratio: safeRatio, px, chapter: getChapter(safeRatio * duration) });
+          setHover({ ratio: safeRatio, px, width: rect.width, chapter: getChapter(safeRatio * duration) });
           if (dragging) onSeek(safeRatio * duration);
         }}
         onMouseLeave={() => setHover(null)}
@@ -659,16 +660,7 @@ function Controls({
             borderRadius: 4,
           }}
         >
-          {playing ? (
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
-            </svg>
-          ) : (
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5,3 19,12 5,21" />
-            </svg>
-          )}
+          {playing ? <Icon name="pause" size={17} color="#ffffff" /> : <Icon name="play" size={17} color="#ffffff" />}
         </button>
 
         <button
@@ -682,18 +674,7 @@ function Controls({
             padding: 3,
           }}
         >
-          {muted || volume === 0 ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M11 5L6 9H2v6h4l5 4V5z" />
-              <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2.5" />
-              <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2.5" />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M11 5L6 9H2v6h4l5 4V5z" />
-              <path d="M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" fill="none" />
-            </svg>
-          )}
+          {muted || volume === 0 ? <Icon name="volume_off" size={14} color="#94a3b8" /> : <Icon name="sound" size={14} color="#94a3b8" />}
         </button>
 
         <input
@@ -748,9 +729,7 @@ function Controls({
             padding: 3,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
-          </svg>
+          <Icon name="fullscreen" size={14} color="#94a3b8" />
         </button>
       </div>
     </div>
@@ -837,8 +816,8 @@ function ChapterSidebar({ currentTime, onSeek }) {
                 {fmt(chapter.start)}–{fmt(chapter.end)}
               </div>
               {isDone && (
-                <div style={{ fontSize: 9, color: chapter.accent, marginTop: 4, fontWeight: 600 }}>
-                  ✓ Tamamlandı
+                <div style={{ fontSize: 9, color: chapter.accent, marginTop: 4, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <Icon name="check" size={9} color={chapter.accent} /> Tamamlandı
                 </div>
               )}
             </div>
@@ -965,9 +944,7 @@ function TabSummary({
             fontWeight: 600,
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="15,18 9,12 15,6" />
-          </svg>
+          <Icon name="back" size={12} color="#94a3b8" />
           Özete Dön
         </button>
         <div style={{ flex: 1 }} />
@@ -1019,7 +996,7 @@ function TabSummary({
               lineHeight: 1.7,
             }}
           >
-            <div style={{ fontSize: 22, marginBottom: 8 }}>🔍</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}><Icon name="search" size={18} color="#94a3b8" /></div>
             <div style={{ fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
               Bu bölüm hakkında soru sor
             </div>
@@ -1167,10 +1144,7 @@ function TabSummary({
               transition: "background 0.15s",
             }}
           >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !loading ? "#fff" : "#94a3b8"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
+            <Icon name="send" size={11} color={input.trim() && !loading ? "#ffffff" : "#94a3b8"} />
           </button>
         </div>
 
@@ -1201,10 +1175,6 @@ function TabQuestion({ chapter }) {
     setSelected(null);
     setShowSolution(false);
   };
-
-  useEffect(() => {
-    resetQuestion(0);
-  }, [chapter.id]);
 
   const questions = chapter.questions;
   const question = questions[questionIndex];
@@ -1314,32 +1284,15 @@ function TabQuestion({ chapter }) {
               <span style={{ fontSize: 11, lineHeight: 1.55, flex: 1 }}>{option.slice(3)}</span>
 
               {answered && index === question.correct && (
-                <svg
-                  style={{ marginLeft: "auto", flexShrink: 0 }}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#059669"
-                  strokeWidth="2.5"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <span style={{ marginLeft: "auto", flexShrink: 0 }}>
+                  <Icon name="check" size={14} color="#059669" />
+                </span>
               )}
 
               {answered && index === selected && !isCorrect && index !== question.correct && (
-                <svg
-                  style={{ marginLeft: "auto", flexShrink: 0 }}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#DC2626"
-                  strokeWidth="2.5"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
+                <span style={{ marginLeft: "auto", flexShrink: 0 }}>
+                  <Icon name="xmark" size={14} color="#DC2626" />
+                </span>
               )}
             </button>
           );
@@ -1359,16 +1312,7 @@ function TabQuestion({ chapter }) {
               gap: 8,
             }}
           >
-            {isCorrect ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            )}
+            {isCorrect ? <Icon name="check" size={16} color="#059669" /> : <Icon name="xmark" size={16} color="#DC2626" />}
 
             <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? "#065f46" : "#991b1b" }}>
               {isCorrect ? "Doğru cevap!" : `Yanlış. Doğru cevap: ${OPTS_LABELS[question.correct]}`}
@@ -1395,10 +1339,7 @@ function TabQuestion({ chapter }) {
                 transition: "background .15s",
               }}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4M12 8h.01" />
-              </svg>
+              <Icon name="info" size={13} color="#92400e" />
               Çözümü Gör
             </button>
           ) : (
@@ -1437,7 +1378,7 @@ function TabQuestion({ chapter }) {
             marginTop: 2,
           }}
         >
-          Sonraki Soru →
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>Sonraki Soru <Icon name="next" size={11} color={chapter.accent} /></span>
         </button>
       )}
 
@@ -1466,11 +1407,6 @@ function TabQuestion({ chapter }) {
 function TabFlashcards({ chapter }) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-
-  useEffect(() => {
-    setIndex(0);
-    setFlipped(false);
-  }, [chapter.id]);
 
   const cards = chapter.flashcards;
   const card = cards[index];
@@ -1560,7 +1496,7 @@ function TabFlashcards({ chapter }) {
               Kavram
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{card.front}</div>
-            <div style={{ fontSize: 9, color: "#cbd5e1", marginTop: 10 }}>Çevirmek için tıkla →</div>
+            <div style={{ fontSize: 9, color: "#cbd5e1", marginTop: 10, display: "inline-flex", alignItems: "center", gap: 4 }}>Çevirmek için tıkla <Icon name="next" size={9} color="#cbd5e1" /></div>
           </div>
 
           <div
@@ -1603,8 +1539,8 @@ function TabFlashcards({ chapter }) {
 
       <div style={{ display: "flex", gap: 6 }}>
         {[
-          { label: "← Önceki", nextIndex: Math.max(0, index - 1), disabled: index === 0 },
-          { label: "Sonraki →", nextIndex: Math.min(cards.length - 1, index + 1), disabled: index === cards.length - 1 },
+          { label: "Önceki", icon: "previous", nextIndex: Math.max(0, index - 1), disabled: index === 0 },
+          { label: "Sonraki", icon: "next", nextIndex: Math.min(cards.length - 1, index + 1), disabled: index === cards.length - 1 },
         ].map((item) => (
           <button
             key={item.label}
@@ -1626,7 +1562,10 @@ function TabFlashcards({ chapter }) {
               transition: "border-color 0.15s",
             }}
           >
-            {item.label}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <Icon name={item.icon} size={10} color={item.disabled ? "#cbd5e1" : "#374151"} />
+              {item.label}
+            </span>
           </button>
         ))}
       </div>
@@ -1647,11 +1586,6 @@ function ContentPanel({ chapter, visible, onToggle }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const isAiSummary = tab === "summary" && aiMode;
-
-  useEffect(() => {
-    setTab("summary");
-    setAiMode(false);
-  }, [chapter?.id]);
 
   const tabs = [
     { id: "summary", label: "Özet" },
@@ -1689,17 +1623,9 @@ function ContentPanel({ chapter, visible, onToggle }) {
         onMouseEnter={(e) => { e.currentTarget.style.background = "#EFF6FF"; e.currentTarget.style.color = "#2563EB"; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#64748b"; }}
       >
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          style={{ transition: "transform 0.3s", transform: visible ? "rotate(0deg)" : "rotate(180deg)" }}
-        >
-          <polyline points="9,18 15,12 9,6" />
-        </svg>
+        <span style={{ transition: "transform 0.3s", transform: visible ? "rotate(0deg)" : "rotate(180deg)", display: "inline-flex" }}>
+          <Icon name="next" size={10} color="#64748b" />
+        </span>
       </button>
 
       {/* Panel — slide animasyonuyla */}
@@ -1821,10 +1747,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
             >
               <span className="ai-mode-pill__inner">
                 <span className="ai-mode-pill__icon-wrap" aria-hidden="true">
-                  <svg className="ai-mode-pill__icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.8l1.76 5.13 5.24 1.82-5.24 1.82L12 16.7l-1.76-5.13L5 9.75l5.24-1.82L12 2.8z" />
-                    <path d="M18.2 14.4l.78 2.27 2.32.8-2.32.8-.78 2.27-.78-2.27-2.32-.8 2.32-.8.78-2.27z" opacity="0.82" />
-                  </svg>
+                  <Icon name="ai" size={11} className="ai-mode-pill__icon" color="#4f46e5" />
                 </span>
                 <span className="ai-mode-pill__label">AI Modu</span>
               </span>
@@ -2105,9 +2028,7 @@ export default function Video() {
                   pointerEvents: "none",
                 }}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
+                <Icon name="play" size={22} color="#ffffff" />
               </div>
             </div>
 
@@ -2148,7 +2069,7 @@ export default function Video() {
             </div>
           </div>
 
-          <ContentPanel chapter={currentChapter} visible={panelOpen} onToggle={() => setPanelOpen((prev) => !prev)} />
+          <ContentPanel key={currentChapter.id} chapter={currentChapter} visible={panelOpen} onToggle={() => setPanelOpen((prev) => !prev)} />
         </div>
 
         <footer style={styles.footer}>
@@ -2199,9 +2120,14 @@ export default function Video() {
             })}
           </div>
 
-          <p style={{ fontSize: 10, color: "#94a3b8", margin: 0 }}>
-            © {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi
-          </p>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+            <p style={{ fontSize: 10, color: "#94a3b8", margin: 0 }}>
+              © {new Date().getFullYear()} Açık ve Uzaktan Eğitim Projesi
+            </p>
+            <p style={{ fontSize: 10, color: "#94a3b8", margin: 0 }}>
+              Icons by <a href="https://icons8.com" target="_blank" rel="noreferrer" style={{ fontWeight: 600, color: "#64748b" }}>Icons8</a>
+            </p>
+          </div>
         </footer>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { QUESTIONS } from "../../data/questions/guvenirlik.js";
+import Icon from "../../components/ui/icons8-icon.jsx";
 
 const TOTAL_SECONDS = 30 * 60;
 
@@ -55,7 +56,10 @@ function useTimer(initial, onExpire) {
   const [seconds, setSeconds] = useState(initial);
   const runningRef = useRef(true);
   const onExpireRef = useRef(onExpire);
-  onExpireRef.current = onExpire;
+
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -165,7 +169,7 @@ function QuestionPalette({ questions, answers, flagged, current, onSelect, stats
 
       {/* Motivational card */}
       <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-        <div className="text-sm">💡</div>
+        <div className="text-sm"><Icon name="idea" size={14} color="#2563EB" /></div>
         <p className="mt-1.5 text-[10px] leading-relaxed text-blue-700">
           Her soruyu dikkatli oku. Şıkları eleyerek ilerle.
         </p>
@@ -185,7 +189,7 @@ function HintPanel({ hint }) {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-semibold text-amber-700 transition-all hover:bg-amber-100"
       >
-        💡 {open ? "İpucunu Gizle" : "İpucu Al"}
+        <Icon name="idea" size={12} color="#b45309" /> {open ? "İpucunu Gizle" : "İpucu Al"}
       </button>
       {open && (
         <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -199,7 +203,7 @@ function HintPanel({ hint }) {
 /* ═══════════════════════════════════════
    EXPLANATION PANEL
 ═══════════════════════════════════════ */
-function ExplanationPanel({ explanation, isCorrect, correctKey, selectedKey }) {
+function ExplanationPanel({ explanation, isCorrect, correctKey }) {
   const [showVideo, setShowVideo] = useState(false);
   const [difficulty, setDifficulty] = useState(null);
 
@@ -213,7 +217,7 @@ function ExplanationPanel({ explanation, isCorrect, correctKey, selectedKey }) {
             : "border-red-100 bg-red-50"
         }`}
       >
-        <span className="text-base">{isCorrect ? "✅" : "❌"}</span>
+        <span className="text-base">{isCorrect ? <Icon name="check_circle" size={16} color="#059669" /> : <Icon name="xmark" size={16} color="#DC2626" />}</span>
         <span
           className={`text-[12px] font-bold ${
             isCorrect ? "text-emerald-700" : "text-red-700"
@@ -241,12 +245,12 @@ function ExplanationPanel({ explanation, isCorrect, correctKey, selectedKey }) {
               onClick={() => setShowVideo(true)}
               className="flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-[11px] font-semibold text-purple-700 transition-all hover:bg-purple-100"
             >
-              ▶ Video Çözümü İzle
+              <Icon name="play" size={12} color="#7C3AED" /> Video Çözümü İzle
             </button>
           ) : (
             <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-purple-200 bg-purple-50">
               <div className="text-center">
-                <div className="text-2xl">🎬</div>
+                <div className="flex justify-center"><Icon name="video" size={22} color="#7C3AED" /></div>
                 <p className="mt-1 text-[10px] text-purple-500">
                   Video çözüm yüklenecek
                 </p>
@@ -279,7 +283,7 @@ function ExplanationPanel({ explanation, isCorrect, correctKey, selectedKey }) {
 
         {/* Similar question */}
         <button className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-semibold text-slate-500 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600">
-          🔄 Benzer Soru Getir
+          <Icon name="refresh" size={11} color="#64748b" /> Benzer Soru Getir
         </button>
       </div>
     </div>
@@ -305,7 +309,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         activeClass="border-emerald-400 bg-emerald-50 text-emerald-700"
         title="Beğen"
       >
-        👍 <span>Beğendim</span>
+        <Icon name="like" size={12} color={liked ? "#047857" : "#64748b"} /> <span>Beğendim</span>
       </IconBtn>
 
       <IconBtn
@@ -314,7 +318,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         activeClass="border-red-300 bg-red-50 text-red-600"
         title="Beğenme"
       >
-        👎 <span>Beğenmedim</span>
+        <Icon name="dislike" size={12} color={disliked ? "#DC2626" : "#64748b"} /> <span>Beğenmedim</span>
       </IconBtn>
 
       <IconBtn
@@ -323,7 +327,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         activeClass="border-amber-400 bg-amber-50 text-amber-700"
         title="Favorile"
       >
-        {isFav ? "★" : "☆"} <span>Favori</span>
+        <Icon name="favorite" size={12} color={isFav ? "#D97706" : "#64748b"} /> <span>Favori</span>
       </IconBtn>
 
       <IconBtn
@@ -332,7 +336,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         activeClass="border-amber-400 bg-amber-50 text-amber-700"
         title="İşaretle"
       >
-        🚩 <span>{isMarked ? "İşaretlendi" : "İşaretle"}</span>
+        <Icon name="flag" size={12} color={isMarked ? "#D97706" : "#64748b"} /> <span>{isMarked ? "İşaretlendi" : "İşaretle"}</span>
       </IconBtn>
 
       <IconBtn
@@ -341,7 +345,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         activeClass="border-blue-300 bg-blue-50 text-blue-700"
         title="Yorum yap"
       >
-        💬 <span>Yorum</span>
+        <Icon name="comment" size={12} color={showComment ? "#2563EB" : "#64748b"} /> <span>Yorum</span>
       </IconBtn>
 
       <IconBtn
@@ -349,7 +353,7 @@ function InteractionBar({ qId, flagged, onFlag, favorites, onFavorite }) {
         title="Bildir"
         className="ml-auto"
       >
-        ⚑ <span>Bildir</span>
+        <Icon name="report_issue" size={12} color="#64748b" /> <span>Bildir</span>
       </IconBtn>
 
       {showComment && (
@@ -506,7 +510,7 @@ export default function TestPage() {
                     : "border-slate-200 bg-slate-50 text-slate-700"
                 }`}
               >
-                ⏱ {timer.fmt}
+                <Icon name="timer" size={12} color={timerDanger ? "#DC2626" : "#334155"} /> {timer.fmt}
               </div>
               <button
                 onClick={() => setShowFinish(true)}
@@ -583,8 +587,8 @@ export default function TestPage() {
                         {opt.key}
                       </span>
                       <span className="flex-1 text-[12px] leading-relaxed">{opt.text}</span>
-                      {isRight && <span className="ml-auto flex-shrink-0 text-emerald-600">✓</span>}
-                      {isWrong && <span className="ml-auto flex-shrink-0 text-red-500">✗</span>}
+                      {isRight && <span className="ml-auto flex-shrink-0 text-emerald-600"><Icon name="check_circle" size={12} color="#059669" /></span>}
+                      {isWrong && <span className="ml-auto flex-shrink-0 text-red-500"><Icon name="xmark" size={12} color="#DC2626" /></span>}
                     </button>
                   );
                 })}
@@ -598,14 +602,14 @@ export default function TestPage() {
                     disabled={currentIdx === 0}
                     className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[11px] font-semibold text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600 disabled:opacity-40"
                   >
-                    ← Önceki
+                    <span className="inline-flex items-center gap-1"><Icon name="previous" size={11} color="#64748b" /> Önceki</span>
                   </button>
                   <button
                     onClick={goNext}
                     disabled={currentIdx === QUESTIONS.length - 1}
                     className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[11px] font-semibold text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600 disabled:opacity-40"
                   >
-                    Sonraki →
+                    <span className="inline-flex items-center gap-1">Sonraki <Icon name="next" size={11} color="#64748b" /></span>
                   </button>
                 </div>
 
@@ -617,7 +621,7 @@ export default function TestPage() {
                         disabled={!selectedKey}
                         className="rounded-xl border border-slate-200 px-3 py-2 text-[10px] font-semibold text-slate-400 transition-all hover:border-red-200 hover:text-red-500 disabled:opacity-30"
                       >
-                        ✕ Temizle
+                        <span className="inline-flex items-center gap-1"><Icon name="close" size={10} color="#94a3b8" /> Temizle</span>
                       </button>
                       <button
                         onClick={skipQuestion}
@@ -633,7 +637,7 @@ export default function TestPage() {
                       onClick={goNext}
                       className="rounded-xl bg-blue-600 px-5 py-2 text-[11px] font-bold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700"
                     >
-                      Sonraki Soru →
+                      <span className="inline-flex items-center gap-1">Sonraki Soru <Icon name="next" size={11} color="#ffffff" /></span>
                     </button>
                   )}
                 </div>
@@ -658,7 +662,6 @@ export default function TestPage() {
               explanation={current.explanation}
               isCorrect={isCorrect}
               correctKey={current.correctAnswer}
-              selectedKey={selectedKey}
             />
           )}
         </main>

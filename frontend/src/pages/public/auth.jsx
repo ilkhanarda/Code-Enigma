@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Icon from '../../components/ui/icons8-icon.jsx'
 
 const trustMetrics = [
   { label: 'Aktif Öğrenci', value: '1.2K' },
@@ -362,7 +363,7 @@ export default function AuthPage() {
                     className="group mt-2 flex w-full items-center justify-center gap-3 rounded-[22px] bg-[#2563EB] px-5 py-4 text-[12px] font-semibold uppercase tracking-[2px] text-white shadow-[0_18px_30px_rgba(37,99,235,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1D4ED8]"
                   >
                     <span>{mode === 'login' ? 'Panele Giriş Yap' : 'Hesabı Oluştur'}</span>
-                    <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    <span className="transition-transform duration-200 group-hover:translate-x-1"><Icon name="next" size={12} color="#ffffff" /></span>
                   </button>
                 </form>
 

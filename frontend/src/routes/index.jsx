@@ -12,6 +12,7 @@ const Test       = lazy(() => import('../pages/dashboard/test.jsx'))
 const Topics     = lazy(() => import('../pages/dashboard/topics.jsx'))
 const Gaps       = lazy(() => import('../pages/dashboard/gaps.jsx'))
 const Settings   = lazy(() => import('../pages/dashboard/settings.jsx'))
+const Logo       = lazy(() => import('../assets/logo.jsx'))
 
 function Fallback() {
   return (
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
         { path: '/topics',    element: <Topics /> },
         { path: '/gaps',      element: <Gaps /> },
         { path: '/settings',  element: <Settings /> },
+        { path: '/logo',      element: <Logo /> },
       ],
     },
   ],
