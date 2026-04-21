@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Icon from "../../components/ui/icons8-icon.jsx";
 
 const STORAGE_KEY = "code-enigma:dashboard-widgets";
-const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "daily_tasks"];
+const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "tasks"];
 
 // square = 1:1  |  wide = 2:1
 const WIDGET_META = [
