@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Icon from "../../components/ui/icons8-icon.jsx";
 
 const STORAGE_KEY = "code-enigma:dashboard-widgets";
-const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "daily_tasks"];
+const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "tasks"];
 
 // square = 1:1  |  wide = 2:1
 const WIDGET_META = [
@@ -16,7 +16,7 @@ const WIDGET_META = [
   { id: "quiz",         title: "Sınav Takvimi",      description: "Yaklaşan quiz ve sınavlar.",           size: "wide",   accent: "#DC2626", icon: "quiz" },
   { id: "notes",        title: "Hızlı Notlar",       description: "Kısa notları dashboard'dan düzenle.", size: "square", accent: "#0891B2", icon: "notes" },
   { id: "focus",        title: "Odak Sayacı",        description: "Pomodoro tabanlı çalışma sayacı.",    size: "square", accent: "#BE185D", icon: "focus" },
-  { id: "xplog",        title: "XP Geçmişi",         description: "Son 7 günün XP kazanımları.",         size: "wide",   accent: "#059669", icon: "xp_log" },
+  { id: "xplog",        title: "XP Geçmişi",         description: "Son 7 günün XP kazanımları.",         size: "wide",   accent: "#059669", icon: "bullish" },
 ];
 
 const WIDGET_IDS = new Set(WIDGET_META.map((w) => w.id));
@@ -277,14 +277,8 @@ function AchievementWidget({ badges }) {
 function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
   const current = rankingData[rankingTab];
   const me      = current.find((r) => r.me);
-  const visibleCount = 5;
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageAnim, setPageAnim] = useState("");
-  const pageCount = Math.max(1, Math.ceil(current.length / visibleCount));
-  const pageStart = pageIndex * visibleCount;
-  const canScrollUp = pageIndex > 0;
-  const canScrollDown = pageIndex < pageCount - 1;
-  const visibleRows = current.slice(pageStart, pageStart + visibleCount);
+  const rankingRows = current.slice(0, 4);
+  const meRankLabel = `${String(me?.rank || "#8").replace("#", "")}.`;
 
   return (
     <div className="flex h-full flex-col">
@@ -305,83 +299,45 @@ function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
           ))}
         </div>
       </div>
-      <div className="mt-2.5 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[clamp(12px,0.86vw,14.5px)] font-bold text-[#111827]">{me?.rank || "#4"} sıradasın</span>
-        </div>
-        <span className="text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-amber-700">{me?.points || "2 750 pts"}</span>
-      </div>
-      <div className="relative mt-2 flex flex-1 overflow-hidden">
-        <div
-          className={`flex w-full flex-col gap-1.5 ${
-            pageAnim === "down"
-              ? "animate-[ranking-slide-down_280ms_cubic-bezier(0.22,1,0.36,1)]"
-              : pageAnim === "up"
-                ? "animate-[ranking-slide-up_280ms_cubic-bezier(0.22,1,0.36,1)]"
-                : ""
-          }`}
-          onAnimationEnd={() => setPageAnim("")}
-        >
-          {visibleRows.map((row, index) => (
-            <div
-              key={`${rankingTab}-${row.rank}-${row.name}`}
-              className={`flex w-full items-center gap-2 rounded-[14px] border px-2.5 py-1.5 ${
-                row.me ? "border-blue-200 bg-blue-50" : "border-slate-100 bg-white"
-              }`}
-            >
-              <span className="flex w-6 items-center justify-center text-[clamp(11.5px,0.78vw,13.5px)] font-bold" style={{ color: row.me ? "#2563EB" : "#94A3B8" }}>
-                {pageStart + index + 1}.
-              </span>
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: row.bg }}>
-                <Icon name={row.avatar} size={15} />
+        <div className="flex min-h-0 flex-1 flex-col p-2.5 md:p-3">
+          <div className="flex flex-1 flex-col gap-1.5">
+            {rankingRows.map((row, index) => (
+              <div
+                key={`${rankingTab}-${row.rank}-${row.name}`}
+                className={`flex w-full items-center gap-2 rounded-[12px] border px-2.5 py-1.5 ${
+                  row.me ? "border-blue-200 bg-blue-50" : "border-slate-100 bg-white"
+                }`}
+              >
+                <span className="flex w-6 items-center justify-center text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-slate-400">
+                  {index + 1}.
+                </span>
+                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: row.bg }}>
+                  <Icon name={row.avatar} size={15} />
+                </div>
+                <span className={`min-w-0 flex-1 truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
+                  {row.name}
+                </span>
+                <span className={`text-[clamp(11.5px,0.78vw,13.5px)] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
+                  {row.points}
+                </span>
               </div>
-              <span className={`min-w-0 flex-1 truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
-                {row.name}
-              </span>
-              <span className={`text-[clamp(11.5px,0.78vw,13.5px)] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
-                {row.points}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
-        <div className="absolute bottom-1 right-1 z-30 flex flex-col gap-1.5">
-          <button
-            type="button"
-            aria-label="Yukarı kaydır"
-            onClick={() => {
-              if (!canScrollUp) return;
-              setPageAnim("up");
-              setPageIndex((prev) => Math.max(0, prev - 1));
-            }}
-            className={`flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all ${
-              canScrollUp ? "opacity-100 hover:border-blue-200 hover:text-blue-600" : "pointer-events-none opacity-0"
-            }`}
-          >
-            <span style={{ transform: "rotate(-90deg)", display: "inline-flex" }}>
-              <Icon name="next" size={11} color={canScrollUp ? "#2563EB" : "#94a3b8"} />
-            </span>
-          </button>
-          <button
-            type="button"
-            aria-label="Aşağı kaydır"
-            onClick={() => {
-              if (!canScrollDown) return;
-              setPageAnim("down");
-              setPageIndex((prev) => Math.min(pageCount - 1, prev + 1));
-            }}
-            disabled={!canScrollDown}
-            className={`flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all ${
-              canScrollDown ? "opacity-100 hover:border-blue-200 hover:text-blue-600" : "cursor-not-allowed opacity-40"
-            }`}
-          >
-            <span style={{ transform: "rotate(90deg)", display: "inline-flex" }}>
-              <Icon name="next" size={11} color={canScrollDown ? "#2563EB" : "#94a3b8"} />
-            </span>
-          </button>
+        <div className="mx-auto h-px w-[94%] rounded-full bg-slate-200/80" />
+        <div className="p-2.5 md:p-3">
+          <div className="flex items-center justify-between rounded-[12px] border border-amber-200 bg-amber-50 px-2.5 py-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="text-[clamp(12px,0.86vw,14.5px)] font-bold text-[#111827]">{meRankLabel}</span>
+              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: me?.bg || "linear-gradient(135deg,#2563EB,#7C3AED)" }}>
+                <Icon name={me?.avatar || "avatar_teddy_bear"} size={15} />
+              </div>
+              <span className="truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold text-amber-700">Sen</span>
+            </div>
+            <span className="text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-amber-700">{me?.points || "2 750 pts"}</span>
+          </div>
         </div>
       </div>
-    </div>
   );
 }
 
@@ -855,14 +811,6 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user 
         @keyframes widget-panel-in {
           from { opacity: 0; transform: translateY(12px) scale(.98); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes ranking-slide-down {
-          from { opacity: .55; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes ranking-slide-up {
-          from { opacity: .55; transform: translateY(-10px); }
-          to   { opacity: 1; transform: translateY(0); }
         }
         .widget-panel { animation: widget-panel-in .22s cubic-bezier(.2,.8,.2,1); }
       `}</style>

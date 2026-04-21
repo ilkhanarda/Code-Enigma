@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { useUser } from "../../context/UserContext.jsx";
 import DashboardWidgets from "./widgets.jsx";
@@ -13,6 +14,7 @@ const suggestedTopics = [
     title: "Temel Kavramlar",
     sub: "Cebir · 12 video",
     progress: 84,
+    peerAverage: 68,
     badge: "Önerilen",
     lastSeen: "2 saat önce",
     instructor: "Dr. Ayşe Kaya",
@@ -23,6 +25,7 @@ const suggestedTopics = [
     title: "Sayı Basamakları",
     sub: "Aritmetik · 8 test",
     progress: 72,
+    peerAverage: 61,
     badge: "Devam Et",
     lastSeen: "Dün",
     instructor: "Mert Demir",
@@ -33,6 +36,7 @@ const suggestedTopics = [
     title: "Rasyonel Sayılar",
     sub: "Sayı Teorisi · 14 set",
     progress: 91,
+    peerAverage: 74,
     badge: "Güçlü Alan",
     lastSeen: "3 gün önce",
     instructor: "Dr. Zeynep Alp",
@@ -43,6 +47,7 @@ const suggestedTopics = [
     title: "Denklemler",
     sub: "Cebir · 6 kazanım",
     progress: 48,
+    peerAverage: 56,
     badge: "Eksik Var",
     lastSeen: "1 hafta önce",
     instructor: "Burak Yıldız",
@@ -53,6 +58,7 @@ const suggestedTopics = [
     title: "Eşitsizlikler",
     sub: "Canlı ders · 19:00",
     progress: 20,
+    peerAverage: 37,
     badge: "Takvimde",
     lastSeen: "Bugün",
     instructor: "Dr. Selin Taş",
@@ -63,6 +69,7 @@ const suggestedTopics = [
     title: "Fonksiyonlar",
     sub: "Analiz · 11 içerik",
     progress: 66,
+    peerAverage: 52,
     badge: "Planlı",
     lastSeen: "4 gün önce",
     instructor: "Dr. Ayşe Kaya",
@@ -73,6 +80,7 @@ const suggestedTopics = [
     title: "Problem Çözme",
     sub: "Karma · 5 görev",
     progress: 35,
+    peerAverage: 44,
     badge: "Görevli",
     lastSeen: "Dün",
     instructor: "Mert Demir",
@@ -83,6 +91,7 @@ const suggestedTopics = [
     title: "Geometri",
     sub: "Uzay · 7 modül",
     progress: 58,
+    peerAverage: 49,
     badge: "Yükseliyor",
     lastSeen: "5 gün önce",
     instructor: "Burak Yıldız",
@@ -155,13 +164,56 @@ const headerStats = [
    SMALL COMPONENTS
 ═══════════════════════════════════════ */
 
-function ProgressBar({ value, color, h = "h-1.5" }) {
+function ProgressBar({ value, color, h = "h-1.5", peerAverage }) {
+  const averagePosition = Math.max(2, Math.min(98, Number(peerAverage ?? 50)));
+  const isAbovePeers = Number(value) >= Number(peerAverage ?? 50);
+  const markerColor = isAbovePeers ? "#34D399" : "#FB923C";
+  const markerBorderColor = isAbovePeers ? "#059669" : "#C2410C";
   return (
-    <div className={`${h} overflow-hidden rounded-full bg-slate-100`}>
-      <div
-        className="h-full rounded-full transition-all duration-700 ease-out"
-        style={{ width: `${value}%`, background: color }}
-      />
+    <div className="relative pt-6">
+      <span
+        className="pointer-events-none absolute -translate-x-1/2 text-center text-[11px] leading-[1.35] font-semibold"
+        style={{ left: `${averagePosition}%`, top: -4, color: markerColor }}
+      >
+        Arkadaşlarının Ortalaması
+      </span>
+
+      <div className={`relative ${h} overflow-visible`}>
+        <div className="h-full overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{ width: `${value}%`, background: color }}
+          />
+        </div>
+        <span
+          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            left: `${averagePosition}%`,
+            top: "50%",
+            width: 18,
+            height: 16,
+            background: markerBorderColor,
+            clipPath: isAbovePeers
+              ? "polygon(50% 0%, 0% 100%, 100% 100%)"
+              : "polygon(0% 0%, 100% 0%, 50% 100%)",
+          }}
+          aria-hidden="true"
+        >
+          <span
+            className="absolute"
+            style={{
+              left: 2,
+              top: isAbovePeers ? 3 : 1,
+              width: 14,
+              height: 12,
+              background: markerColor,
+              clipPath: isAbovePeers
+                ? "polygon(50% 0%, 0% 100%, 100% 100%)"
+                : "polygon(0% 0%, 100% 0%, 50% 100%)",
+            }}
+          />
+        </span>
+      </div>
     </div>
   );
 }
@@ -177,6 +229,37 @@ function SectionLabel({ text, color = "#2563EB" }) {
         {text}
       </span>
     </div>
+  );
+}
+
+function HeaderPattern({ color, variant }) {
+  const variants = ["dots", "grid", "diagonal", "rings"];
+  const type = variants[Math.abs(variant ?? 0) % variants.length];
+
+  const patternByType = {
+    dots: `radial-gradient(circle at 1px 1px, ${color}40 1px, transparent 0)`,
+    grid: `linear-gradient(${color}2e 1px, transparent 1px), linear-gradient(90deg, ${color}2e 1px, transparent 1px)`,
+    diagonal: `repeating-linear-gradient(135deg, ${color}24 0px, ${color}24 6px, transparent 6px, transparent 12px)`,
+    rings: `radial-gradient(circle at 16% 30%, ${color}26 0 8px, transparent 8px),
+            radial-gradient(circle at 72% 72%, ${color}22 0 10px, transparent 10px),
+            radial-gradient(circle at 52% 18%, ${color}20 0 6px, transparent 6px)`,
+  };
+
+  const sizeByType = {
+    dots: "12px 12px",
+    grid: "14px 14px",
+    diagonal: "auto",
+    rings: "auto",
+  };
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[1] opacity-60"
+      style={{
+        backgroundImage: patternByType[type],
+        backgroundSize: sizeByType[type],
+      }}
+    />
   );
 }
 
@@ -298,7 +381,10 @@ function NotificationDropdown() {
 /* ═══════════════════════════════════════
    TOPIC CARD
 ═══════════════════════════════════════ */
-function TopicCard({ topic }) {
+function TopicCard({ topic, patternVariant = 0 }) {
+  const isAbovePeerAverage = Number(topic.progress) >= Number(topic.peerAverage ?? topic.progress);
+  const performanceBadge = isAbovePeerAverage ? "Harika Gidiyorsun" : "Hedefe Çok Yakınsın";
+
   return (
     <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
       <div
@@ -313,15 +399,24 @@ function TopicCard({ topic }) {
             background: `radial-gradient(circle at top right, ${topic.color}22, transparent 42%)`,
           }}
         />
+        <HeaderPattern color={topic.color} variant={patternVariant} />
+        <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-end px-5 pt-4">
+          <span
+            className="inline-flex rounded-full border border-topic.color bg-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.9px] backdrop-blur-[10px]"
+            style={{
+              color: topic.color,
+              WebkitBackdropFilter: "blur(10px)",
+            }}
+          >
+            {performanceBadge}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <span className="inline-flex rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.8px] text-slate-500">
-              Ders Modülü
-            </span>
-            <h2 className="mt-2 text-[18px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
+            <h2 className="text-[18px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
               {topic.title}
             </h2>
             <p className="mt-1.5 text-[13px] font-medium text-slate-500">
@@ -339,7 +434,7 @@ function TopicCard({ topic }) {
               %{topic.progress}
             </span>
           </div>
-          <ProgressBar value={topic.progress} color={topic.color} h="h-1.5" />
+          <ProgressBar value={topic.progress} color={topic.color} h="h-1.5" peerAverage={topic.peerAverage} />
         </div>
 
         <div className="mt-4 w-full">
@@ -366,30 +461,6 @@ function TopicCard({ topic }) {
           </div>
         </div>
 
-        <div className="mt-4 border-t border-slate-200 pt-4">
-          <div className="flex items-center justify-between gap-2.5">
-            <span
-              className="inline-flex rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.9px]"
-              style={{
-                color: topic.color,
-                background: topic.bg,
-              }}
-            >
-              {topic.badge}
-            </span>
-
-            <button
-              className="inline-flex min-w-[108px] items-center justify-center rounded-full border px-4 py-2 text-[12px] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-              style={{
-                color: topic.color,
-                background: topic.bg,
-                borderColor: `${topic.color}40`,
-              }}
-            >
-              Derse Git
-            </button>
-          </div>
-        </div>
       </div>
     </article>
   );
@@ -399,6 +470,7 @@ function TopicCard({ topic }) {
    DASHBOARD
 ═══════════════════════════════════════ */
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState(dailyTasks);
   const [toasts, setToasts] = useState([]);
   const { user, addCoins, addXp } = useUser();
@@ -520,11 +592,19 @@ export default function Dashboard() {
                   <div>
                     <SectionLabel text="Ders Özeti" />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/topics")}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-600 transition-colors hover:border-blue-200 hover:text-[#2563EB]"
+                  >
+                    Tümünü Gör
+                    <Icon name="next" size={12} color="#64748B" />
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                  {suggestedTopics.map((topic) => (
-                    <TopicCard key={topic.title} topic={topic} />
+                  {suggestedTopics.map((topic, idx) => (
+                    <TopicCard key={topic.title} topic={topic} patternVariant={idx} />
                   ))}
                 </div>
               </section>

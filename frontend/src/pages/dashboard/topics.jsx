@@ -51,62 +51,120 @@ function SectionLabel({ text, color = "#2563EB" }) {
   );
 }
 
-function TrendChip({ trend }) {
-  const map = {
-    up:   { icon: "next", color: "#059669", bg: "#ECFDF5", label: "Yükseliyor" },
-    down: { icon: "previous", color: "#DC2626", bg: "#FEF2F2", label: "Düşüyor" },
-    flat: { icon: "minus", color: "#64748B", bg: "#F1F5F9", label: "Sabit" },
+function HeaderPattern({ color, variant }) {
+  const variants = ["dots", "grid", "diagonal", "rings"];
+  const type = variants[Math.abs(variant ?? 0) % variants.length];
+
+  const patternByType = {
+    dots: `radial-gradient(circle at 1px 1px, ${color}40 1px, transparent 0)`,
+    grid: `linear-gradient(${color}2e 1px, transparent 1px), linear-gradient(90deg, ${color}2e 1px, transparent 1px)`,
+    diagonal: `repeating-linear-gradient(135deg, ${color}24 0px, ${color}24 6px, transparent 6px, transparent 12px)`,
+    rings: `radial-gradient(circle at 16% 30%, ${color}26 0 8px, transparent 8px),
+            radial-gradient(circle at 72% 72%, ${color}22 0 10px, transparent 10px),
+            radial-gradient(circle at 52% 18%, ${color}20 0 6px, transparent 6px)`,
   };
-  const t = map[trend];
+
+  const sizeByType = {
+    dots: "12px 12px",
+    grid: "14px 14px",
+    diagonal: "auto",
+    rings: "auto",
+  };
+
   return (
-    <span
-      className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-[1px]"
-      style={{ background: t.bg, color: t.color }}
-    >
-      <Icon name={t.icon} size={11} color={t.color} />
-      {t.label}
-    </span>
+    <div
+      className="pointer-events-none absolute inset-0 z-[1] opacity-60"
+      style={{
+        backgroundImage: patternByType[type],
+        backgroundSize: sizeByType[type],
+      }}
+    />
   );
 }
 
-function TopicCard({ t }) {
-  const started = t.progress > 0;
+function TopicCard({ t, patternVariant = 0 }) {
+  const badge =
+    t.progress >= 90 ? "Güçlü Alan" :
+    t.progress >= 65 ? "Devam Et" :
+    t.progress >= 35 ? "Planlı" :
+    "Eksik Var";
+  const lastSeen = t.trend === "up" ? "Bugün" : t.trend === "down" ? "1 hafta önce" : "3 gün önce";
+
   return (
-    <article className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(15,23,42,.08)]">
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
+      <div
+        className="relative h-[96px] border-b border-slate-100"
+        style={{
+          background: `linear-gradient(135deg, ${t.color}24 0%, ${t.color}12 52%, #F8FAFC 100%)`,
+        }}
+      >
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-[16px] transition-transform duration-200 group-hover:scale-110"
-          style={{ background: t.bg, color: t.color }}
-        >
-          <Icon name={t.icon} size={16} color={t.color} />
+          className="absolute inset-x-0 top-0 h-full opacity-90"
+          style={{
+            background: `radial-gradient(circle at top right, ${t.color}22, transparent 42%)`,
+          }}
+        />
+        <HeaderPattern color={t.color} variant={patternVariant} />
+        <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-end px-5 pt-4">
+          <span
+            className="inline-flex rounded-full border border-white/50 bg-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.9px] backdrop-blur-[10px]"
+            style={{
+              color: t.color,
+              WebkitBackdropFilter: "blur(10px)",
+            }}
+          >
+            {badge}
+          </span>
         </div>
-        <TrendChip trend={t.trend} />
       </div>
 
-      <h2 className="text-[14px] font-bold tracking-tight text-[#111827] leading-snug">{t.title}</h2>
-      <p className="mt-1 text-[10px] font-medium text-slate-400">{t.category} · {t.level}</p>
-
-      <div className="my-4">
-        <div className="mb-1.5 flex justify-between">
-          <span className="text-[9px] font-semibold uppercase tracking-[1px] text-slate-400">İlerleme</span>
-          <span className="text-[9px] font-bold" style={{ color: t.color }}>{t.progress}%</span>
+      <div className="flex flex-col p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[18px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
+              {t.title}
+            </h2>
+            <p className="mt-1.5 text-[13px] font-medium text-slate-500">
+              {t.category} · {t.items} içerik
+            </p>
+          </div>
         </div>
-        <ProgressBar value={t.progress} color={t.color} />
-      </div>
 
-      <div className="mt-auto flex items-center gap-3 text-[9px] text-slate-300">
-        <span className="inline-flex items-center gap-1" title="Eğitmen"><Icon name="instructor" size={12} color="#94a3b8" /> {t.instructor}</span>
-        <span className="ml-auto inline-flex items-center gap-1"><Icon name="book_stack" size={12} color="#94a3b8" /> {t.items} içerik</span>
-      </div>
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between gap-2.5">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.9px] text-slate-400">
+              İlerleme
+            </span>
+            <span className="text-[13px] font-bold" style={{ color: t.color }}>
+              %{t.progress}
+            </span>
+          </div>
+          <ProgressBar value={t.progress} color={t.color} />
+        </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-        <span className="text-[9px] font-semibold uppercase tracking-[1.4px] text-slate-300">LMS Modülü</span>
-        <button
-          className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all duration-150 hover:shadow-sm"
-          style={{ color: t.color, background: t.bg }}
-        >
-          {started ? "Devam Et" : "Başla"} <Icon name="next" size={12} color={t.color} className="transition-transform duration-150 group-hover:translate-x-0.5" />
-        </button>
+        <div className="mt-4 w-full">
+          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-3">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
+                  Eğitmen
+                </div>
+                <div className="mt-1 truncate text-[13px] font-semibold text-slate-700">
+                  {t.instructor}
+                </div>
+              </div>
+
+              <div className="min-w-0 text-right">
+                <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
+                  Son Giriş
+                </div>
+                <div className="mt-1 whitespace-nowrap text-[13px] font-semibold text-slate-700">
+                  {lastSeen}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </article>
   );
@@ -263,7 +321,7 @@ export default function Topics() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {filtered.map((t) => <TopicCard key={t.title} t={t} />)}
+                {filtered.map((t, idx) => <TopicCard key={t.title} t={t} patternVariant={idx} />)}
               </div>
             )}
           </main>
