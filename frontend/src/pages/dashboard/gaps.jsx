@@ -52,8 +52,8 @@ function GapRow({ g, onSelect, selected }) {
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left rounded-2xl border bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,.06)]
-        ${selected ? "border-blue-300 shadow-md shadow-blue-100" : "border-slate-100"}`}
+      className={`surface-wrap w-full rounded-2xl border bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5
+        ${selected ? "border-blue-300 shadow-md shadow-blue-100" : "border-slate-200/70"}`}
     >
       <div className="flex items-center gap-4">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[14px] font-bold" style={{ background: g.bg, color: g.color }}>
@@ -99,15 +99,46 @@ export default function Gaps() {
   const selected = GAPS.find((g) => g.topic === selectedTopic) || GAPS[0];
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#111827]">
-      <style>{`* { font-family: 'IBM Plex Mono', monospace; }`}</style>
+    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
+      <style>{`
+        .dashboard-grid-bg * {
+          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        }
+        .dashboard-grid-bg {
+          background:
+            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
+            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
+            #f3f6fc;
+          background-image:
+            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
+          background-size: 26px 26px;
+        }
+        .glass-header {
+          border-bottom: 1px solid rgba(226,232,240,0.88);
+          background: rgba(255,255,255,0.84);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+        }
+        .surface-wrap {
+          border: 1px solid #dbe5f3;
+          background: #ffffff;
+          box-shadow:
+            0 10px 32px rgba(15,23,42,0.07),
+            0 2px 8px rgba(15,23,42,0.03);
+        }
+        .surface-pill {
+          border: 1px solid #dbe5f3;
+          background: rgba(255,255,255,0.92);
+          box-shadow: 0 6px 16px rgba(15,23,42,0.05);
+        }
+      `}</style>
 
       <div className="flex min-h-screen">
         <DashboardNavbar />
 
         <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
           {/* HEADER */}
-          <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/90 px-8 py-5 backdrop-blur-md">
+          <header className="glass-header sticky top-0 z-40 px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="mb-2 flex items-center gap-2">
@@ -126,7 +157,7 @@ export default function Gaps() {
                   { value: stats.critical,     label: "Öncelikli", color: "#DC2626" },
                   { value: `${stats.hoursNeeded}sa`, label: "Önerilen", color: "#2563EB" },
                 ].map((s) => (
-                  <div key={s.label} className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 min-w-[72px]">
+                  <div key={s.label} className="surface-pill flex min-w-[72px] flex-col items-center justify-center rounded-xl px-4 py-2.5">
                     <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>{s.value}</div>
                     <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[1.5px] text-slate-400">{s.label}</div>
                   </div>
@@ -154,7 +185,7 @@ export default function Gaps() {
           </header>
 
           {/* MAIN */}
-          <main className="flex-1 px-8 py-7">
+          <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
             <div className="grid grid-cols-1 gap-7 xl:grid-cols-[minmax(0,1fr)_340px]">
 
               {/* LEFT: Gap list */}
@@ -173,7 +204,7 @@ export default function Gaps() {
                     />
                   ))}
                   {sortedGaps.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center">
+                    <div className="surface-wrap rounded-2xl border border-dashed border-slate-200 py-12 text-center">
                       <div className="mb-2 flex justify-center"><Icon name="target" size={30} color="#94a3b8" /></div>
                       <p className="text-[11px] font-semibold text-slate-500">Bu kategoride eksik yok</p>
                     </div>
@@ -190,7 +221,7 @@ export default function Gaps() {
                     {STUDY_PLAN.map((p) => (
                       <div
                         key={p.day}
-                        className="group flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+                        className="surface-pill group flex items-center gap-3 rounded-xl p-3.5 transition-all hover:-translate-y-0.5"
                       >
                         <div
                           className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[14px]"
@@ -214,7 +245,7 @@ export default function Gaps() {
 
               {/* RIGHT: Detail panel */}
               <aside className="flex flex-col gap-5">
-                <div className="rounded-2xl border border-slate-100 bg-white p-5">
+                <div className="surface-wrap rounded-2xl p-5">
                   <div className="mb-3 flex items-center justify-between">
                     <SectionLabel text="Seçili Eksik" color={selected.color} />
                     <SeverityBadge level={selected.severity} color={selected.color} bg={selected.bg} />
@@ -244,11 +275,11 @@ export default function Gaps() {
 
                   {/* Facts */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <div className="rounded-xl border border-slate-200/70 bg-slate-50/80 p-3">
                       <div className="text-[9px] font-bold uppercase tracking-[1.4px] text-slate-400">Yanlış</div>
                       <div className="mt-1 text-[14px] font-bold text-[#DC2626]">{selected.missed}/{selected.total}</div>
                     </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <div className="rounded-xl border border-slate-200/70 bg-slate-50/80 p-3">
                       <div className="text-[9px] font-bold uppercase tracking-[1.4px] text-slate-400">Son Test</div>
                       <div className="mt-1 text-[12px] font-bold text-slate-600">{selected.lastTest}</div>
                     </div>
@@ -271,7 +302,7 @@ export default function Gaps() {
                 </div>
 
                 {/* Tips */}
-                <div className="rounded-2xl border border-slate-100 bg-white p-5">
+                <div className="surface-wrap rounded-2xl p-5">
                   <div className="mb-4">
                     <SectionLabel text="Genel İpuçları" color="#059669" />
                   </div>

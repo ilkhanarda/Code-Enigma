@@ -8,6 +8,7 @@ const Auth       = lazy(() => import('../pages/public/auth.jsx'))
 const Profile    = lazy(() => import('../pages/dashboard/profile.jsx'))
 const Video      = lazy(() => import('../pages/dashboard/video.jsx'))
 const Dashboard  = lazy(() => import('../pages/dashboard/dashboard.jsx'))
+const Concept    = lazy(() => import('../../../new-tasarım/frontend/src/pages/dashboard/dashboard.jsx'))
 const Test       = lazy(() => import('../pages/dashboard/test.jsx'))
 const Topics     = lazy(() => import('../pages/dashboard/topics.jsx'))
 const Topic      = lazy(() => import('../pages/dashboard/topic.jsx'))
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
         { path: '/profile',   element: <Profile /> },
         { path: '/video',     element: <Video /> },
         { path: '/dashboard', element: <Dashboard /> },
+        { path: '/concept',   element: <Concept /> },
         { path: '/test',      element: <Test /> },
         { path: '/topics',    element: <Topics /> },
         { path: '/topic',     element: <Topic /> },

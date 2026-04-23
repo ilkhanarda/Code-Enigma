@@ -223,9 +223,12 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     height: "100vh",
-    background: "#F8F9FB",
+    backgroundColor: "#f3f6fc",
+    backgroundImage:
+      "radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%), radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%), radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px)",
+    backgroundSize: "auto, auto, 26px 26px",
     color: "#111827",
-    fontFamily: '"IBM Plex Mono", monospace',
+    fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
     overflow: "hidden",
   },
   header: {
@@ -234,9 +237,11 @@ const styles = {
     justifyContent: "space-between",
     padding: "0 24px",
     height: 60,
-    background: "#fff",
-    borderBottom: "1px solid #e2e8f0",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+    background: "rgba(255,255,255,0.84)",
+    borderBottom: "1px solid rgba(226,232,240,0.88)",
+    boxShadow: "0 1px 3px rgba(15,23,42,0.04)",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
     flexShrink: 0,
     zIndex: 50,
   },
@@ -246,8 +251,10 @@ const styles = {
     justifyContent: "space-between",
     padding: "0 24px",
     height: 46,
-    background: "#fff",
-    borderTop: "1px solid #e2e8f0",
+    background: "rgba(255,255,255,0.9)",
+    borderTop: "1px solid rgba(226,232,240,0.88)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
     flexShrink: 0,
   },
   main: {
@@ -266,10 +273,11 @@ const styles = {
 function GlobalStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
       * , *::before, *::after { box-sizing: border-box; }
       html, body, #root { margin: 0; padding: 0; height: 100%; }
+      body { font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif; }
       ::-webkit-scrollbar { width: 4px; }
       ::-webkit-scrollbar-track { background: #f1f5f9; }
       ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
@@ -365,7 +373,7 @@ function GlobalStyles() {
         border-radius: 999px;
         background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
         color: #111827;
-        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
         font-weight: 500;
         font-size: 12px;
         letter-spacing: 0.01em;
@@ -464,7 +472,7 @@ function GlobalStyles() {
         cursor: pointer;
         transition: border-color 0.15s, background 0.15s;
         font-size: 11px;
-        font-family: "IBM Plex Mono", monospace;
+        font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
         line-height: 1.55;
         text-align: left;
         width: 100%;
@@ -694,7 +702,7 @@ function Controls({
           style={{
             fontSize: 11,
             color: "rgba(255,255,255,0.5)",
-            fontFamily: '"IBM Plex Mono", monospace',
+            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
           }}
         >
           <span style={{ color: "#fff" }}>{fmt(currentTime)}</span> / {fmt(duration)}
@@ -859,6 +867,9 @@ function TabSummary({
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "30px";
+    }
     setLoading(true);
 
     try {
@@ -921,55 +932,72 @@ function TabSummary({
       style={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
         height: "100%",
         animation: "fadein 0.3s ease both",
-        paddingTop: 12,
+        paddingTop: 10,
       }}
     >
       {/* Geri + başlık */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-        <button
-          onClick={onCloseAi}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "2px 4px",
-            color: "#94a3b8",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            fontSize: 10,
-            fontFamily: '"IBM Plex Mono", monospace',
-            fontWeight: 600,
-          }}
-        >
-          <Icon name="back" size={12} color="#94a3b8" />
-          Özete Dön
-        </button>
-        <div style={{ flex: 1 }} />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            fontSize: 9,
-            fontWeight: 700,
-            color: "#7C3AED",
-            letterSpacing: "1.2px",
-            textTransform: "uppercase",
-          }}
-        >
+      <div
+        style={{
+          border: "1px solid #dbe5f3",
+          borderRadius: 12,
+          background: "linear-gradient(145deg, #ffffff 0%, #f8faff 100%)",
+          padding: "10px 11px",
+          marginBottom: 10,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <button
+            onClick={onCloseAi}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "2px 4px",
+              color: "#64748b",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 10,
+              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+              fontWeight: 700,
+            }}
+          >
+            <Icon name="back" size={12} color="#64748b" />
+            Özete Dön
+          </button>
           <div
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: "#7C3AED",
-              animation: "pulse-dot 2s ease-in-out infinite",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: 9,
+              fontWeight: 700,
+              color: "#7C3AED",
+              letterSpacing: "1.2px",
+              textTransform: "uppercase",
+              border: "1px solid #ddd6fe",
+              background: "#f5f3ff",
+              borderRadius: 999,
+              padding: "4px 8px",
             }}
-          />
-          Enigma AI
+          >
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#7C3AED",
+                animation: "pulse-dot 2s ease-in-out infinite",
+              }}
+            />
+            Enigma AI
+          </div>
+        </div>
+        <div style={{ marginTop: 6, fontSize: 10, color: "#64748b", lineHeight: 1.55 }}>
+          {chapter.phase} · {chapter.title}
         </div>
       </div>
 
@@ -977,13 +1005,17 @@ function TabSummary({
       <div
         ref={messagesRef}
         style={{
+          width: "100%",
           flex: 1,
           overflowY: "auto",
           display: "flex",
           flexDirection: "column",
           gap: 10,
-          paddingBottom: 8,
+          padding: "10px 10px 8px",
           minHeight: 0,
+          border: "1px solid #dbe5f3",
+          borderRadius: 12,
+          background: "linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%)",
         }}
       >
         {messages.length === 0 && (
@@ -1018,16 +1050,21 @@ function TabSummary({
           >
             <div
               style={{
-                maxWidth: "88%",
+                width: "100%",
+                maxWidth: "100%",
                 padding: "9px 12px",
                 borderRadius: msg.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px",
-                background: msg.role === "user" ? "#7C3AED" : "#F1F5F9",
+                background: msg.role === "user" ? "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)" : "#ffffff",
                 color: msg.role === "user" ? "#fff" : "#1e293b",
                 fontSize: 11,
                 lineHeight: 1.65,
-                fontFamily: '"IBM Plex Mono", monospace',
+                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
+                border: msg.role === "user" ? "1px solid #7c3aed" : "1px solid #dbe5f3",
+                boxShadow: msg.role === "user"
+                  ? "0 8px 18px rgba(124,58,237,0.20)"
+                  : "0 4px 10px rgba(15,23,42,0.06)",
               }}
             >
               {msg.content}
@@ -1092,14 +1129,16 @@ function TabSummary({
             display: "flex",
             gap: 6,
             alignItems: "flex-end",
-            background: "#F8F9FB",
-            border: "1.5px solid #e2e8f0",
+            width: "100%",
+            minHeight: 42,
+            background: "linear-gradient(180deg, #ffffff 0%, #f8faff 100%)",
+            border: "1.5px solid #dbe5f3",
             borderRadius: 12,
             padding: "6px 8px 6px 12px",
             transition: "border-color 0.15s",
           }}
           onFocusCapture={(e) => { e.currentTarget.style.borderColor = "#7C3AED88"; }}
-          onBlurCapture={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; }}
+          onBlurCapture={(e) => { e.currentTarget.style.borderColor = "#dbe5f3"; }}
         >
           <textarea
             ref={textareaRef}
@@ -1114,15 +1153,18 @@ function TabSummary({
             rows={1}
             style={{
               flex: 1,
+              width: "100%",
+              minWidth: 0,
               background: "none",
               border: "none",
               outline: "none",
               resize: "none",
-              fontFamily: '"IBM Plex Mono", monospace',
+              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
               fontSize: 11,
               color: "#1e293b",
               lineHeight: 1.6,
               padding: 0,
+              minHeight: 30,
               maxHeight: 96,
               overflow: "auto",
             }}
@@ -1134,7 +1176,7 @@ function TabSummary({
               width: 26,
               height: 26,
               borderRadius: "50%",
-              background: input.trim() && !loading ? "#7C3AED" : "#e2e8f0",
+              background: input.trim() && !loading ? "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)" : "#e2e8f0",
               border: "none",
               cursor: input.trim() && !loading ? "pointer" : "not-allowed",
               display: "flex",
@@ -1142,6 +1184,7 @@ function TabSummary({
               justifyContent: "center",
               flexShrink: 0,
               transition: "background 0.15s",
+              boxShadow: input.trim() && !loading ? "0 8px 18px rgba(124,58,237,0.24)" : "none",
             }}
           >
             <Icon name="send" size={11} color={input.trim() && !loading ? "#ffffff" : "#94a3b8"} />
@@ -1219,7 +1262,7 @@ function TabQuestion({ chapter }) {
                 fontSize: 9,
                 fontWeight: 700,
                 cursor: "pointer",
-                fontFamily: '"IBM Plex Mono", monospace',
+                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
               }}
             >
               {index + 1}
@@ -1331,7 +1374,7 @@ function TabQuestion({ chapter }) {
                 cursor: "pointer",
                 fontSize: 11,
                 fontWeight: 700,
-                fontFamily: '"IBM Plex Mono", monospace',
+                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
                 display: "flex",
                 alignItems: "center",
                 gap: 7,
@@ -1374,7 +1417,7 @@ function TabQuestion({ chapter }) {
             cursor: "pointer",
             fontSize: 11,
             fontWeight: 700,
-            fontFamily: '"IBM Plex Mono", monospace',
+            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
             marginTop: 2,
           }}
         >
@@ -1393,7 +1436,7 @@ function TabQuestion({ chapter }) {
             borderRadius: 6,
             cursor: "pointer",
             fontSize: 11,
-            fontFamily: '"IBM Plex Mono", monospace',
+            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
             marginTop: 2,
           }}
         >
@@ -1558,7 +1601,7 @@ function TabFlashcards({ chapter }) {
               padding: "7px",
               cursor: item.disabled ? "not-allowed" : "pointer",
               fontSize: 11,
-              fontFamily: '"IBM Plex Mono", monospace',
+              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
               transition: "border-color 0.15s",
             }}
           >
@@ -1580,6 +1623,7 @@ const TAB_COLORS = {
 };
 
 function ContentPanel({ chapter, visible, onToggle }) {
+  const PANEL_WIDTH = 428;
   const [tab, setTab] = useState("summary");
   const [aiMode, setAiMode] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -1631,7 +1675,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
       {/* Panel — slide animasyonuyla */}
       <div
         style={{
-          width: visible ? 360 : 0,
+          width: visible ? PANEL_WIDTH : 0,
           height: "100%",
           minWidth: 0,
           overflow: "hidden",
@@ -1642,9 +1686,9 @@ function ContentPanel({ chapter, visible, onToggle }) {
       >
         <div
           style={{
-            width: 360,
+            width: PANEL_WIDTH,
             height: "100%",
-            minWidth: 360,
+            minWidth: PANEL_WIDTH,
             background: "#fff",
             borderLeft: "1px solid #e2e8f0",
             display: "flex",
@@ -1694,7 +1738,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
                     border: `1.5px solid ${isActive ? colors.active : "#e2e8f0"}`,
                     background: isActive ? colors.activeBg : "#F8F9FB",
                     color: isActive ? colors.active : "#94a3b8",
-                    fontFamily: '"IBM Plex Mono", monospace',
+                    fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
                     fontWeight: 700,
                     fontSize: 10,
                     letterSpacing: "0.04em",
@@ -1717,7 +1761,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
             style={{
               flex: 1,
               minHeight: 0,
-              padding: "0 20px",
+              padding: isAiSummary ? "0 10px 10px" : "0 18px",
               overflowY: isAiSummary ? "hidden" : "auto",
               display: isAiSummary ? "flex" : "block",
             }}

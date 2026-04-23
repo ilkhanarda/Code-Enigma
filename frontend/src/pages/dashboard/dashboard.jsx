@@ -256,7 +256,7 @@ function SectionLabel({ text, color = "#2563EB" }) {
     <div className="flex items-center gap-2">
       <div className="h-px w-5 rounded-full" style={{ background: color }} />
       <span
-        className="text-[20px] font-bold uppercase tracking-[2.5px]"
+        className="text-[11px] font-bold uppercase tracking-[1.9px]"
         style={{ color }}
       >
         {text}
@@ -323,58 +323,56 @@ function NotificationDropdown() {
 
   return (
     <div className="relative" ref={ref}>
-      {/* Bell button */}
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`relative flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-150
+        className={`surface-wrap relative flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-200
           ${open
-            ? "border-blue-300 bg-blue-50 text-[#2563EB]"
-            : "border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            ? "border-blue-200 bg-white text-blue-600 shadow-[0_14px_30px_rgba(37,99,235,.14)]"
+            : "border-[#dbe5f3] bg-white text-slate-500 hover:border-blue-200 hover:bg-white hover:text-blue-600"
           }`}
         aria-label="Bildirimler"
         aria-expanded={open}
       >
-        <Icon name="notifications" size={16} color={open ? "#2563EB" : "#64748B"} />
+        <Icon name="notifications" size={20} color={open ? "#2563EB" : "#64748B"} />
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#DC2626] text-[8px] font-bold text-white ring-2 ring-white">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white ring-2 ring-white">
             {unreadCount}
           </span>
         )}
       </button>
 
-      {/* Dropdown panel */}
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-[340px] rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
-          {/* Header */}
+        <div className="absolute right-0 top-[3.25rem] z-50 w-[min(360px,calc(100vw-1.5rem))] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_26px_60px_rgba(15,23,42,0.22)]">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="text-[12px] font-bold text-[#111827]">Bildirimler</span>
+              <span className="text-[13px] font-semibold text-slate-900">Bildirimler</span>
               {unreadCount > 0 && (
-                <span className="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[9px] font-bold text-[#2563EB]">
+                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
                   {unreadCount} yeni
                 </span>
               )}
             </div>
             {unreadCount > 0 && (
               <button
+                type="button"
                 onClick={markAllRead}
-                className="text-[10px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                className="text-[11px] font-semibold text-blue-600 transition-colors hover:text-blue-700"
               >
                 Tümünü okundu işaretle
               </button>
             )}
           </div>
 
-          {/* List */}
-          <div className="max-h-[340px] overflow-y-auto">
+          <div className="max-h-[320px] overflow-y-auto">
             {notes.map((n) => (
-              <div
+              <button
                 key={n.id}
+                type="button"
                 onClick={() => markRead(n.id)}
-                className={`flex cursor-pointer gap-3 px-4 py-3.5 transition-colors duration-150 border-b border-slate-50 last:border-b-0
-                  ${n.unread ? "bg-blue-50/40 hover:bg-blue-50/70" : "hover:bg-slate-50"}`}
+                className={`flex w-full items-start gap-3 border-b border-slate-100 px-4 py-3.5 text-left transition-colors duration-150 last:border-b-0
+                  ${n.unread ? "bg-blue-50/45 hover:bg-blue-50" : "hover:bg-slate-50"}`}
               >
-                {/* Icon */}
                 <div
                   className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl text-sm"
                   style={{ background: n.accent + "18" }}
@@ -382,28 +380,20 @@ function NotificationDropdown() {
                   <Icon name={n.icon} size={14} color={n.accent} />
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className={`text-[11px] font-semibold leading-snug ${n.unread ? "text-[#111827]" : "text-slate-600"}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`truncate text-[12px] font-semibold leading-snug ${n.unread ? "text-slate-900" : "text-slate-600"}`}>
                       {n.title}
                     </span>
                     {n.unread && (
-                      <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: n.accent }} />
+                      <div className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: n.accent }} />
                     )}
                   </div>
-                  <p className="mt-0.5 text-[10px] leading-relaxed text-slate-400">{n.desc}</p>
-                  <span className="mt-1 block text-[9px] font-medium text-slate-300">{n.time}</span>
+                  <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{n.desc}</p>
+                  <span className="mt-1 block text-[10px] font-medium text-slate-400">{n.time}</span>
                 </div>
-              </div>
+              </button>
             ))}
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-slate-100 px-4 py-2.5 text-center">
-            <button className="text-[10px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">
-              <span className="inline-flex items-center gap-1">Tüm bildirimleri gör <Icon name="next" size={12} color="#2563EB" /></span>
-            </button>
           </div>
         </div>
       )}
@@ -421,7 +411,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
 
   return (
     <article
-      className={`group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)] ${
+      className={`group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_12px_30px_rgba(15,23,42,.08)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_20px_42px_rgba(37,99,235,.16)] ${
         isInteractive ? "cursor-pointer focus-within:ring-2 focus-within:ring-blue-300 focus-within:ring-offset-1" : ""
       }`}
       role={isInteractive ? "button" : undefined}
@@ -435,7 +425,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
       } : undefined}
     >
       <div
-        className="relative h-[96px] border-b border-slate-100"
+        className="relative h-[104px] border-b border-slate-100"
         style={{
           background: `linear-gradient(135deg, ${topic.color}24 0%, ${topic.color}12 52%, #F8FAFC 100%)`,
         }}
@@ -449,7 +439,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
         <HeaderPattern color={topic.color} variant={patternVariant} />
         <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-end px-5 pt-4">
           <span
-            className="inline-flex rounded-full border border-topic.color bg-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.9px] backdrop-blur-[10px]"
+            className="inline-flex rounded-full border border-white/60 bg-white/45 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[1.1px] backdrop-blur-[10px]"
             style={{
               color: topic.color,
               WebkitBackdropFilter: "blur(10px)",
@@ -463,7 +453,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
       <div className="flex flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[18px] font-bold tracking-[-0.2px] text-slate-950 leading-[1.2]">
+            <h2 className="text-[19px] font-bold tracking-[-0.3px] text-slate-950 leading-[1.2]">
               {topic.title}
             </h2>
             <p className="mt-1.5 text-[13px] font-medium text-slate-500">
@@ -485,7 +475,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
         </div>
 
         <div className="mt-4 w-full">
-          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-3">
+          <div className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
@@ -510,7 +500,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
 
         {isInteractive && showCta && (
           <div className="mt-4 border-t border-slate-100 pt-3">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[1.2px] text-[#2563EB]">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[1.2px] text-blue-600">
               Üniteye Git <Icon name="next" size={11} color="#2563EB" />
             </span>
           </div>
@@ -554,15 +544,58 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
+    <div className="dashboard-grid-bg min-h-screen text-slate-900">
       <style>{`
-        * { font-family: 'IBM Plex Mono', monospace; }
+        .dashboard-grid-bg * {
+          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        }
         .dashboard-grid-bg {
-          background-color: #F8F9FB;
-          background-image: radial-gradient(circle at 1px 1px, rgba(148,163,184,0.14) 1px, transparent 1px);
-          background-size: 30px 30px;
+          background:
+            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
+            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
+            #f3f6fc;
+          background-image:
+            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
+          background-size: 26px 26px;
         }
         .logo-hex { clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
+        .glass-header {
+          border-bottom: 1px solid rgba(226,232,240,0.88);
+          background: rgba(255,255,255,0.84);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+        }
+        .surface-wrap {
+          border: 1px solid #dbe5f3;
+          border-radius: 24px;
+          background: #ffffff;
+          box-shadow:
+            0 10px 32px rgba(15, 23, 42, 0.07),
+            0 2px 8px rgba(15, 23, 42, 0.03);
+        }
+        .action-btn {
+          border-radius: 14px;
+          border: 1px solid #e2e8f0;
+          background: white;
+          padding: 8px 14px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #475569;
+          transition: all .2s;
+        }
+        .action-btn:hover {
+          border-color: #bfdbfe;
+          background: #eff6ff;
+          color: #1d4ed8;
+        }
+        .topic-grid-card {
+          transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
+        }
+        .topic-grid-card:hover {
+          transform: translateY(-4px);
+          border-color: #bfdbfe;
+          box-shadow: 0 18px 36px rgba(37,99,235,.15);
+        }
         @keyframes xp-rise {
           0%   { opacity: 0; transform: translateY(8px) scale(.92); }
           15%  { opacity: 1; transform: translateY(0) scale(1); }
@@ -573,16 +606,16 @@ export default function Dashboard() {
       `}</style>
 
       {/* ── XP TOASTS ── */}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-2">
+      <div className="pointer-events-none fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 md:bottom-6 md:right-6">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="xp-toast flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-4 py-2.5 shadow-lg shadow-emerald-100/70"
+            className="xp-toast flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-4 py-2.5 shadow-[0_14px_30px_rgba(5,150,105,0.22)]"
           >
             <Icon name="guarantee" size={16} color="#059669" />
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-emerald-600">+{t.xp} XP</span>
-              <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-amber-600">+{t.coins} <Icon name="coin" size={10} color="#D97706" /> Coin</span>
+              <span className="text-[11px] font-bold text-emerald-600">+{t.xp} XP</span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600">+{t.coins} <Icon name="coin" size={10} color="#D97706" /> Coin</span>
             </div>
           </div>
         ))}
@@ -591,37 +624,37 @@ export default function Dashboard() {
       <div className="flex min-h-screen">
         <DashboardNavbar />
 
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-screen flex-1 flex-col overflow-hidden pb-24 md:pb-0">
 
           {/* ══ HEADER ══ */}
-          <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/90 px-8 py-5 backdrop-blur-md">
-            <div className="flex flex-wrap items-start justify-between gap-4">
+          <header className="glass-header sticky top-0 z-40 px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
 
               {/* Left: greeting */}
               <div>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <p className="mt-1 text-[11px] text-slate-500">
                   {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
                 </p>
-                <h1 className="text-[26px] font-bold tracking-[-0.4px] text-[#111827] leading-tight">
+                <h1 className="text-[clamp(22px,2.5vw,32px)] font-bold tracking-[-0.4px] text-slate-950 leading-tight">
                   Hoşgeldin, İlkhan Arda
                 </h1>
               </div>
 
               {/* Right: stats + notification */}
-              <div className="flex items-center gap-3 flex-wrap justify-end">
+              <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:gap-2.5 lg:w-auto lg:justify-end">
                 {/* Insight cards */}
                 {headerInsights.map((insight) => (
                   <div
                     key={insight.id}
-                    className="flex max-w-[330px] items-start gap-2.5 rounded-xl border border-slate-100 bg-white px-3 py-2.5"
+                    className="surface-wrap flex min-h-[52px] min-w-0 flex-1 basis-[250px] items-center gap-2 px-3 py-2.5 sm:basis-[270px] lg:max-w-[300px]"
                   >
                     <span
-                      className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
+                      className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-xl"
                       style={{ background: insight.bg }}
                     >
-                      <Icon name={insight.icon} size={13} color={insight.color} />
+                      <Icon name={insight.icon} size={12} color={insight.color} />
                     </span>
-                    <div className="text-[12px] font-normal leading-relaxed text-slate-800">
+                    <div className="min-w-0 text-left text-[11px] font-normal leading-[1.45] text-slate-700">
                       {insight.content}
                     </div>
                   </div>
@@ -635,8 +668,8 @@ export default function Dashboard() {
           </header>
 
           {/* ══ MAIN ══ */}
-          <main className="flex-1 px-8 py-7 overflow-x-hidden">
-            <div className="mb-7">
+          <main className="flex-1 overflow-x-hidden px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
+            <div className="surface-wrap mb-7 p-4 sm:p-5">
               <DashboardWidgets
                 tasks={tasks}
                 onToggleTask={toggleTask}
@@ -658,7 +691,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => navigate("/topics")}
-                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-600 transition-colors hover:border-blue-200 hover:text-[#2563EB]"
+                    className="action-btn inline-flex items-center gap-1"
                   >
                     Tümünü Gör
                     <Icon name="next" size={12} color="#64748B" />
@@ -683,7 +716,7 @@ export default function Dashboard() {
           </main>
 
           {/* ══ FOOTER ══ */}
-          <footer className="border-t border-slate-100 bg-white px-8 py-4">
+          <footer className="border-t border-slate-200 bg-white/90 px-4 py-3.5 sm:px-6 sm:py-4 xl:px-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div
@@ -692,7 +725,7 @@ export default function Dashboard() {
                   C:E
                 </div>
                 <div>
-                  <div className="text-[12px] font-semibold text-[#111827]">Code:Enigma Dashboard</div>
+                  <div className="text-[12px] font-semibold text-slate-900">Code:Enigma Dashboard</div>
                   <div className="text-[9px] uppercase tracking-[1.8px] text-slate-400">
                     Canvas LMS Esintili Panel
                   </div>

@@ -91,7 +91,7 @@ function TopicCard({ t, patternVariant = 0 }) {
   const lastSeen = t.trend === "up" ? "Bugün" : t.trend === "down" ? "1 hafta önce" : "3 gün önce";
 
   return (
-    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
+    <article className="surface-wrap topic-grid-card group overflow-hidden rounded-[24px] border border-slate-200 bg-white">
       <div
         className="relative h-[96px] border-b border-slate-100"
         style={{
@@ -143,7 +143,7 @@ function TopicCard({ t, patternVariant = 0 }) {
         </div>
 
         <div className="mt-4 w-full">
-          <div className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-3">
+          <div className="w-full rounded-xl border border-slate-200/70 bg-slate-50/70 px-3.5 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-[11px] uppercase tracking-[1px] text-slate-400">
@@ -204,15 +204,54 @@ export default function Topics() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#111827]">
-      <style>{`* { font-family: 'IBM Plex Mono', monospace; }`}</style>
+    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
+      <style>{`
+        .dashboard-grid-bg * {
+          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        }
+        .dashboard-grid-bg {
+          background:
+            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
+            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
+            #f3f6fc;
+          background-image:
+            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
+          background-size: 26px 26px;
+        }
+        .glass-header {
+          border-bottom: 1px solid rgba(226,232,240,0.88);
+          background: rgba(255,255,255,0.84);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+        }
+        .surface-wrap {
+          border: 1px solid #dbe5f3;
+          background: #ffffff;
+          box-shadow:
+            0 10px 32px rgba(15,23,42,0.07),
+            0 2px 8px rgba(15,23,42,0.03);
+        }
+        .surface-pill {
+          border: 1px solid #dbe5f3;
+          background: rgba(255,255,255,0.92);
+          box-shadow: 0 6px 16px rgba(15,23,42,0.05);
+        }
+        .topic-grid-card {
+          transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
+        }
+        .topic-grid-card:hover {
+          transform: translateY(-4px);
+          border-color: #bfdbfe;
+          box-shadow: 0 18px 36px rgba(37,99,235,.15);
+        }
+      `}</style>
 
       <div className="flex min-h-screen">
         <DashboardNavbar />
 
         <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
           {/* HEADER */}
-          <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/90 px-8 py-5 backdrop-blur-md">
+          <header className="glass-header sticky top-0 z-40 px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="mb-2 flex items-center gap-2">
@@ -233,7 +272,7 @@ export default function Topics() {
                   { value: stats.done,    label: "Tamamlandı",  color: "#059669" },
                   { value: `%${stats.avg}`, label: "Ortalama",  color: "#7C3AED" },
                 ].map((s) => (
-                  <div key={s.label} className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 min-w-[72px]">
+                  <div key={s.label} className="surface-pill flex min-w-[72px] flex-col items-center justify-center rounded-xl px-4 py-2.5">
                     <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>{s.value}</div>
                     <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[1.5px] text-slate-400">{s.label}</div>
                   </div>
@@ -243,7 +282,7 @@ export default function Topics() {
 
             {/* Search + Sort */}
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <div className="flex flex-1 min-w-[240px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 focus-within:border-blue-300">
+              <div className="surface-pill flex min-w-[240px] flex-1 items-center gap-2 rounded-xl px-3.5 py-2.5 focus-within:border-blue-300">
                 <Icon name="search" size={14} color="#94a3b8" />
                 <input
                   value={query}
@@ -260,7 +299,7 @@ export default function Topics() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[10px] font-bold text-slate-600 outline-none transition-all hover:border-blue-200 focus:border-blue-300"
+                className="surface-pill rounded-xl px-3 py-2.5 text-[10px] font-bold text-slate-600 outline-none transition-all hover:border-blue-200 focus:border-blue-300"
               >
                 {SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
               </select>
@@ -300,7 +339,7 @@ export default function Topics() {
           </header>
 
           {/* MAIN */}
-          <main className="flex-1 px-8 py-7">
+          <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
             <div className="mb-4 flex items-center justify-between">
               <SectionLabel text={`${filtered.length} konu bulundu`} />
               {(cat !== "Tümü" || level !== "Tümü" || query) && (
@@ -314,7 +353,7 @@ export default function Topics() {
             </div>
 
             {filtered.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center">
+              <div className="surface-wrap rounded-2xl border border-dashed border-slate-200 py-16 text-center">
                 <div className="mb-3 flex justify-center"><Icon name="search" size={32} color="#94a3b8" /></div>
                 <p className="text-[12px] font-semibold text-slate-500">Sonuç bulunamadı</p>
                 <p className="mt-1 text-[10px] text-slate-400">Farklı bir arama veya filtre dene.</p>

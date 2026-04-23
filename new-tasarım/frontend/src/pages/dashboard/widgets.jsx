@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import Icon from "../../components/ui/icons8-icon.jsx";
+import Icon from "../../../../../frontend/src/components/ui/icons8-icon.jsx";
 
 const STORAGE_KEY = "code-enigma:dashboard-widgets";
 const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "xplog", "streak"];
@@ -224,11 +224,10 @@ function DailyTasksWidget({ tasks, doneTasks, onToggleTask }) {
                 : "border-slate-100 bg-white hover:border-blue-200 hover:bg-blue-50/40"
             }`}
           >
-            <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
+            <div className="flex h-4 w-4 flex-shrink-0 items-center justify-center">
               <Icon
                 name={task.done ? "check_box" : "unchecked_box"}
-                size={18}
-                className="scale-[1.12]"
+                size={14}
                 color={task.done ? "#059669" : "#94a3b8"}
               />
             </div>

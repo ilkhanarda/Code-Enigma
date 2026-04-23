@@ -114,7 +114,7 @@ function QuestionPalette({ questions, answers, flagged, current, onSelect, stats
   return (
     <aside className="flex w-[220px] flex-shrink-0 flex-col gap-4">
       {/* Stats summary */}
-      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="surface-wrap rounded-2xl border border-slate-200/70 bg-white p-4">
         <SectionLabel text="Test Durumu" />
         <div className="mt-3 grid grid-cols-3 gap-2">
           {statCells.map((s) => (
@@ -136,7 +136,7 @@ function QuestionPalette({ questions, answers, flagged, current, onSelect, stats
       </div>
 
       {/* Question grid */}
-      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="surface-wrap rounded-2xl border border-slate-200/70 bg-white p-4">
         <SectionLabel text="Soru Paleti" />
         <div className="mt-3 grid grid-cols-4 gap-1.5">
           {questions.map((q) => (
@@ -208,7 +208,7 @@ function ExplanationPanel({ explanation, isCorrect, correctKey }) {
   const [difficulty, setDifficulty] = useState(null);
 
   return (
-    <div className="mt-4 animate-[fadeIn_.3s_ease_both] rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <div className="surface-wrap mt-4 animate-[fadeIn_.3s_ease_both] rounded-2xl border border-slate-200/70 bg-white">
       {/* Result banner */}
       <div
         className={`flex items-center gap-2 rounded-t-2xl border-b px-5 py-3 ${
@@ -460,9 +460,33 @@ export default function TestPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FB] font-['IBM_Plex_Mono',monospace] text-[#111827]">
+    <div className="dashboard-grid-bg flex min-h-screen text-[#111827]">
       <style>{`
-        * { font-family: 'IBM Plex Mono', monospace; }
+        .dashboard-grid-bg * {
+          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        }
+        .dashboard-grid-bg {
+          background:
+            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
+            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
+            #f3f6fc;
+          background-image:
+            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
+          background-size: 26px 26px;
+        }
+        .glass-header {
+          border-bottom: 1px solid rgba(226,232,240,0.88);
+          background: rgba(255,255,255,0.84);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+        }
+        .surface-wrap {
+          border: 1px solid #dbe5f3;
+          background: #ffffff;
+          box-shadow:
+            0 10px 32px rgba(15,23,42,0.07),
+            0 2px 8px rgba(15,23,42,0.03);
+        }
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
       `}</style>
 
@@ -471,7 +495,7 @@ export default function TestPage() {
       <div className="flex-1 min-w-0">
 
       {/* ══ HEADER ══ */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-6 py-3 shadow-sm backdrop-blur-md">
+      <header className="glass-header sticky top-0 z-40 px-4 py-3 sm:px-6 sm:py-4 xl:px-8">
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             {/* Left: test info */}
@@ -524,13 +548,13 @@ export default function TestPage() {
       </header>
 
       {/* ══ BODY ══ */}
-      <div className="mx-auto flex max-w-[1200px] gap-5 px-5 py-6">
+      <div className="mx-auto flex w-full max-w-[1200px] gap-4 px-4 py-5 sm:gap-5 sm:px-6 sm:py-6 xl:px-8">
 
         {/* ─ MAIN QUESTION AREA ─ */}
         <main className="min-w-0 flex-1">
 
           {/* Question card */}
-          <div className="rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="surface-wrap rounded-2xl border border-slate-200/70 bg-white">
 
             {/* Card header */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
@@ -646,7 +670,7 @@ export default function TestPage() {
           </div>
 
           {/* Interaction bar */}
-          <div className="mt-3 rounded-2xl border border-slate-100 bg-white px-5 py-4 shadow-sm">
+          <div className="surface-wrap mt-3 rounded-2xl border border-slate-200/70 bg-white px-5 py-4">
             <InteractionBar
               qId={currentId}
               flagged={flagged}
@@ -681,7 +705,7 @@ export default function TestPage() {
       {/* ══ FINISH MODAL ══ */}
       {showFinish && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-8 shadow-2xl">
+          <div className="surface-wrap w-full max-w-md rounded-2xl border border-slate-200/70 bg-white p-8 shadow-2xl">
             <h2 className="text-[18px] font-bold text-slate-800">Testi Bitir</h2>
             <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
               Cevaplanmamış {stats.empty} sorunuz var. Testi bitirmek istediğinizden emin misiniz?
