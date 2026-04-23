@@ -12,7 +12,7 @@ const COMMANDS = [
   { id: "profile", label: "Profil", hint: "Hesap", icon: "profile", to: "/profile", kind: "Sayfa" },
   { id: "settings", label: "Ayarlar", hint: "Sistem", icon: "settings", to: "/settings", kind: "Sayfa" },
   { id: "absent", label: "Devamsızlık", hint: "Durum", icon: "tasks", to: "/absent", kind: "Sayfa" },
-  { id: "t-algebra", label: "Temel Kavramlar", hint: "Cebir", icon: "goals", to: "/topics", kind: "Konu" },
+  { id: "t-algebra", label: "Temel Kavramlar", hint: "Cebir", icon: "goals", to: "/topic", kind: "Konu" },
   { id: "t-digits", label: "Sayı Basamakları", hint: "Aritmetik", icon: "stats", to: "/topics", kind: "Konu" },
   { id: "t-rational", label: "Rasyonel Sayılar", hint: "Sayı Teorisi", icon: "journey", to: "/topics", kind: "Konu" },
   { id: "t-eq", label: "Denklemler", hint: "Cebir", icon: "tasks", to: "/topics", kind: "Konu" },

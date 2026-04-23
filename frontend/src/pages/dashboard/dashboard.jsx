@@ -155,9 +155,42 @@ const notifications = [
   },
 ];
 
-const headerStats = [
-  { value: "8",  label: "Aktif Ders",  color: "#2563EB" },
-  { value: "%84", label: "Başarı",      color: "#059669" },
+const headerInsights = [
+  {
+    id: "friends-topics",
+    icon: "users",
+    content: (
+      <>
+        Arkadaşların son 3 günde ortalama{" "}
+        <span className="font-bold text-slate-900">32 konu</span> tamamladı.
+      </>
+    ),
+    color: "#2563EB",
+    bg: "#EFF6FF",
+  },
+  {
+    id: "weekly-questions",
+    icon: "test",
+    content: (
+      <>
+        Bu hafta <span className="font-bold text-slate-900">37 soru</span> çözdün,{" "}
+        <span className="font-bold text-slate-900">78 soru</span> çözen bir arkadaşın var.
+      </>
+    ),
+    color: "#D97706",
+    bg: "#FFFBEB",
+  },
+  {
+    id: "total-questions",
+    icon: "chart",
+    content: (
+      <>
+        Bugüne kadar <span className="font-bold text-slate-900">173 soru</span> çözdün.
+      </>
+    ),
+    color: "#059669",
+    bg: "#ECFDF5",
+  },
 ];
 
 /* ═══════════════════════════════════════
@@ -381,12 +414,26 @@ function NotificationDropdown() {
 /* ═══════════════════════════════════════
    TOPIC CARD
 ═══════════════════════════════════════ */
-function TopicCard({ topic, patternVariant = 0 }) {
+function TopicCard({ topic, patternVariant = 0, onOpen, showCta = true }) {
   const isAbovePeerAverage = Number(topic.progress) >= Number(topic.peerAverage ?? topic.progress);
   const performanceBadge = isAbovePeerAverage ? "Harika Gidiyorsun" : "Hedefe Çok Yakınsın";
+  const isInteractive = typeof onOpen === "function";
 
   return (
-    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)]">
+    <article
+      className={`group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_34px_rgba(15,23,42,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(37,99,235,.10)] ${
+        isInteractive ? "cursor-pointer focus-within:ring-2 focus-within:ring-blue-300 focus-within:ring-offset-1" : ""
+      }`}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      onClick={isInteractive ? onOpen : undefined}
+      onKeyDown={isInteractive ? (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      } : undefined}
+    >
       <div
         className="relative h-[96px] border-b border-slate-100"
         style={{
@@ -461,6 +508,14 @@ function TopicCard({ topic, patternVariant = 0 }) {
           </div>
         </div>
 
+        {isInteractive && showCta && (
+          <div className="mt-4 border-t border-slate-100 pt-3">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[1.2px] text-[#2563EB]">
+              Üniteye Git <Icon name="next" size={11} color="#2563EB" />
+            </span>
+          </div>
+        )}
+
       </div>
     </article>
   );
@@ -499,9 +554,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#111827]">
+    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
       <style>{`
         * { font-family: 'IBM Plex Mono', monospace; }
+        .dashboard-grid-bg {
+          background-color: #F8F9FB;
+          background-image: radial-gradient(circle at 1px 1px, rgba(148,163,184,0.14) 1px, transparent 1px);
+          background-size: 30px 30px;
+        }
         .logo-hex { clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
         @keyframes xp-rise {
           0%   { opacity: 0; transform: translateY(8px) scale(.92); }
@@ -548,18 +608,21 @@ export default function Dashboard() {
               </div>
 
               {/* Right: stats + notification */}
-              <div className="flex items-center gap-3 flex-wrap">
-                {/* Stat pills */}
-                {headerStats.map((s) => (
+              <div className="flex items-center gap-3 flex-wrap justify-end">
+                {/* Insight cards */}
+                {headerInsights.map((insight) => (
                   <div
-                    key={s.label}
-                    className="flex gap-1 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 min-w-[72px]"
+                    key={insight.id}
+                    className="flex max-w-[330px] items-start gap-2.5 rounded-xl border border-slate-100 bg-white px-3 py-2.5"
                   >
-                    <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>
-                      {s.value}
-                    </div>
-                    <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[1.5px] text-slate-400">
-                      {s.label}
+                    <span
+                      className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
+                      style={{ background: insight.bg }}
+                    >
+                      <Icon name={insight.icon} size={13} color={insight.color} />
+                    </span>
+                    <div className="text-[12px] font-normal leading-relaxed text-slate-800">
+                      {insight.content}
                     </div>
                   </div>
                 ))}
@@ -604,7 +667,13 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
                   {suggestedTopics.map((topic, idx) => (
-                    <TopicCard key={topic.title} topic={topic} patternVariant={idx} />
+                    <TopicCard
+                      key={topic.title}
+                      topic={topic}
+                      patternVariant={idx}
+                      onOpen={topic.title === "Temel Kavramlar" ? () => navigate("/topic") : undefined}
+                      showCta={topic.title !== "Temel Kavramlar"}
+                    />
                   ))}
                 </div>
               </section>

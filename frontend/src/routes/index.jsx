@@ -10,6 +10,7 @@ const Video      = lazy(() => import('../pages/dashboard/video.jsx'))
 const Dashboard  = lazy(() => import('../pages/dashboard/dashboard.jsx'))
 const Test       = lazy(() => import('../pages/dashboard/test.jsx'))
 const Topics     = lazy(() => import('../pages/dashboard/topics.jsx'))
+const Topic      = lazy(() => import('../pages/dashboard/topic.jsx'))
 const Gaps       = lazy(() => import('../pages/dashboard/gaps.jsx'))
 const Settings   = lazy(() => import('../pages/dashboard/settings.jsx'))
 const Logo       = lazy(() => import('../assets/logo.jsx'))
@@ -50,6 +51,7 @@ const router = createBrowserRouter(
         { path: '/dashboard', element: <Dashboard /> },
         { path: '/test',      element: <Test /> },
         { path: '/topics',    element: <Topics /> },
+        { path: '/topic',     element: <Topic /> },
         { path: '/gaps',      element: <Gaps /> },
         { path: '/settings',  element: <Settings /> },
         { path: '/logo',      element: <Logo /> },
