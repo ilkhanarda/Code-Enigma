@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import Icon from "../../components/ui/icons8-icon.jsx";
 
@@ -29,6 +29,14 @@ const STUDY_PLAN = [
 ];
 
 const SEVERITY_ORDER = { "Kritik": 0, "Yüksek": 1, "Orta": 2, "Hafif": 3 };
+
+const FILTER_COLORS = {
+  "Tümü":   "#64748B",
+  "Kritik": "#DC2626",
+  "Yüksek": "#DC2626",
+  "Orta":   "#D97706",
+  "Hafif":  "#2563EB",
+};
 
 function ProgressBar({ value, color }) {
   return (
@@ -106,6 +114,12 @@ export default function Gaps() {
     return { avg, critical, hoursNeeded };
   }, [enriched]);
 
+  useEffect(() => {
+    if (sortedGaps.length > 0 && !sortedGaps.find((g) => g.topic === selectedTopic)) {
+      setSelectedTopic(sortedGaps[0].topic);
+    }
+  }, [sortedGaps, selectedTopic]);
+
   const selected = enriched.find((g) => g.topic === selectedTopic) || enriched[0];
 
   return (
@@ -115,13 +129,12 @@ export default function Gaps() {
           font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
         }
         .dashboard-grid-bg {
-          background:
+          background-color: #f3f6fc;
+          background-image:
             radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
             radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
-            #f3f6fc;
-          background-image:
             radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
-          background-size: 26px 26px;
+          background-size: auto, auto, 26px 26px;
         }
         .glass-header {
           border-bottom: 1px solid rgba(226,232,240,0.88);
@@ -178,19 +191,30 @@ export default function Gaps() {
             {/* Severity filter chips */}
             <div className="mt-4 flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-[9px] font-bold uppercase tracking-[1.5px] text-slate-400">Öncelik</span>
-              {["Tümü", "Kritik", "Yüksek", "Orta", "Hafif"].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setFilter(s)}
-                  className={`rounded-full px-3 py-1 text-[10px] font-bold transition-all ${
-                    filter === s
-                      ? "bg-[#DC2626] text-white shadow-sm shadow-red-200"
-                      : "border border-slate-200 bg-white text-slate-500 hover:border-red-200 hover:text-[#DC2626]"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+              {["Tümü", "Kritik", "Yüksek", "Orta", "Hafif"].map((s) => {
+                const fc = FILTER_COLORS[s];
+                const isActive = filter === s;
+                const hoverCls = {
+                  "Tümü":   "hover:border-slate-300 hover:text-slate-600",
+                  "Kritik": "hover:border-red-200 hover:text-[#DC2626]",
+                  "Yüksek": "hover:border-red-200 hover:text-[#DC2626]",
+                  "Orta":   "hover:border-amber-200 hover:text-[#D97706]",
+                  "Hafif":  "hover:border-blue-200 hover:text-[#2563EB]",
+                }[s];
+                return (
+                  <button
+                    key={s}
+                    onClick={() => setFilter(s)}
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold transition-all border ${!isActive ? hoverCls : ""}`}
+                    style={isActive
+                      ? { background: fc, color: "#fff", borderColor: fc }
+                      : { background: "#fff", color: "#64748B", borderColor: "#e2e8f0" }
+                    }
+                  >
+                    {s}
+                  </button>
+                );
+              })}
             </div>
           </header>
 

@@ -30,6 +30,9 @@ function SectionLabel({ text, color = "#2563EB" }) {
 function Toggle({ checked, onChange }) {
   return (
     <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${
         checked ? "bg-[#2563EB]" : "bg-slate-200"
@@ -225,13 +228,17 @@ export default function Settings() {
                   <Row label="Günlük hedef" description="Gün başına tamamlanacak görev sayısı">
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
                         onClick={() => updatePref("dailyGoal", Math.max(1, prefs.dailyGoal - 1))}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all hover:border-violet-300 hover:text-[#7C3AED]"
+                        disabled={prefs.dailyGoal <= 1}
+                        className={`flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all ${prefs.dailyGoal <= 1 ? "cursor-not-allowed opacity-40" : "hover:border-violet-300 hover:text-[#7C3AED]"}`}
                       ><Icon name="minus" size={12} color="#64748b" /></button>
                       <span className="min-w-[24px] text-center text-[12px] font-bold text-[#111827]">{prefs.dailyGoal}</span>
                       <button
+                        type="button"
                         onClick={() => updatePref("dailyGoal", Math.min(12, prefs.dailyGoal + 1))}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all hover:border-violet-300 hover:text-[#7C3AED]"
+                        disabled={prefs.dailyGoal >= 12}
+                        className={`flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-500 transition-all ${prefs.dailyGoal >= 12 ? "cursor-not-allowed opacity-40" : "hover:border-violet-300 hover:text-[#7C3AED]"}`}
                       ><Icon name="plus" size={12} color="#64748b" /></button>
                     </div>
                   </Row>
