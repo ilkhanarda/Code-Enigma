@@ -3,20 +3,20 @@ import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import Icon from "../../components/ui/icons8-icon.jsx";
 
 const ALL_TOPICS = [
-  { title: "Temel Kavramlar",     category: "Cebir",        level: "Başlangıç", progress: 84, items: 12, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "goals", trend: "up" },
-  { title: "Sayı Basamakları",    category: "Aritmetik",    level: "Orta",      progress: 72, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "stats", trend: "up" },
-  { title: "Rasyonel Sayılar",    category: "Sayı Teorisi", level: "Orta",      progress: 91, items: 14, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "journey", trend: "flat" },
-  { title: "Denklemler",          category: "Cebir",        level: "Orta",      progress: 48, items: 6,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "tasks", trend: "down" },
-  { title: "Eşitsizlikler",       category: "Cebir",        level: "İleri",     progress: 20, items: 19, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "module", trend: "up" },
-  { title: "Fonksiyonlar",        category: "Analiz",       level: "İleri",     progress: 66, items: 11, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "target", trend: "up" },
-  { title: "Problem Çözme",       category: "Karma",        level: "Orta",      progress: 35, items: 5,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "goals", trend: "flat" },
-  { title: "Geometri",            category: "Uzay",         level: "Orta",      progress: 58, items: 7,  instructor: "Burak Yıldız",   color: "#059669", bg: "#ECFDF5", icon: "module", trend: "up" },
-  { title: "Limit ve Süreklilik", category: "Analiz",       level: "İleri",     progress: 12, items: 9,  instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "infinity", trend: "flat" },
-  { title: "Türev",               category: "Analiz",       level: "İleri",     progress: 0,  items: 15, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "derivative", trend: "flat" },
-  { title: "İntegral",            category: "Analiz",       level: "İleri",     progress: 0,  items: 13, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "integral", trend: "flat" },
-  { title: "Olasılık",            category: "İstatistik",   level: "Orta",      progress: 44, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "percent", trend: "up" },
-  { title: "İstatistik Temelleri",category: "İstatistik",   level: "Başlangıç", progress: 55, items: 10, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "chart", trend: "flat" },
-  { title: "Logaritma",           category: "Cebir",        level: "İleri",     progress: 38, items: 7,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "module", trend: "down" },
+  { title: "Temel Kavramlar",     category: "Cebir",        level: "Başlangıç", progress: 84, peerAverage: 68, items: 12, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "goals",      trend: "up"   },
+  { title: "Sayı Basamakları",    category: "Aritmetik",    level: "Orta",      progress: 72, peerAverage: 61, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "stats",      trend: "up"   },
+  { title: "Rasyonel Sayılar",    category: "Sayı Teorisi", level: "Orta",      progress: 91, peerAverage: 74, items: 14, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "journey",    trend: "flat" },
+  { title: "Denklemler",          category: "Cebir",        level: "Orta",      progress: 48, peerAverage: 56, items: 6,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "tasks",      trend: "down" },
+  { title: "Eşitsizlikler",       category: "Cebir",        level: "İleri",     progress: 20, peerAverage: 37, items: 19, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "module",     trend: "up"   },
+  { title: "Fonksiyonlar",        category: "Analiz",       level: "İleri",     progress: 66, peerAverage: 52, items: 11, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "target",     trend: "up"   },
+  { title: "Problem Çözme",       category: "Karma",        level: "Orta",      progress: 35, peerAverage: 44, items: 5,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "goals",      trend: "flat" },
+  { title: "Geometri",            category: "Uzay",         level: "Orta",      progress: 58, peerAverage: 49, items: 7,  instructor: "Burak Yıldız",   color: "#059669", bg: "#ECFDF5", icon: "module",     trend: "up"   },
+  { title: "Limit ve Süreklilik", category: "Analiz",       level: "İleri",     progress: 12, peerAverage: 18, items: 9,  instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "infinity",   trend: "flat" },
+  { title: "Türev",               category: "Analiz",       level: "İleri",     progress: 0,  peerAverage: 22, items: 15, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "derivative", trend: "flat" },
+  { title: "İntegral",            category: "Analiz",       level: "İleri",     progress: 0,  peerAverage: 15, items: 13, instructor: "Dr. Zeynep Alp", color: "#059669", bg: "#ECFDF5", icon: "integral",   trend: "flat" },
+  { title: "Olasılık",            category: "İstatistik",   level: "Orta",      progress: 44, peerAverage: 38, items: 8,  instructor: "Mert Demir",     color: "#7C3AED", bg: "#F5F3FF", icon: "percent",    trend: "up"   },
+  { title: "İstatistik Temelleri",category: "İstatistik",   level: "Başlangıç", progress: 55, peerAverage: 48, items: 10, instructor: "Dr. Selin Taş",  color: "#DC2626", bg: "#FEF2F2", icon: "chart",      trend: "flat" },
+  { title: "Logaritma",           category: "Cebir",        level: "İleri",     progress: 38, peerAverage: 42, items: 7,  instructor: "Burak Yıldız",   color: "#D97706", bg: "#FFFBEB", icon: "module",     trend: "down" },
 ];
 
 const CATEGORIES = ["Tümü", "Cebir", "Aritmetik", "Analiz", "Sayı Teorisi", "İstatistik", "Uzay", "Karma"];
@@ -34,10 +34,44 @@ function normalize(s) {
     .replace(/ö/g,"o").replace(/ş/g,"s").replace(/ü/g,"u");
 }
 
-function ProgressBar({ value, color }) {
+function ProgressBar({ value, color, peerAverage }) {
+  const avgPos = Math.max(2, Math.min(98, Number(peerAverage ?? 50)));
+  const isAbove = Number(value) >= Number(peerAverage ?? 50);
+  const markerColor = isAbove ? "#34D399" : "#FB923C";
+  const markerBorder = isAbove ? "#059669" : "#C2410C";
   return (
-    <div className="h-1 overflow-hidden rounded-full bg-slate-100">
-      <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${value}%`, background: color }} />
+    <div className="relative pt-5">
+      <span
+        className="pointer-events-none absolute -translate-x-1/2 text-center text-[9px] leading-tight font-semibold"
+        style={{ left: `${avgPos}%`, top: 0, color: markerColor }}
+      >
+        Arkadaşlarının<br />Ortalaması
+      </span>
+      <div className="relative h-1 overflow-visible">
+        <div className="h-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${value}%`, background: color }} />
+        </div>
+        <span
+          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            left: `${avgPos}%`, top: "50%",
+            width: 16, height: 14,
+            background: markerBorder,
+            clipPath: isAbove ? "polygon(50% 0%,0% 100%,100% 100%)" : "polygon(0% 0%,100% 0%,50% 100%)",
+          }}
+          aria-hidden="true"
+        >
+          <span
+            className="absolute"
+            style={{
+              left: 2, top: isAbove ? 3 : 1,
+              width: 12, height: 10,
+              background: markerColor,
+              clipPath: isAbove ? "polygon(50% 0%,0% 100%,100% 100%)" : "polygon(0% 0%,100% 0%,50% 100%)",
+            }}
+          />
+        </span>
+      </div>
     </div>
   );
 }
@@ -83,11 +117,8 @@ function HeaderPattern({ color, variant }) {
 }
 
 function TopicCard({ t, patternVariant = 0 }) {
-  const badge =
-    t.progress >= 90 ? "Güçlü Alan" :
-    t.progress >= 65 ? "Devam Et" :
-    t.progress >= 35 ? "Planlı" :
-    "Eksik Var";
+  const isAbovePeers = t.progress >= (t.peerAverage ?? t.progress);
+  const badge = isAbovePeers ? "Harika Gidiyorsun" : "Hedefe Çok Yakınsın";
   const lastSeen = t.trend === "up" ? "Bugün" : t.trend === "down" ? "1 hafta önce" : "3 gün önce";
 
   return (
@@ -139,7 +170,7 @@ function TopicCard({ t, patternVariant = 0 }) {
               %{t.progress}
             </span>
           </div>
-          <ProgressBar value={t.progress} color={t.color} />
+          <ProgressBar value={t.progress} color={t.color} peerAverage={t.peerAverage} />
         </div>
 
         <div className="mt-4 w-full">
