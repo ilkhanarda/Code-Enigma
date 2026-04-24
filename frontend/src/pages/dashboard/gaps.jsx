@@ -2,14 +2,21 @@ import { useMemo, useState } from "react";
 import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import Icon from "../../components/ui/icons8-icon.jsx";
 
+function classify(score) {
+  if (score < 25) return { severity: "Kritik", color: "#DC2626", bg: "#FEF2F2" };
+  if (score < 40) return { severity: "Yüksek", color: "#DC2626", bg: "#FEF2F2" };
+  if (score < 55) return { severity: "Orta",   color: "#D97706", bg: "#FFFBEB" };
+  return            { severity: "Hafif",  color: "#2563EB", bg: "#EFF6FF" };
+}
+
 const GAPS = [
-  { topic: "Denklemler",         category: "Cebir",     severity: "Kritik", score: 48, missed: 12, total: 24, lastTest: "3 gün önce", suggested: "Mini Test 3 + 2 video", color: "#DC2626", bg: "#FEF2F2" },
-  { topic: "Eşitsizlikler",      category: "Cebir",     severity: "Kritik", score: 20, missed: 18, total: 25, lastTest: "1 hafta önce", suggested: "Başlangıç modülünden tekrar", color: "#DC2626", bg: "#FEF2F2" },
-  { topic: "Logaritma",          category: "Cebir",     severity: "Orta",   score: 38, missed: 9,  total: 18, lastTest: "2 gün önce", suggested: "Kural kartları + 5 soru", color: "#D97706", bg: "#FFFBEB" },
-  { topic: "Problem Çözme",      category: "Karma",     severity: "Orta",   score: 35, missed: 11, total: 20, lastTest: "Dün", suggested: "Günde 3 problem çöz", color: "#D97706", bg: "#FFFBEB" },
-  { topic: "Limit ve Süreklilik",category: "Analiz",    severity: "Yüksek", score: 12, missed: 14, total: 16, lastTest: "Başlanmadı", suggested: "Konuyu baştan al", color: "#DC2626", bg: "#FEF2F2" },
-  { topic: "Olasılık",           category: "İstatistik",severity: "Hafif",  score: 44, missed: 7,  total: 15, lastTest: "4 gün önce", suggested: "Kavram haritasını incele", color: "#2563EB", bg: "#EFF6FF" },
-  { topic: "Geometri",           category: "Uzay",      severity: "Hafif",  score: 58, missed: 5,  total: 14, lastTest: "5 gün önce", suggested: "Formül defterini gözden geçir", color: "#2563EB", bg: "#EFF6FF" },
+  { topic: "Denklemler",         category: "Cebir",      score: 48, missed: 12, total: 24, lastTest: "3 gün önce",   suggested: "Mini Test 3 + 2 video" },
+  { topic: "Eşitsizlikler",      category: "Cebir",      score: 20, missed: 18, total: 25, lastTest: "1 hafta önce", suggested: "Başlangıç modülünden tekrar" },
+  { topic: "Logaritma",          category: "Cebir",      score: 38, missed: 9,  total: 18, lastTest: "2 gün önce",   suggested: "Kural kartları + 5 soru" },
+  { topic: "Problem Çözme",      category: "Karma",      score: 35, missed: 11, total: 20, lastTest: "Dün",          suggested: "Günde 3 problem çöz" },
+  { topic: "Limit ve Süreklilik",category: "Analiz",     score: 12, missed: 14, total: 16, lastTest: "Başlanmadı",   suggested: "Konuyu baştan al" },
+  { topic: "Olasılık",           category: "İstatistik", score: 44, missed: 7,  total: 15, lastTest: "4 gün önce",   suggested: "Kavram haritasını incele" },
+  { topic: "Geometri",           category: "Uzay",       score: 58, missed: 5,  total: 14, lastTest: "5 gün önce",   suggested: "Formül defterini gözden geçir" },
 ];
 
 const STUDY_PLAN = [
@@ -82,21 +89,24 @@ function GapRow({ g, onSelect, selected }) {
 
 export default function Gaps() {
   const [filter, setFilter] = useState("Tümü");
-  const [selectedTopic, setSelectedTopic] = useState(GAPS[0].topic);
+
+  const enriched = useMemo(() => GAPS.map((g) => ({ ...g, ...classify(g.score) })), []);
+
+  const [selectedTopic, setSelectedTopic] = useState(enriched[0].topic);
 
   const sortedGaps = useMemo(() => {
-    const list = filter === "Tümü" ? GAPS : GAPS.filter((g) => g.severity === filter);
+    const list = filter === "Tümü" ? enriched : enriched.filter((g) => g.severity === filter);
     return [...list].sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
-  }, [filter]);
+  }, [filter, enriched]);
 
   const stats = useMemo(() => {
-    const avg = Math.round(GAPS.reduce((s, g) => s + g.score, 0) / GAPS.length);
-    const critical = GAPS.filter((g) => g.severity === "Kritik" || g.severity === "Yüksek").length;
-    const hoursNeeded = Math.round(GAPS.reduce((s, g) => s + (100 - g.score) / 10, 0));
+    const avg = Math.round(enriched.reduce((s, g) => s + g.score, 0) / enriched.length);
+    const critical = enriched.filter((g) => g.severity === "Kritik" || g.severity === "Yüksek").length;
+    const hoursNeeded = Math.round(enriched.reduce((s, g) => s + (100 - g.score) / 10, 0));
     return { avg, critical, hoursNeeded };
-  }, []);
+  }, [enriched]);
 
-  const selected = GAPS.find((g) => g.topic === selectedTopic) || GAPS[0];
+  const selected = enriched.find((g) => g.topic === selectedTopic) || enriched[0];
 
   return (
     <div className="dashboard-grid-bg min-h-screen text-[#111827]">

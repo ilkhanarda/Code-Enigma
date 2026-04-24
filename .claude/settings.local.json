@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/forev/.claude/plans/**)",
+      "Read(//c/Users/forev/.claude/**)"
+    ]
+  }
+}
