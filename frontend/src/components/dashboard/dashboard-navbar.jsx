@@ -26,23 +26,14 @@ function NavItem({ item, active }) {
       to={item.to}
       aria-current={active ? "page" : undefined}
       className={[
-        "group relative flex w-full flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center no-underline transition-all duration-200",
+        "group relative flex w-full flex-col items-center gap-1.5 rounded-2xl border px-2 py-2.5 text-center no-underline transition-all duration-200",
         active
-          ? "border-blue-200 bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-[0_12px_26px_rgba(37,99,235,0.34)]"
-          : "border-transparent text-slate-500 hover:border-blue-100 hover:bg-blue-50/75 hover:text-blue-700",
+          ? "border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 text-white shadow-[0_18px_34px_rgba(37,99,235,0.32)]"
+          : "border-white/50 bg-white/55 text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl hover:-translate-y-0.5 hover:border-blue-200/80 hover:bg-white/75 hover:text-blue-700 hover:shadow-[0_16px_30px_rgba(37,99,235,0.12)]",
       ].join(" ")}
     >
-      <span
-        className={[
-          "inline-flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200",
-          active
-            ? "bg-white/15 ring-1 ring-white/30"
-            : "bg-slate-100 group-hover:bg-blue-100",
-        ].join(" ")}
-      >
-        <Icon name={item.icon} size={18} color={active ? "#ffffff" : "#475569"} />
-      </span>
-      <span className={active ? "text-[9px] font-semibold uppercase tracking-[1.2px] text-white/95" : "text-[9px] font-semibold uppercase tracking-[1.2px]"}>
+      <Icon name={item.icon} size={18} color={active ? "#ffffff" : "#475569"} />
+      <span className={active ? "text-[10px] font-semibold uppercase tracking-[1.2px] text-white/95" : "text-[10px] font-semibold uppercase tracking-[1.2px]"}>
         {item.label}
       </span>
     </Link>
@@ -57,12 +48,12 @@ function MobileDockItem({ item, active }) {
       className={[
         "flex flex-col items-center justify-center rounded-2xl px-1 py-2.5 text-center no-underline transition-all duration-200",
         active
-          ? "bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-[0_8px_20px_rgba(37,99,235,0.34)]"
-          : "text-slate-500 hover:bg-blue-50 hover:text-blue-700",
+          ? "border border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 text-white shadow-[0_14px_28px_rgba(37,99,235,0.28)]"
+          : "border border-transparent text-slate-500 hover:border-blue-100/80 hover:bg-white/80 hover:text-blue-700",
       ].join(" ")}
     >
       <Icon name={item.icon} size={17} color={active ? "#ffffff" : "#64748B"} />
-      <span className={active ? "mt-1 text-[9px] font-semibold text-white/95" : "mt-1 text-[9px] font-semibold"}>{item.label}</span>
+      <span className={active ? "mt-1 text-[10px] font-semibold text-white/95" : "mt-1 text-[10px] font-semibold"}>{item.label}</span>
     </Link>
   );
 }
@@ -73,32 +64,32 @@ export default function DashboardNavbar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden h-screen w-[88px] sm:w-[94px] lg:w-[104px] flex-col items-center justify-between border-r border-slate-200/75 bg-white/88 px-2 py-4 shadow-[8px_0_32px_rgba(15,23,42,0.08)] backdrop-blur-xl md:flex">
-        <div className="flex w-full flex-col items-center gap-4">
+      <aside className="sticky top-0 hidden h-screen w-[100px] sm:w-[108px] lg:w-[120px] flex-col items-center justify-between overflow-y-auto overscroll-y-contain border-r border-white/55 bg-white/56 px-3 py-5 shadow-[0_24px_70px_rgba(15,23,42,0.1)] backdrop-blur-2xl md:flex">
+        <div className="flex w-full shrink-0 flex-col items-center gap-5">
           <Logo size="mg" />
 
-          <div className="h-px w-10 bg-slate-200/90" />
+          <div className="h-px w-10 bg-white/80" />
 
-          <div className="flex w-full flex-col items-center gap-2 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-blue-50/40 px-2 py-2.5 text-center shadow-sm">
+          <div className="flex w-full flex-col items-center gap-2.5 rounded-2xl border border-white/70 bg-white/62 px-3 py-3 text-center shadow-[0_16px_34px_rgba(37,99,235,0.1)] backdrop-blur-xl">
             <div className="relative">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 shadow-[0_10px_20px_rgba(37,99,235,0.35)]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/40 bg-gradient-to-br from-blue-600 to-cyan-500 shadow-[0_14px_28px_rgba(37,99,235,0.35)]">
                 <Icon name={user.avatar} size={20} />
               </div>
               <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400" />
             </div>
 
             <div className="w-full">
-              <p className="truncate text-[10px] font-semibold text-slate-900">{user.name}</p>
-              <p className="text-[9px] text-slate-500">Sv. {user.level} • {user.streak}g</p>
+              <p className="truncate text-[11px] font-semibold text-slate-900">{user.name}</p>
+              <p className="text-[10px] text-slate-500">Sv. {user.level} • {user.streak}g</p>
             </div>
 
-            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[9px] font-semibold text-amber-700">
+            <div className="inline-flex items-center gap-1 rounded-full border border-amber-100/80 bg-amber-50/80 px-2.5 py-1 text-[10px] font-semibold text-amber-700 backdrop-blur-sm">
               <Icon name="coin" size={11} color="#D97706" />
               <span>{user.coins.toLocaleString("tr-TR")}</span>
             </div>
           </div>
 
-          <div className="h-px w-10 bg-slate-200/90" />
+          <div className="h-px w-10 bg-white/80" />
 
           <nav className="flex w-full flex-col gap-1.5" aria-label="Ana navigasyon">
             {NAV_ITEMS.map((item) => (
@@ -111,24 +102,24 @@ export default function DashboardNavbar() {
           </nav>
         </div>
 
-        <div className="flex w-full flex-col gap-2">
+        <div className="flex w-full shrink-0 flex-col gap-2">
           <Link
             to="/profile"
-            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-white px-2 py-2.5 text-center text-[9px] font-semibold uppercase tracking-[1.1px] text-slate-500 no-underline transition-all duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-white/60 bg-white/62 px-2 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[1.1px] text-slate-600 no-underline shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200/80 hover:bg-white/80 hover:text-blue-700 hover:shadow-[0_16px_30px_rgba(37,99,235,0.12)]"
           >
             <Icon name="profile" size={15} color="#64748B" />
             Profil
           </Link>
           <Link
             to="/video"
-            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-blue-200 bg-blue-600 px-2 py-2.5 text-center text-[9px] font-semibold uppercase tracking-[1.1px] text-white no-underline transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,0.25)]"
+            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 px-2 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[1.1px] text-white no-underline shadow-[0_18px_34px_rgba(37,99,235,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_20px_36px_rgba(37,99,235,0.32)]"
           >
             <Icon name="video" size={15} color="#ffffff" />
             Video
           </Link>
           <Link
             to="/concept"
-            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-indigo-200 bg-indigo-50 px-2 py-2.5 text-center text-[9px] font-semibold uppercase tracking-[1.1px] text-indigo-700 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-100"
+            className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-indigo-100/90 bg-white/62 px-2 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[1.1px] text-indigo-700 no-underline shadow-[0_10px_24px_rgba(79,70,229,0.09)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-white/82"
           >
             <Icon name="idea" size={15} color="#4338CA" />
             Concept
@@ -136,7 +127,7 @@ export default function DashboardNavbar() {
         </div>
       </aside>
 
-      <nav className="fixed inset-x-3 bottom-3 z-[100] rounded-[28px] border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_14px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-3 bottom-3 z-[100] rounded-[28px] border border-white/65 bg-white/70 p-1.5 shadow-[0_24px_60px_rgba(15,23,42,0.14)] backdrop-blur-2xl md:hidden">
         <div className="grid grid-cols-6 gap-1">
           {MOBILE_DOCK_ITEMS.map((item) => (
             <MobileDockItem

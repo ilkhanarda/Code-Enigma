@@ -1,6 +1,8 @@
+/* global require, process */
 const express = require('express');
 const cors = require('cors');
 const { Ollama } = require('ollama');
+const { createAiRouter } = require('./routes/ai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -11,6 +13,7 @@ const ollama = new Ollama({ host: OLLAMA_HOST });
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/ai', createAiRouter({ ollama, modelName: MODEL_NAME }));
 
 process.on('unhandledRejection', (error) => {
   console.error('[Process] Unhandled rejection:', error);

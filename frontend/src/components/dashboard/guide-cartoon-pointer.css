@@ -1,0 +1,235 @@
+.guide-cartoon-pointer {
+  pointer-events: none;
+  position: absolute;
+  z-index: 280;
+  width: var(--gcp-width, 108px);
+  height: var(--gcp-height, 94px);
+}
+
+.guide-cartoon-pointer-motion {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: var(--gcp-size, 84px);
+  height: var(--gcp-size, 84px);
+  transform: translateY(-50%);
+  animation: gcp-route-in 0.92s cubic-bezier(0.21, 0.88, 0.3, 1) both;
+}
+
+.guide-cartoon-pointer-character {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 86% 50%;
+  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.24));
+  animation:
+    gcp-squash 0.58s cubic-bezier(0.22, 1.18, 0.3, 1) both,
+    gcp-tap 0.28s ease-in-out 1.02s 2,
+    gcp-idle 2.4s ease-in-out 2s infinite;
+}
+
+.guide-cartoon-pointer-orient {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(92deg);
+  transform-origin: center;
+}
+
+.guide-cartoon-pointer-art {
+  width: 100%;
+  height: 100%;
+  filter: saturate(1.02) contrast(1.01);
+}
+
+.guide-cartoon-pointer--right .guide-cartoon-pointer-orient {
+  transform: rotate(-92deg);
+}
+
+.guide-hand-cls-1 {
+  fill: #1e3a8a;
+}
+
+.guide-hand-cls-1,
+.guide-hand-cls-2,
+.guide-hand-cls-3,
+.guide-hand-cls-4 {
+  stroke: #0f172a;
+  stroke-miterlimit: 10;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.guide-hand-cls-3,
+.guide-hand-cls-5 {
+  fill: #fffdf6;
+}
+
+.guide-hand-cls-2 {
+  stroke-linecap: round;
+  fill: none;
+}
+
+.guide-hand-cls-4 {
+  fill: none;
+}
+
+.guide-cartoon-pointer-accent {
+  position: absolute;
+  right: 2px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.75);
+  opacity: 0;
+  animation: gcp-spark 1.5s ease-in-out 1.2s infinite;
+}
+
+.guide-cartoon-pointer-accent--one {
+  top: 8px;
+  width: 7px;
+  height: 7px;
+}
+
+.guide-cartoon-pointer-accent--two {
+  top: 0;
+  right: 12px;
+  width: 4px;
+  height: 4px;
+  animation-delay: 1.32s;
+}
+
+.enigma-guide-button-toon {
+  position: relative;
+  isolation: isolate;
+  will-change: transform, box-shadow;
+  transform-origin: center;
+  animation:
+    gcp-target-tap-sync 1.92s cubic-bezier(0.34, 1.56, 0.64, 1) infinite,
+    gcp-target-glow 1.92s ease-in-out infinite;
+}
+
+.enigma-guide-button-toon::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid rgba(37, 99, 235, 0.32);
+  z-index: -1;
+  animation: gcp-target-ring 1.92s ease-out infinite;
+}
+
+@keyframes gcp-route-in {
+  0% {
+    opacity: 0;
+    transform: translateY(calc(-50% + var(--gcp-start-y))) translateX(var(--gcp-start-x)) rotate(var(--gcp-start-rot));
+  }
+  46% {
+    opacity: 1;
+    transform: translateY(calc(-50% + var(--gcp-curve-y))) translateX(var(--gcp-curve-x)) rotate(var(--gcp-curve-rot));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes gcp-squash {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  28% {
+    transform: scale(1.1, 0.89);
+  }
+  58% {
+    transform: scale(0.94, 1.09);
+  }
+}
+
+@keyframes gcp-tap {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1, 1);
+  }
+  44% {
+    transform: translate(var(--gcp-tap-x, 8px), 1px) scale(1.08, 0.9);
+  }
+  72% {
+    transform: translate(calc(var(--gcp-tap-x, 8px) * -0.24), -1px) scale(0.97, 1.05);
+  }
+}
+
+@keyframes gcp-idle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(1px) rotate(1.5deg);
+  }
+}
+
+@keyframes gcp-spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.62);
+  }
+  46% {
+    opacity: 0.8;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes gcp-target-tap-sync {
+  0%,
+  20% {
+    transform: scale(1);
+  }
+  29% {
+    transform: scale(1.06);
+  }
+  36% {
+    transform: scale(0.98);
+  }
+  45% {
+    transform: scale(1.05);
+  }
+  52% {
+    transform: scale(0.99);
+  }
+  100% {
+    transform: scale(1.01);
+  }
+}
+
+@keyframes gcp-target-glow {
+  0%,
+  100% {
+    box-shadow: 0 9px 18px rgba(37, 99, 235, 0.1);
+  }
+  30%,
+  46% {
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.28);
+  }
+}
+
+@keyframes gcp-target-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  48% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .guide-cartoon-pointer {
+    display: none;
+  }
+}

@@ -48,7 +48,7 @@ export const ICONS8_ICON_MAP = {
   xmark: "cancel",
   lock: "lock",
   unlock: "unlock",
-  target: "target",
+  goal: "goal",
   idea: "idea",
   repeat: "recurring-appointment",
   brain: "brain",

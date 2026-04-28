@@ -1,35 +1,50 @@
 import { useEffect, useMemo, useState } from "react";
 import Icon from "../../components/ui/icons8-icon.jsx";
+import GuideCartoonPointer from "../../components/dashboard/guide-cartoon-pointer.jsx";
 
 const STORAGE_KEY = "code-enigma:dashboard-widgets";
-const DEFAULT_ACTIVE_WIDGETS = ["goals", "ranking", "xplog", "streak"];
+const DEFAULT_ACTIVE_WIDGETS = ["tasks", "achievements", "ranking", "goals"];
+const WIDGET_COLORS = {
+  accent: "#2563EB",
+  accentStrong: "#1D4ED8",
+  accentSoft: "#EFF6FF",
+  accentSoftAlt: "#DBEAFE",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F8FAFC",
+  border: "#E2E8F0",
+  borderAccent: "#BFDBFE",
+  text: "#111827",
+  textMuted: "#475569",
+  textSubtle: "#94A3B8",
+  iconMuted: "#64748B",
+};
 
 // square = 1:1  |  wide = 2:1
 const WIDGET_META = [
-  { id: "tasks",        title: "Günlük Görevler",   description: "Bugünkü görev akışı ve XP.",          size: "square", accent: "#2563EB", icon: "tasks" },
-  { id: "achievements", title: "Başarım Vitrini",   description: "Rozetler ve kilitli başarımlar.",      size: "wide",   accent: "#D97706", icon: "achievements" },
-  { id: "ranking",      title: "Lig & Sıralama",    description: "Haftalık lig ve sıralama.",            size: "wide",   accent: "#2563EB", icon: "ranking" },
-  { id: "journey",      title: "Öğrenme Yolculuğu", description: "Aktif modül ve sıradaki durak.",       size: "square", accent: "#059669", icon: "journey" },
-  { id: "stats",        title: "İstatistikler",      description: "Seviye, coin, seri, görev.",           size: "wide",   accent: "#7C3AED", icon: "stats" },
-  { id: "goals",        title: "Günlük Hedef",       description: "Odak, seri ve seviye ilerlemesi.",     size: "square", accent: "#7C3AED", icon: "goals" },
-  { id: "streak",       title: "Çalışma Serisi",     description: "Isı haritası ve seri takibi.",         size: "wide",   accent: "#F59E0B", icon: "streak" },
-  { id: "quiz",         title: "Sınav Takvimi",      description: "Yaklaşan quiz ve sınavlar.",           size: "wide",   accent: "#DC2626", icon: "quiz" },
-  { id: "notes",        title: "Hızlı Notlar",       description: "Kısa notları dashboard'dan düzenle.", size: "square", accent: "#0891B2", icon: "notes" },
-  { id: "focus",        title: "Odak Sayacı",        description: "Pomodoro tabanlı çalışma sayacı.",    size: "square", accent: "#BE185D", icon: "focus" },
-  { id: "xplog",        title: "XP Geçmişi",         description: "Son 7 günün XP kazanımları.",         size: "wide",   accent: "#059669", icon: "bullish" },
+  { id: "tasks",        title: "Günlük Görevler",   description: "Bugünkü görev akışı ve XP.",          size: "square", accent: WIDGET_COLORS.accent, icon: "tasks" },
+  { id: "achievements", title: "Başarım Vitrini",   description: "Rozetler ve kilitli başarımlar.",      size: "wide",   accent: WIDGET_COLORS.accent, icon: "achievements" },
+  { id: "ranking",      title: "Lig & Sıralama",    description: "Haftalık lig ve sıralama.",            size: "wide",   accent: WIDGET_COLORS.accent, icon: "ranking" },
+  { id: "journey",      title: "Öğrenme Yolculuğu", description: "Aktif modül ve sıradaki durak.",       size: "square", accent: WIDGET_COLORS.accent, icon: "journey" },
+  { id: "stats",        title: "İstatistikler",      description: "Seviye, coin, seri, görev.",           size: "wide",   accent: WIDGET_COLORS.accent, icon: "stats" },
+  { id: "goals",        title: "Günlük Hedef",       description: "Odak, seri ve seviye ilerlemesi.",     size: "square", accent: WIDGET_COLORS.accent, icon: "goals" },
+  { id: "streak",       title: "Çalışma Serisi",     description: "Isı haritası ve seri takibi.",         size: "wide",   accent: WIDGET_COLORS.accent, icon: "streak" },
+  { id: "quiz",         title: "Sınav Takvimi",      description: "Yaklaşan quiz ve sınavlar.",           size: "wide",   accent: WIDGET_COLORS.accent, icon: "quiz" },
+  { id: "notes",        title: "Hızlı Notlar",       description: "Kısa notları dashboard'dan düzenle.", size: "square", accent: WIDGET_COLORS.accent, icon: "notes" },
+  { id: "focus",        title: "Odak Sayacı",        description: "Pomodoro tabanlı çalışma sayacı.",    size: "square", accent: WIDGET_COLORS.accent, icon: "focus" },
+  { id: "xplog",        title: "XP Geçmişi",         description: "Son 7 günün XP kazanımları.",         size: "wide",   accent: WIDGET_COLORS.accent, icon: "bullish" },
 ];
 
 const WIDGET_IDS = new Set(WIDGET_META.map((w) => w.id));
 
 const badgeSeed = [
-  { icon: "graduation", title: "İlk Ders",  bg: "#EFF6FF", color: "#2563EB", locked: false },
-  { icon: "streak", title: "7 Gün",     bg: "#FFFBEB", color: "#D97706", locked: false },
-  { icon: "chart", title: "İlk 100",   bg: "#ECFDF5", color: "#059669", locked: false },
-  { icon: "book_stack", title: "5 Kurs",    bg: "#F5F3FF", color: "#7C3AED", locked: false },
-  { icon: "bolt", title: "Hızlı Öğr", bg: "#FFFBEB", color: "#D97706", locked: false },
-  { icon: "trophy", title: "Şampiyon",  bg: "#FEF2F2", color: "#DC2626", locked: false },
-  { icon: "lock", title: "Mükemmel",  bg: "#F8F9FB", color: "#94A3B8", locked: true  },
-  { icon: "lock", title: "Elmas",     bg: "#F8F9FB", color: "#94A3B8", locked: true  },
+  { icon: "graduation", title: "İlk Ders Tamamlandı", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "streak", title: "7 Günlük Seri", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "chart", title: "İlk 100 Soru", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "book_stack", title: "5 Kurs Tamamlandı", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "bolt", title: "Hızlı Öğrenen", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "trophy", title: "Lig Şampiyonu", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
+  { icon: "lock", title: "Mükemmeliyet Kilidi", bg: WIDGET_COLORS.surfaceAlt, color: WIDGET_COLORS.textSubtle, locked: true  },
+  { icon: "lock", title: "Elmas Lig Kilidi", bg: WIDGET_COLORS.surfaceAlt, color: WIDGET_COLORS.textSubtle, locked: true  },
 ];
 
 const journeySeed = [
@@ -40,16 +55,16 @@ const journeySeed = [
 ];
 
 const upcomingQuizzes = [
-  { subject: "Cebir II",       date: "23 Nis", type: "Quiz",  color: "#DC2626" },
-  { subject: "Geometri Giriş", date: "28 Nis", type: "Sınav", color: "#7C3AED" },
-  { subject: "Lineer Cebir",   date: "5 May",  type: "Quiz",  color: "#2563EB" },
-  { subject: "Olasılık",       date: "12 May", type: "Ödev",  color: "#059669" },
+  { subject: "Cebir II",       date: "23 Nis", type: "Quiz",  color: WIDGET_COLORS.accent },
+  { subject: "Geometri Giriş", date: "28 Nis", type: "Sınav", color: WIDGET_COLORS.accent },
+  { subject: "Lineer Cebir",   date: "5 May",  type: "Quiz",  color: WIDGET_COLORS.accent },
+  { subject: "Olasılık",       date: "12 May", type: "Ödev",  color: WIDGET_COLORS.accent },
 ];
 
 const quickNotesSeed = [
-  { id: 1, text: "Cebir II — türev formüllerini tekrar et",    color: "#EFF6FF" },
-  { id: 2, text: "Geometri: pisagor uygulamaları konu 4",      color: "#ECFDF5" },
-  { id: 3, text: "Hocaya sor: limit tanımı belirsizlik",       color: "#FFFBEB" },
+  { id: 1, text: "Cebir II — türev formüllerini tekrar et",    color: WIDGET_COLORS.surface },
+  { id: 2, text: "Geometri: pisagor uygulamaları konu 4",      color: WIDGET_COLORS.surface },
+  { id: 3, text: "Hocaya sor: limit tanımı belirsizlik",       color: WIDGET_COLORS.surface },
 ];
 
 const xpLogSeed = [
@@ -83,7 +98,7 @@ function loadActiveWidgets() {
 
 function ProgressBar({ value, color, height = "6px" }) {
   return (
-    <div className="overflow-hidden rounded-full bg-slate-100" style={{ height }}>
+    <div className="overflow-hidden rounded-full border border-white/70 bg-white/65 backdrop-blur-sm" style={{ height }}>
       <div
         className="h-full rounded-full transition-all duration-500"
         style={{ width: `${Math.max(0, Math.min(100, value))}%`, background: color }}
@@ -94,17 +109,9 @@ function ProgressBar({ value, color, height = "6px" }) {
 
 function Eyebrow({ accent, children }) {
   return (
-    <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold uppercase tracking-[1.8px]" style={{ color: accent }}>
-      {children}
-    </span>
-  );
-}
-
-function WidgetEyebrowTitle({ accent, children }) {
-  return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-center gap-2">
       <div className="h-px w-5 rounded-full" style={{ background: accent }} />
-      <span className="text-[clamp(18px,1.55vw,24px)] font-bold tracking-[-0.01em]" style={{ color: accent }}>
+      <span className="text-[clamp(14px,0.78vw,15.5px)] font-bold uppercase tracking-[1.8px]" style={{ color: WIDGET_COLORS.text }}>
         {children}
       </span>
     </div>
@@ -114,15 +121,15 @@ function WidgetEyebrowTitle({ accent, children }) {
 function WidgetShell({ widget, isCustomizing, children }) {
   return (
     <article
-      className={`group relative h-full overflow-hidden rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,.08)] transition-all duration-300 ${
+      className={`group relative h-full overflow-hidden rounded-[28px] border border-white/70 bg-white/66 p-4 shadow-[0_18px_50px_rgba(37,99,235,0.08)] backdrop-blur-2xl transition-all duration-300 xl:p-5 ${
         isCustomizing
-          ? "ring-1 ring-slate-300 ring-offset-2 ring-offset-[#F3F6FC] hover:-translate-y-0.5"
-          : "hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_18px_36px_rgba(37,99,235,.16)]"
+          ? "ring-1 ring-blue-200/80 ring-offset-2 ring-offset-[#eef5ff] hover:-translate-y-0.5"
+          : "hover:-translate-y-0.5 hover:border-blue-200/85 hover:bg-white/78 hover:shadow-[0_24px_52px_rgba(37,99,235,.14)]"
       }`}
     >
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: `radial-gradient(circle at top right, ${widget.accent}10, transparent 44%)` }}
+        style={{ background: `radial-gradient(circle at top right, ${widget.accent}1f, transparent 50%)` }}
       />
       <div className={isCustomizing ? "pointer-events-none h-full select-none" : "h-full"}>
         {children}
@@ -136,9 +143,9 @@ function WidgetSlot({ widget, isCustomizing, children }) {
   const slotClass = isWide
     ? "col-span-1 sm:col-span-2 lg:col-span-2 2xl:col-span-2"
     : "col-span-1 sm:col-span-1 lg:col-span-1 2xl:col-span-1";
-  const minHeight = 250;
-  const maxHeight = 350;
-  const fluidHeight = "clamp(250px,24vw,350px)";
+  const minHeight = 224;
+  const maxHeight = 312;
+  const fluidHeight = "clamp(224px,21vw,312px)";
 
   return (
     <div className={slotClass}>
@@ -157,37 +164,39 @@ function GoalsWidget({ doneTasks, totalTasks, user }) {
   const weekly = Math.min(100, Math.round(((user?.streak || 0) / 7) * 100));
   const level  = Math.min(100, Math.round(((user?.xp || 0) / 1000) * 100));
   const rows   = [
-    { label: "Bugün",  value: `${doneTasks}/${totalTasks}`, progress: daily,  color: "#2563EB" },
-    { label: "Seri",   value: `${user?.streak || 0}/7`,     progress: weekly, color: "#7C3AED" },
-    { label: "Seviye", value: `%${level}`,                  progress: level,  color: "#059669" },
+    { label: "Bugün",  value: `${doneTasks}/${totalTasks}`, progress: daily,  color: WIDGET_COLORS.accent },
+    { label: "Seri",   value: `${user?.streak || 0}/7`,     progress: weekly, color: WIDGET_COLORS.accent },
+    { label: "Seviye", value: `%${level}`,                  progress: level,  color: WIDGET_COLORS.accent },
   ];
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent="#7C3AED">Günlük Hedef</Eyebrow>
-      <div className="flex min-h-0 flex-1 items-center justify-center py-1">
+      <div className="flex items-center justify-between">
+        <Eyebrow accent={WIDGET_COLORS.accent}>Günlük Hedef</Eyebrow>
+      </div>
+      <div className="flex min-h-0 flex-1 items-center justify-center py-2">
         <div
           className="relative flex items-center justify-center rounded-full"
           style={{
-            width: "clamp(92px,11vw,152px)",
-            height: "clamp(92px,11vw,152px)",
-            padding: "clamp(6px,0.7vw,10px)",
-            background: `conic-gradient(#2563EB 0deg ${daily * 3.6}deg, #E2E8F0 ${daily * 3.6}deg 360deg)`,
+            width: "clamp(72px,6.5vw,94px)",
+            height: "clamp(72px,6.5vw,94px)",
+            padding: "clamp(5px,0.6vw,8px)",
+            background: `conic-gradient(${WIDGET_COLORS.accent} 0deg ${daily * 3.6}deg, #E2E8F0 ${daily * 3.6}deg 360deg)`,
           }}
         >
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
-            <span className="text-[clamp(18px,1.5vw,24px)] font-bold text-[#111827]">%{daily}</span>
+          <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-md">
+            <span className="text-[clamp(18px,1.2vw,22px)] font-bold text-[#111827]">%{daily}</span>
           </div>
         </div>
       </div>
-      <div className="mt-auto space-y-2">
+      <div className="mt-auto space-y-1.5">
         {rows.map((r) => (
           <div key={r.label}>
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-[clamp(11px,0.72vw,12.5px)] font-semibold text-slate-400">{r.label}</span>
-              <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold" style={{ color: r.color }}>{r.value}</span>
+            <div className="mb-0.5 flex items-center justify-between">
+              <span className="text-[13px] font-semibold text-slate-400">{r.label}</span>
+              <span className="text-[13px] font-bold" style={{ color: r.color }}>{r.value}</span>
             </div>
-            <ProgressBar value={r.progress} color={r.color} height="clamp(6px,0.55vw,10px)" />
+            <ProgressBar value={r.progress} color={r.color} height="4px" />
           </div>
         ))}
       </div>
@@ -198,44 +207,44 @@ function GoalsWidget({ doneTasks, totalTasks, user }) {
 // ── Widget: Daily Tasks (1:1) ─────────────────────────────────────────────────
 function DailyTasksWidget({ tasks, doneTasks, onToggleTask }) {
   const pct = tasks.length ? Math.round((doneTasks / tasks.length) * 100) : 0;
+  const visibleTasks = tasks.slice(0, 4);
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#2563EB">Görevler</Eyebrow>
-        <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-blue-600">{doneTasks}/{tasks.length}</span>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Görevler</Eyebrow>
+        <span className="text-[14px] font-bold text-blue-600">{doneTasks}/{tasks.length}</span>
       </div>
-      <div className="mt-2">
+      <div className="mt-1.5">
         <ProgressBar
           value={pct}
-          color="linear-gradient(90deg,#2563EB,#059669)"
-          height="clamp(7px,0.7vw,12px)"
+          color={WIDGET_COLORS.accent}
+          height="4px"
         />
       </div>
-      <div className="mt-1.5 flex flex-1 flex-col gap-1.5">
-        {tasks.map((task) => (
+      <div className="mt-2.5 flex flex-1 flex-col gap-2">
+        {visibleTasks.map((task) => (
           <button
             key={task.id}
             type="button"
             onClick={() => onToggleTask(task.id)}
-            className={`flex items-center gap-2 rounded-[14px] border px-2.5 py-2 text-left transition-all ${
+              className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-all ${
               task.done
-                ? "border-emerald-200 bg-emerald-50"
-                : "border-slate-100 bg-white hover:border-blue-200 hover:bg-blue-50/40"
+                ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.09)]"
+                : "border-white/70 bg-white/72 backdrop-blur-md hover:border-blue-200/80 hover:bg-white/86"
             }`}
           >
-            <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
               <Icon
                 name={task.done ? "check_box" : "unchecked_box"}
-                size={18}
-                className="scale-[1.12]"
-                color={task.done ? "#059669" : "#94a3b8"}
+                size={15}
+                color={task.done ? WIDGET_COLORS.accent : WIDGET_COLORS.textSubtle}
               />
             </div>
-            <span className={`min-w-0 flex-1 text-[clamp(11.5px,0.78vw,13.5px)] leading-[1.3] ${task.done ? "text-emerald-700 line-through" : "text-slate-600"}`}>
+            <span className={`min-w-0 flex-1 text-[14px] leading-[1.4] ${task.done ? "text-slate-700 line-through" : "text-slate-600"}`}>
               {task.title}
             </span>
-            <span className={`text-[clamp(11.5px,0.78vw,13.5px)] font-bold ${task.done ? "text-emerald-500" : "text-slate-400"}`}>
+            <span className={`text-[13px] font-bold ${task.done ? "text-blue-600" : "text-slate-400"}`}>
               +{task.xp}
             </span>
           </button>
@@ -248,25 +257,26 @@ function DailyTasksWidget({ tasks, doneTasks, onToggleTask }) {
 // ── Widget: Achievements (2:1) ────────────────────────────────────────────────
 function AchievementWidget({ badges }) {
   const unlocked = badges.filter((b) => !b.locked).length;
+  const visibleBadges = badges.slice(0, 8);
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#D97706">Başarımlar</Eyebrow>
-        <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-amber-600">{unlocked}/{badges.length}</span>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Başarımlar</Eyebrow>
+        <span className="text-[14px] font-bold text-blue-600">{unlocked}/{badges.length}</span>
       </div>
       <div className="mt-3 grid flex-1 grid-cols-4 gap-2">
-        {badges.map((b) => (
+        {visibleBadges.map((b) => (
           <div
             key={b.title}
-            className={`flex flex-col items-center justify-center rounded-xl border py-2 ${
-              b.locked ? "border-slate-100 bg-slate-50 opacity-40" : "border-slate-100 bg-white shadow-sm"
+            className={`flex flex-col items-center justify-center rounded-xl border px-2 py-2 ${
+              b.locked ? "border-white/65 bg-white/50 opacity-45" : "border-white/70 bg-white/72 backdrop-blur-sm"
             }`}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: b.bg }}>
-              <Icon name={b.icon} size={15} color={b.color} />
+            <div className="flex h-7 w-7 items-center justify-center rounded-full" style={{ background: b.bg }}>
+              <Icon name={b.icon} size={12} color={b.color} />
             </div>
-            <div className="mt-1 text-[clamp(11px,0.72vw,12.5px)] font-semibold text-slate-600">{b.title}</div>
+            <div className="mt-1 text-center text-[12px] font-semibold leading-[1.25] text-slate-600">{b.title}</div>
           </div>
         ))}
       </div>
@@ -278,21 +288,21 @@ function AchievementWidget({ badges }) {
 function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
   const current = rankingData[rankingTab];
   const me      = current.find((r) => r.me);
-  const rankingRows = current.slice(0, 4);
+  const rankingRows = current.slice(0, 3);
   const meRankLabel = `${String(me?.rank || "#8").replace("#", "")}.`;
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#2563EB">Sıralama</Eyebrow>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Sıralama</Eyebrow>
         <div className="flex gap-1.5">
           {[["haftalik","Haftalık"],["sinif","Sınıf"],["arkadaslar","Arkadaş"]].map(([key, label]) => (
             <button
               key={key}
               type="button"
               onClick={() => onRankingTabChange(key)}
-              className={`rounded-full px-2.5 py-1 text-[clamp(11px,0.72vw,12.5px)] font-semibold tracking-[0.3px] transition-all ${
-                rankingTab === key ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-400 hover:bg-slate-200/70"
+              className={`rounded-full px-2.5 py-1.5 text-[13px] font-semibold tracking-[0.2px] transition-all ${
+                rankingTab === key ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border border-white/65 bg-white/68 text-slate-500 backdrop-blur-sm hover:border-blue-100 hover:bg-white/82"
               }`}
             >
               {label}
@@ -300,60 +310,59 @@ function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
           ))}
         </div>
       </div>
-        <div className="flex min-h-0 flex-1 flex-col p-2.5 md:p-3">
-          <div className="flex flex-1 flex-col gap-1.5">
+        <div className="mt-2.5 flex min-h-0 flex-1 flex-col">
+          <div className="flex flex-1 flex-col gap-2">
             {rankingRows.map((row, index) => (
               <div
                 key={`${rankingTab}-${row.rank}-${row.name}`}
-                className={`flex w-full items-center gap-2 rounded-[12px] border px-2.5 py-1.5 ${
-                  row.me ? "border-blue-200 bg-blue-50" : "border-slate-100 bg-white"
+                className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 ${
+                  row.me ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border-white/70 bg-white/72 backdrop-blur-sm"
                 }`}
               >
-                <span className="flex w-6 items-center justify-center text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-slate-400">
+                <span className="flex w-6 items-center justify-center text-[14px] font-bold text-slate-400">
                   {index + 1}.
                 </span>
-                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: row.bg }}>
-                  <Icon name={row.avatar} size={15} />
+                <div className="flex h-[24px] w-[24px] flex-shrink-0 items-center justify-center rounded-lg" style={{ background: row.bg }}>
+                  <Icon name={row.avatar} size={12} />
                 </div>
-                <span className={`min-w-0 flex-1 truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
+                <span className={`min-w-0 flex-1 truncate text-[14px] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
                   {row.name}
                 </span>
-                <span className={`text-[clamp(11.5px,0.78vw,13.5px)] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
+                <span className={`text-[13px] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
                   {row.points}
                 </span>
               </div>
             ))}
           </div>
         </div>
-        <div className="mx-auto h-px w-[94%] rounded-full bg-slate-200/80" />
-        <div className="p-2.5 md:p-3">
-          <div className="flex items-center justify-between rounded-[12px] border border-amber-200 bg-amber-50 px-2.5 py-2">
+        <div className="mt-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 px-3 py-2 shadow-[0_12px_24px_rgba(37,99,235,0.11)] backdrop-blur-sm">
+          <div className="flex items-center justify-between">
             <div className="flex min-w-0 items-center gap-2">
-              <span className="text-[clamp(12px,0.86vw,14.5px)] font-bold text-[#111827]">{meRankLabel}</span>
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(12.5px,0.92vw,15.5px)]" style={{ background: me?.bg || "linear-gradient(135deg,#2563EB,#7C3AED)" }}>
-                <Icon name={me?.avatar || "avatar_teddy_bear"} size={15} />
+              <span className="text-[14px] font-bold text-[#111827]">{meRankLabel}</span>
+              <div className="flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-lg" style={{ background: me?.bg || "linear-gradient(135deg,#2563EB,#60A5FA)" }}>
+                <Icon name={me?.avatar || "avatar_teddy_bear"} size={12} />
               </div>
-              <span className="truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold text-amber-700">Sen</span>
+              <span className="truncate text-[14px] font-semibold text-blue-700">Sen</span>
             </div>
-            <span className="text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-amber-700">{me?.points || "2 750 pts"}</span>
+            <span className="text-[13px] font-bold text-blue-700">{me?.points || "2 750 pts"}</span>
           </div>
         </div>
-      </div>
+    </div>
   );
 }
 
 // ── Widget: Journey (1:1) ─────────────────────────────────────────────────────
 function JourneyWidget() {
   const tone = {
-    done:   { card: "border-emerald-200 bg-emerald-50",           dot: "bg-emerald-500",                  title: "text-emerald-700", badge: "bg-emerald-100 text-emerald-600" },
-    active: { card: "border-blue-200 bg-blue-50",                 dot: "bg-blue-500 ring-2 ring-blue-100", title: "text-blue-700",    badge: "bg-blue-100 text-blue-600"       },
-    locked: { card: "border-slate-100 bg-slate-50/80 opacity-55", dot: "bg-slate-300",                    title: "text-slate-400",   badge: "bg-slate-200 text-slate-400"     },
+    done:   { card: "border-white/70 bg-white/74 backdrop-blur-sm",                   dot: "bg-blue-600",                       title: "text-slate-900",   badge: "bg-blue-50/75 text-blue-600"        },
+    active: { card: "border-blue-200/80 bg-blue-50/68 shadow-[0_10px_24px_rgba(37,99,235,0.11)] backdrop-blur-sm",                 dot: "bg-blue-600 ring-2 ring-blue-100", title: "text-slate-900",   badge: "bg-white/90 text-blue-600"          },
+    locked: { card: "border-white/65 bg-white/52 opacity-55", dot: "bg-slate-300",                    title: "text-slate-400",   badge: "bg-slate-200/80 text-slate-400"     },
   };
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent="#059669">Yolculuk</Eyebrow>
-      <div className="mt-3 flex flex-1 flex-col gap-2">
+      <Eyebrow accent={WIDGET_COLORS.accent}>Yolculuk</Eyebrow>
+      <div className="mt-4 flex flex-1 flex-col gap-2.5">
         {journeySeed.map((step, i) => {
           const t = tone[step.tone];
           return (
@@ -361,14 +370,14 @@ function JourneyWidget() {
               {i < journeySeed.length - 1 && (
                 <div className="absolute left-[12px] top-8 h-3.5 w-px bg-slate-200" />
               )}
-              <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 ${t.card}`}>
+              <div className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 ${t.card}`}>
                 <div className={`h-3 w-3 flex-shrink-0 rounded-full ${t.dot}`} />
                 <div className="min-w-0 flex-1">
-                  <div className={`text-[clamp(11.5px,0.78vw,13.5px)] font-bold ${t.title}`}>{step.title}</div>
-                  <div className="text-[clamp(11px,0.72vw,12.5px)] text-slate-400">{step.desc}</div>
+                  <div className={`text-[clamp(13.5px,0.78vw,15.5px)] font-bold ${t.title}`}>{step.title}</div>
+                  <div className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">{step.desc}</div>
                 </div>
-                <span className={`inline-flex items-center rounded-full px-2 py-1 text-[clamp(11px,0.72vw,12.5px)] font-bold ${t.badge}`}>
-                  {step.statusIcon ? <Icon name={step.statusIcon} size={11} color={step.tone === "locked" ? "#94a3b8" : (step.tone === "active" ? "#2563EB" : "#059669")} /> : step.status}
+                <span className={`inline-flex items-center rounded-full px-2 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold ${t.badge}`}>
+                  {step.statusIcon ? <Icon name={step.statusIcon} size={11} color={step.tone === "locked" ? WIDGET_COLORS.textSubtle : WIDGET_COLORS.accent} /> : step.status}
                 </span>
               </div>
             </div>
@@ -382,22 +391,22 @@ function JourneyWidget() {
 // ── Widget: Stats (2:1) ───────────────────────────────────────────────────────
 function StatsWidget({ user, doneTasks, totalTasks }) {
   const stats = [
-    { label: "Seviye", value: String(user?.level || 12),      icon: "goals", color: "#2563EB", progress: Math.min(100, Math.round(((user?.xp    || 0) / 1000) * 100)) },
-    { label: "Coin",   value: formatNumber(user?.coins || 0), icon: "coin", color: "#D97706", progress: Math.min(100, Math.round(((user?.coins || 0) / 2000) * 100)) },
-    { label: "Seri",   value: `${user?.streak || 0} gün`,     icon: "streak", color: "#059669", progress: Math.min(100, Math.round(((user?.streak|| 0) / 14)   * 100)) },
-    { label: "Görev",  value: `${doneTasks}/${totalTasks}`,   icon: "tasks", color: "#7C3AED", progress: totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0   },
+    { label: "Seviye", value: String(user?.level || 12),      icon: "goals", color: WIDGET_COLORS.accent, progress: Math.min(100, Math.round(((user?.xp    || 0) / 1000) * 100)) },
+    { label: "Coin",   value: formatNumber(user?.coins || 0), icon: "coin", color: WIDGET_COLORS.accent, progress: Math.min(100, Math.round(((user?.coins || 0) / 2000) * 100)) },
+    { label: "Seri",   value: `${user?.streak || 0} gün`,     icon: "streak", color: WIDGET_COLORS.accent, progress: Math.min(100, Math.round(((user?.streak|| 0) / 14)   * 100)) },
+    { label: "Görev",  value: `${doneTasks}/${totalTasks}`,   icon: "tasks", color: WIDGET_COLORS.accent, progress: totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0   },
   ];
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent="#7C3AED">İstatistikler</Eyebrow>
-      <div className="mt-3 grid flex-1 grid-cols-2 gap-2">
+      <Eyebrow accent={WIDGET_COLORS.accent}>İstatistikler</Eyebrow>
+      <div className="mt-4 grid flex-1 grid-cols-2 gap-3">
         {stats.map((s) => (
-          <div key={s.label} className="flex flex-col justify-between rounded-[16px] border border-slate-100 bg-white p-3 shadow-sm">
-            <div className="text-[clamp(11px,0.72vw,12.5px)] font-bold uppercase tracking-[1.2px]" style={{ color: s.color }}>
+          <div key={s.label} className="flex flex-col justify-between rounded-[16px] border border-white/70 bg-white/72 p-4 shadow-[0_10px_22px_rgba(37,99,235,0.08)] backdrop-blur-sm">
+            <div className="text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.2px]" style={{ color: s.color }}>
               <span className="inline-flex items-center gap-1"><Icon name={s.icon} size={12} color={s.color} /> {s.label}</span>
             </div>
-            <div className="text-[clamp(20px,2.1vw,26px)] font-bold tracking-tight text-[#111827]">{s.value}</div>
+            <div className="text-[clamp(22px,2.1vw,28px)] font-bold tracking-tight text-[#111827]">{s.value}</div>
             <ProgressBar value={s.progress} color={s.color} />
           </div>
         ))}
@@ -414,13 +423,13 @@ function StreakWidget({ user }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#F59E0B">Çalışma Serisi</Eyebrow>
-        <span className="inline-flex items-center gap-1 text-[clamp(12px,0.86vw,14.5px)] font-bold text-amber-600"><Icon name="streak" size={14} color="#D97706" /> {streak} gün</span>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Çalışma Serisi</Eyebrow>
+        <span className="inline-flex items-center gap-1 text-[clamp(14px,0.86vw,16.5px)] font-bold text-blue-600"><Icon name="streak" size={14} color={WIDGET_COLORS.accent} /> {streak} gün</span>
       </div>
-      <div className="mt-2 flex-1">
-        <div className="grid grid-cols-7 gap-1.5">
+      <div className="mt-3 flex-1">
+        <div className="grid grid-cols-7 gap-2">
           {["P","S","Ç","P","C","C","P"].map((d, i) => (
-            <div key={i} className="text-center text-[clamp(11px,0.72vw,12.5px)] font-bold text-slate-300">{d}</div>
+            <div key={i} className="text-center text-[clamp(13px,0.72vw,14.5px)] font-bold text-slate-300">{d}</div>
           ))}
           {heatSeed.map((cell, i) => (
             <div
@@ -428,19 +437,19 @@ function StreakWidget({ user }) {
               className="aspect-square rounded-[4px]"
               style={{
                 background: cell.active
-                  ? cell.intensity === 3 ? "#F59E0B" : cell.intensity === 2 ? "#FCD34D" : "#FEF3C7"
+                  ? cell.intensity === 3 ? WIDGET_COLORS.accent : cell.intensity === 2 ? "#93C5FD" : "#DBEAFE"
                   : "#F1F5F9",
               }}
             />
           ))}
         </div>
       </div>
-      <div className="mt-3">
+      <div className="mt-4">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-[clamp(11px,0.72vw,12.5px)] text-slate-400">Rekora {maxStreak - streak} gün</span>
-          <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-amber-600">{streak}/{maxStreak}</span>
+          <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">Rekora {maxStreak - streak} gün</span>
+          <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{streak}/{maxStreak}</span>
         </div>
-        <ProgressBar value={Math.round((streak / maxStreak) * 100)} color="#F59E0B" />
+        <ProgressBar value={Math.round((streak / maxStreak) * 100)} color={WIDGET_COLORS.accent} />
       </div>
     </div>
   );
@@ -451,21 +460,21 @@ function QuizWidget() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#DC2626">Sınav Takvimi</Eyebrow>
-        <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-red-500">{upcomingQuizzes.length} yaklaşan</span>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Sınav Takvimi</Eyebrow>
+        <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{upcomingQuizzes.length} yaklaşan</span>
       </div>
-      <div className="mt-3 flex flex-1 flex-col gap-1.5">
+      <div className="mt-4 flex flex-1 flex-col gap-2">
         {upcomingQuizzes.map((q) => (
-          <div key={q.subject} className="flex items-center gap-2 rounded-[14px] border border-slate-100 bg-white px-2.5 py-2">
+          <div key={q.subject} className="flex items-center gap-2.5 rounded-[14px] border border-white/70 bg-white/72 px-3 py-2.5 backdrop-blur-sm">
             <div
-              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(11px,0.72vw,12.5px)] font-bold text-white"
+              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(13px,0.72vw,14.5px)] font-bold text-white"
               style={{ background: q.color }}
             >
               {q.date.split(" ")[0]}
             </div>
-            <span className="min-w-0 flex-1 truncate text-[clamp(11.5px,0.78vw,13.5px)] font-semibold text-slate-700">{q.subject}</span>
-            <span className="text-[clamp(11px,0.72vw,12.5px)] text-slate-400">{q.date}</span>
-            <span className="rounded-full px-2 py-1 text-[clamp(11px,0.72vw,12.5px)] font-bold" style={{ background: `${q.color}18`, color: q.color }}>
+            <span className="min-w-0 flex-1 truncate text-[clamp(13.5px,0.78vw,15.5px)] font-semibold text-slate-700">{q.subject}</span>
+            <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">{q.date}</span>
+            <span className="rounded-full px-2 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold" style={{ background: `${q.color}18`, color: q.color }}>
               {q.type}
             </span>
           </div>
@@ -483,44 +492,44 @@ function NotesWidget() {
   const addNote = () => {
     const text = input.trim();
     if (!text) return;
-    const colors = ["#EFF6FF", "#ECFDF5", "#FFFBEB", "#F5F3FF"];
+    const colors = [WIDGET_COLORS.surface, WIDGET_COLORS.surface, WIDGET_COLORS.surface];
     setNotes((prev) => [{ id: Date.now(), text, color: colors[prev.length % colors.length] }, ...prev]);
     setInput("");
   };
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent="#0891B2">Notlar</Eyebrow>
-      <div className="mt-3 flex gap-1.5">
+      <Eyebrow accent={WIDGET_COLORS.accent}>Notlar</Eyebrow>
+      <div className="mt-4 flex gap-2">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addNote()}
           placeholder="Not ekle..."
-          className="flex-1 rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-[clamp(11.5px,0.78vw,13.5px)] text-slate-600 outline-none focus:border-cyan-300"
+          className="flex-1 rounded-xl border border-white/70 bg-white/72 px-3 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] text-slate-600 shadow-[0_8px_18px_rgba(37,99,235,0.06)] outline-none backdrop-blur-sm focus:border-blue-300 focus:bg-white/88"
         />
         <button
           type="button"
           onClick={addNote}
-          className="rounded-xl bg-cyan-600 px-3 py-2 text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-white hover:bg-cyan-700"
+          className="rounded-xl border border-white/60 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-white shadow-[0_12px_26px_rgba(37,99,235,0.2)] hover:brightness-105"
         >
           <Icon name="plus" size={12} color="#ffffff" />
         </button>
       </div>
-      <div className="mt-2.5 flex flex-1 flex-col gap-1.5 overflow-hidden">
+      <div className="mt-3 flex flex-1 flex-col gap-2 overflow-hidden">
         {notes.slice(0, 4).map((n) => (
           <div
             key={n.id}
-            className="flex items-center gap-2 rounded-[14px] border border-slate-100 px-2.5 py-2"
+            className="flex items-center gap-2.5 rounded-[14px] border border-white/70 bg-white/72 px-3 py-2.5 backdrop-blur-sm"
             style={{ background: n.color }}
           >
-            <span className="min-w-0 flex-1 truncate text-[clamp(11.5px,0.78vw,13.5px)] text-slate-700">{n.text}</span>
+            <span className="min-w-0 flex-1 truncate text-[clamp(13.5px,0.78vw,15.5px)] text-slate-700">{n.text}</span>
             <button
               type="button"
               onClick={() => setNotes((prev) => prev.filter((x) => x.id !== n.id))}
-              className="text-[clamp(11.5px,0.78vw,13.5px)] text-slate-300 hover:text-red-400"
+              className="text-[clamp(13.5px,0.78vw,15.5px)] text-slate-300 hover:text-blue-500"
             >
-              <Icon name="close" size={12} color="#94A3B8" />
+              <Icon name="close" size={12} color={WIDGET_COLORS.textSubtle} />
             </button>
           </div>
         ))}
@@ -556,34 +565,34 @@ function FocusWidget() {
   const pct        = Math.round(((total - seconds) / total) * 100);
   const mm         = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss         = String(seconds % 60).padStart(2, "0");
-  const phaseColor = phase === "work" ? "#BE185D" : "#059669";
+  const phaseColor = WIDGET_COLORS.accent;
   const reset      = () => { setRunning(false); setPhase("work"); setSeconds(POMODORO_WORK_SECONDS); };
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#BE185D">Odak</Eyebrow>
+        <Eyebrow accent={WIDGET_COLORS.accent}>Odak</Eyebrow>
         <span
-          className="rounded-full px-2.5 py-1 text-[clamp(11px,0.72vw,12.5px)] font-bold"
-          style={{ background: phase === "work" ? "#FCE7F3" : "#ECFDF5", color: phaseColor }}
+          className="rounded-full px-2.5 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold"
+          style={{ background: WIDGET_COLORS.accentSoft, color: phaseColor }}
         >
           {phase === "work" ? "Çalışma" : "Mola"} · {sessions} oturum
         </span>
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center gap-3">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div
-          className="relative flex h-24 w-24 items-center justify-center rounded-full p-[7px]"
+          className="relative flex h-28 w-28 items-center justify-center rounded-full p-[8px]"
           style={{ background: `conic-gradient(${phaseColor} 0deg ${pct * 3.6}deg, #E2E8F0 ${pct * 3.6}deg 360deg)` }}
         >
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
-            <span className="text-[clamp(18px,1.8vw,24px)] font-bold tabular-nums text-[#111827]">{mm}:{ss}</span>
+          <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-sm">
+            <span className="text-[clamp(22px,1.9vw,28px)] font-bold tabular-nums text-[#111827]">{mm}:{ss}</span>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <button
             type="button"
             onClick={() => setRunning((r) => !r)}
-            className="rounded-xl px-4 py-2 text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-white"
+            className="rounded-xl px-[18px] py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-white"
             style={{ background: phaseColor }}
           >
             {running ? "Duraklat" : "Başlat"}
@@ -591,7 +600,7 @@ function FocusWidget() {
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[clamp(11.5px,0.78vw,13.5px)] font-bold text-slate-500"
+            className="rounded-xl border border-white/70 bg-white/74 px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm"
           >
             <Icon name="refresh" size={13} color="#64748b" />
           </button>
@@ -610,23 +619,23 @@ function XpLogWidget() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <Eyebrow accent="#059669">XP Geçmişi</Eyebrow>
-        <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-emerald-600">+{formatNumber(totalXp)} bu hafta</span>
+        <Eyebrow accent={WIDGET_COLORS.accent}>XP Geçmişi</Eyebrow>
+        <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">+{formatNumber(totalXp)} bu hafta</span>
       </div>
-      <div className="mt-3 flex flex-1 items-end gap-1.5">
+      <div className="mt-4 flex flex-1 items-end gap-2">
         {xpLogSeed.map((d) => {
           const h       = Math.round((d.xp / maxXp) * 100);
           const isToday = d.day === "Paz";
           return (
-            <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-              <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold" style={{ color: isToday ? "#059669" : "#CBD5E1" }}>{d.xp}</span>
+            <div key={d.day} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold" style={{ color: isToday ? WIDGET_COLORS.accent : "#CBD5E1" }}>{d.xp}</span>
               <div className="w-full overflow-hidden rounded-t-md" style={{ height: "56px" }}>
                 <div
                   className="w-full rounded-t-md transition-all duration-500"
-                  style={{ height: `${h}%`, marginTop: `${100 - h}%`, background: isToday ? "#059669" : "#E2E8F0" }}
+                  style={{ height: `${h}%`, marginTop: `${100 - h}%`, background: isToday ? WIDGET_COLORS.accent : "#DBEAFE" }}
                 />
               </div>
-              <span className="text-[clamp(11px,0.72vw,12.5px)] font-semibold text-slate-400">{d.day}</span>
+              <span className="text-[clamp(13px,0.72vw,14.5px)] font-semibold text-slate-400">{d.day}</span>
             </div>
           );
         })}
@@ -639,15 +648,15 @@ function XpLogWidget() {
 function EmptyState({ onOpenCustomizer }) {
   return (
     <div
-      className="flex items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-white/80 px-8 text-center shadow-sm"
-      style={{ minHeight: "clamp(240px,30vh,360px)" }}
+      className="flex items-center justify-center rounded-[26px] border border-dashed border-white/75 bg-white/62 px-10 py-10 text-center shadow-[0_18px_44px_rgba(37,99,235,0.09)] backdrop-blur-2xl"
+      style={{ minHeight: "clamp(260px,30vh,340px)" }}
     >
       <div className="max-w-sm">
-        <div className="text-[clamp(16px,1.35vw,20px)] font-bold text-[#111827]">Dashboard şu an boş.</div>
+        <div className="text-[clamp(18px,1.35vw,22px)] font-bold text-[#111827]">Dashboard şu an boş.</div>
         <button
           type="button"
           onClick={onOpenCustomizer}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-[clamp(11.5px,0.78vw,13.5px)] font-bold uppercase tracking-[1.4px] text-blue-600 hover:bg-blue-100"
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-blue-50/78 px-4 py-2 text-[clamp(13.5px,0.78vw,15.5px)] font-bold uppercase tracking-[1.4px] text-blue-600 shadow-[0_12px_26px_rgba(37,99,235,0.12)] backdrop-blur-sm hover:bg-blue-100/90"
         >
           <Icon name="plus" size={13} color="#2563EB" /> Widget Ekle
         </button>
@@ -663,51 +672,51 @@ function WidgetPanel({ widgets, activeWidgetIds, onAdd, onRemove, onClose }) {
   return (
     <>
       <button type="button" onClick={onClose} aria-label="Kapat"
-        className="fixed inset-0 z-[60] bg-slate-950/12 backdrop-blur-[2px]" />
-      <div className="widget-panel fixed inset-x-4 top-20 z-[70] mx-auto w-[min(100%,980px)] rounded-[30px] border border-slate-200 bg-white/95 p-5 shadow-[0_28px_60px_rgba(15,23,42,.2)] backdrop-blur-xl md:right-10 md:left-auto md:mx-0">
+        className="fixed inset-0 z-[60] bg-slate-950/14 backdrop-blur-[3px]" />
+      <div className="widget-panel fixed inset-x-4 top-20 z-[70] mx-auto w-[min(100%,1080px)] rounded-[30px] border border-white/75 bg-white/72 p-6 shadow-[0_24px_70px_rgba(15,23,42,.18)] backdrop-blur-2xl md:right-10 md:left-auto md:mx-0">
         <div className="flex items-center justify-between">
-          <Eyebrow accent="#2563EB">Vitrin Düzenleyici</Eyebrow>
+          <Eyebrow accent={WIDGET_COLORS.accent}>Vitrin Düzenleyici</Eyebrow>
           <button type="button" onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-[clamp(13px,1vw,16px)] text-slate-500 hover:text-blue-600">
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/70 bg-white/78 text-[clamp(15px,1vw,18px)] text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm hover:text-blue-600">
             <Icon name="close" size={14} color="#64748b" />
           </button>
         </div>
-        <div className="mt-4 rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+        <div className="mt-5 rounded-[22px] border border-white/70 bg-white/62 p-5 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold uppercase tracking-[1.4px] text-slate-400">Aktif</span>
-            <span className="text-[clamp(11px,0.72vw,12.5px)] font-bold text-blue-600">{activeWidgetIds.length}/{widgets.length}</span>
+            <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.4px] text-slate-400">Aktif</span>
+            <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{activeWidgetIds.length}/{widgets.length}</span>
           </div>
-          <div className="mt-2.5 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2.5">
             {activeTitles.length
               ? activeTitles.map((t) => (
-                  <span key={t} className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[clamp(11px,0.72vw,12.5px)] font-bold text-blue-600">{t}</span>
+                  <span key={t} className="rounded-full border border-blue-200/80 bg-blue-50/78 px-2.5 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600 backdrop-blur-sm">{t}</span>
                 ))
-              : <span className="text-[clamp(11px,0.72vw,12.5px)] text-slate-400">Henüz aktif widget yok.</span>}
+              : <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">Henüz aktif widget yok.</span>}
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {widgets.map((widget) => {
             const isActive = activeWidgetIds.includes(widget.id);
             return (
               <div key={widget.id}
-                className={`rounded-[22px] border px-4 py-3 transition-all ${isActive ? "border-blue-200 bg-blue-50/70" : "border-slate-200 bg-white"}`}>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[clamp(13px,1vw,16px)]"
+                className={`rounded-[22px] border px-5 py-4 transition-all backdrop-blur-sm ${isActive ? "border-blue-200/80 bg-blue-50/70 shadow-[0_12px_28px_rgba(37,99,235,0.11)]" : "border-white/70 bg-white/72"}`}>
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[clamp(15px,1vw,18px)]"
                     style={{ background: `${widget.accent}12`, color: widget.accent }}>
                     <Icon name={widget.icon} size={16} color={widget.accent} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[clamp(12px,0.86vw,14.5px)] font-bold text-[#111827]">{widget.title}</span>
-                      <span className="text-[clamp(11px,0.72vw,12.5px)] text-slate-400">{widget.size === "wide" ? "2:1" : "1:1"}</span>
-                      {isActive && <span className="rounded-full bg-white px-2 py-0.5 text-[clamp(11px,0.72vw,12.5px)] font-bold text-blue-600">Aktif</span>}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[clamp(14px,0.86vw,16.5px)] font-bold text-[#111827]">{widget.title}</span>
+                      <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">{widget.size === "wide" ? "2:1" : "1:1"}</span>
+                      {isActive && <span className="rounded-full border border-white/65 bg-white/82 px-2 py-0.5 text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">Aktif</span>}
                     </div>
-                    <p className="mt-0.5 text-[clamp(11px,0.72vw,12.5px)] leading-relaxed text-slate-400">{widget.description}</p>
+                    <p className="mt-1 text-[clamp(13px,0.72vw,14.5px)] leading-relaxed text-slate-400">{widget.description}</p>
                   </div>
                   <button type="button"
                     onClick={() => (isActive ? onRemove(widget.id) : onAdd(widget.id))}
-                    className={`rounded-full px-3 py-1.5 text-[clamp(11px,0.72vw,12.5px)] font-bold uppercase tracking-[1.2px] transition-all ${
-                      isActive ? "bg-white text-slate-500 hover:text-rose-500" : "bg-slate-900 text-white hover:bg-slate-700"
+                    className={`rounded-full px-3.5 py-2 text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.2px] transition-all ${
+                      isActive ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 hover:bg-blue-100/90" : "border border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)] hover:brightness-105"
                     }`}>
                     {isActive ? "Çıkar" : "Ekle"}
                   </button>
@@ -722,117 +731,192 @@ function WidgetPanel({ widgets, activeWidgetIds, onAdd, onRemove, onClose }) {
 }
 
 // ── Dashboard Root ────────────────────────────────────────────────────────────
-export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user }) {
-  const [activeWidgetIds, setActiveWidgetIds] = useState(loadActiveWidgets);
-  const [isCustomizing,   setIsCustomizing  ] = useState(false);
-  const [rankingTab,      setRankingTab     ] = useState("haftalik");
-
-  useEffect(() => {
-    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activeWidgetIds)); } catch { /* ignore persistence errors */ }
-  }, [activeWidgetIds]);
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") setIsCustomizing(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user, guideState }) {
+  const availableWidgetIds = WIDGET_META.map((widget) => widget.id);
+  const [rankingTab, setRankingTab] = useState("haftalik");
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const isShowcaseGuided = guideState?.target === "showcase";
+  const [activeWidgetIds, setActiveWidgetIds] = useState(() => {
+    const loaded = loadActiveWidgets().filter((id) => availableWidgetIds.includes(id));
+    if (loaded.length) {
+      const isAutoExpandedAll =
+        loaded.length === availableWidgetIds.length &&
+        availableWidgetIds.every((id) => loaded.includes(id));
+      return isAutoExpandedAll ? [...DEFAULT_ACTIVE_WIDGETS] : loaded;
+    }
+    return [...DEFAULT_ACTIVE_WIDGETS];
+  });
 
   const rankingData = useMemo(() => ({
     haftalik: [
-      { rank: "#1", avatar: "avatar_fox", name: "Zeynep Ç.", points: "3 420 pts", bg: "#EFF6FF" },
-      { rank: "#2", avatar: "avatar_dog", name: "Rızgar O.", points: "3 180 pts", bg: "#F5F3FF" },
-      { rank: "#3", avatar: "avatar_chameleon", name: "Rojhat T.", points: "2 990 pts", bg: "#ECFDF5" },
-      { rank: "#4", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "2 900 pts", bg: "#FFFBEB" },
-      { rank: "#5", avatar: "avatar_penguin", name: "Selin K.", points: "2 860 pts", bg: "#FEF2F2" },
-      { rank: "#6", avatar: "avatar_mouse", name: "Mert D.", points: "2 810 pts", bg: "#EFF6FF" },
-      { rank: "#7", avatar: "avatar_duck", name: "Ayşe N.", points: "2 780 pts", bg: "#F5F3FF" },
-      { rank: "#8", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "2 750 pts", bg: "linear-gradient(135deg,#2563EB,#7C3AED)", me: true },
-      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "2 710 pts", bg: "#ECFDF5" },
-      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "2 660 pts", bg: "#FFFBEB" },
-      { rank: "#11", avatar: "avatar_maneki", name: "Deniz P.", points: "2 640 pts", bg: "#FEF2F2" },
-      { rank: "#12", avatar: "avatar_dragon", name: "Okan R.", points: "2 610 pts", bg: "#EFF6FF" },
+      { rank: "#1", avatar: "avatar_fox", name: "Zeynep Ç.", points: "3 420 pts", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#2", avatar: "avatar_dog", name: "Rızgar O.", points: "3 180 pts", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#3", avatar: "avatar_chameleon", name: "Rojhat T.", points: "2 990 pts", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#4", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "2 900 pts", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#5", avatar: "avatar_penguin", name: "Selin K.", points: "2 860 pts", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#6", avatar: "avatar_mouse", name: "Mert D.", points: "2 810 pts", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#7", avatar: "avatar_duck", name: "Ayşe N.", points: "2 780 pts", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#8", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "2 750 pts", bg: "linear-gradient(135deg,#2563EB,#60A5FA)", me: true },
+      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "2 710 pts", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "2 660 pts", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#11", avatar: "avatar_maneki", name: "Deniz P.", points: "2 640 pts", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#12", avatar: "avatar_dragon", name: "Okan R.", points: "2 610 pts", bg: WIDGET_COLORS.accentSoft },
     ],
     sinif: [
-      { rank: "#1", avatar: "avatar_dragon", name: "Rojhat T.", points: "97 puan", bg: "#ECFDF5" },
-      { rank: "#2", avatar: "avatar_fox", name: "Zeynep Ç.", points: "95 puan", bg: "#EFF6FF" },
-      { rank: "#3", avatar: "avatar_dog", name: "Rızgar O.", points: "94 puan", bg: "#F5F3FF" },
-      { rank: "#4", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "92 puan", bg: "#FFFBEB" },
-      { rank: "#5", avatar: "avatar_penguin", name: "Selin K.", points: "91 puan", bg: "#FEF2F2" },
-      { rank: "#6", avatar: "avatar_mouse", name: "Mert D.", points: "90 puan", bg: "#EFF6FF" },
-      { rank: "#7", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "89 puan", bg: "linear-gradient(135deg,#2563EB,#7C3AED)", me: true },
-      { rank: "#8", avatar: "avatar_duck", name: "Ayşe N.", points: "88 puan", bg: "#F5F3FF" },
-      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "87 puan", bg: "#ECFDF5" },
-      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "86 puan", bg: "#FFFBEB" },
+      { rank: "#1", avatar: "avatar_dragon", name: "Rojhat T.", points: "97 puan", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#2", avatar: "avatar_fox", name: "Zeynep Ç.", points: "95 puan", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#3", avatar: "avatar_dog", name: "Rızgar O.", points: "94 puan", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#4", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "92 puan", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#5", avatar: "avatar_penguin", name: "Selin K.", points: "91 puan", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#6", avatar: "avatar_mouse", name: "Mert D.", points: "90 puan", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#7", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "89 puan", bg: "linear-gradient(135deg,#2563EB,#60A5FA)", me: true },
+      { rank: "#8", avatar: "avatar_duck", name: "Ayşe N.", points: "88 puan", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "87 puan", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "86 puan", bg: WIDGET_COLORS.accentSoft },
     ],
     arkadaslar: [
-      { rank: "#1", avatar: "avatar_fox", name: "Zeynep Ç.", points: "8 920 XP", bg: "#EFF6FF" },
-      { rank: "#2", avatar: "avatar_dragon", name: "Rojhat T.", points: "8 710 XP", bg: "#ECFDF5" },
-      { rank: "#3", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "8 540 XP", bg: "#FFFBEB" },
-      { rank: "#4", avatar: "avatar_penguin", name: "Selin K.", points: "8 510 XP", bg: "#FEF2F2" },
-      { rank: "#5", avatar: "avatar_mouse", name: "Mert D.", points: "8 480 XP", bg: "#EFF6FF" },
-      { rank: "#6", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "8 450 XP", bg: "linear-gradient(135deg,#2563EB,#7C3AED)", me: true },
-      { rank: "#7", avatar: "avatar_dog", name: "Rızgar O.", points: "8 120 XP", bg: "#F5F3FF" },
-      { rank: "#8", avatar: "avatar_duck", name: "Ayşe N.", points: "8 030 XP", bg: "#ECFDF5" },
-      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "7 980 XP", bg: "#FFFBEB" },
-      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "7 900 XP", bg: "#FEF2F2" },
-      { rank: "#11", avatar: "avatar_maneki", name: "Deniz P.", points: "7 860 XP", bg: "#EFF6FF" },
+      { rank: "#1", avatar: "avatar_fox", name: "Zeynep Ç.", points: "8 920 XP", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#2", avatar: "avatar_dragon", name: "Rojhat T.", points: "8 710 XP", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#3", avatar: "avatar_teddy_bear", name: "Burak Y.", points: "8 540 XP", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#4", avatar: "avatar_penguin", name: "Selin K.", points: "8 510 XP", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#5", avatar: "avatar_mouse", name: "Mert D.", points: "8 480 XP", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#6", avatar: user?.avatar || "avatar_teddy_bear", name: `Sen (${user?.name || "İlkhan"})`, points: "8 450 XP", bg: "linear-gradient(135deg,#2563EB,#60A5FA)", me: true },
+      { rank: "#7", avatar: "avatar_dog", name: "Rızgar O.", points: "8 120 XP", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#8", avatar: "avatar_duck", name: "Ayşe N.", points: "8 030 XP", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#9", avatar: "avatar_hamster", name: "Ece A.", points: "7 980 XP", bg: WIDGET_COLORS.surfaceAlt },
+      { rank: "#10", avatar: "avatar_doge", name: "Kerem U.", points: "7 900 XP", bg: WIDGET_COLORS.accentSoft },
+      { rank: "#11", avatar: "avatar_maneki", name: "Deniz P.", points: "7 860 XP", bg: WIDGET_COLORS.surfaceAlt },
     ],
   }), [user?.avatar, user?.name]);
 
-  const widgetRegistry = useMemo(() =>
-    WIDGET_META.map((meta) => ({
-      ...meta,
-      render: () => {
-        switch (meta.id) {
-          case "tasks":        return <DailyTasksWidget tasks={tasks} doneTasks={doneTasks} onToggleTask={onToggleTask} />;
-          case "achievements": return <AchievementWidget badges={badgeSeed} />;
-          case "ranking":      return <RankingWidget key={`ranking-${rankingTab}`} rankingTab={rankingTab} onRankingTabChange={setRankingTab} rankingData={rankingData} />;
-          case "journey":      return <JourneyWidget />;
-          case "stats":        return <StatsWidget user={user} doneTasks={doneTasks} totalTasks={tasks.length} />;
-          case "streak":       return <StreakWidget user={user} />;
-          case "quiz":         return <QuizWidget />;
-          case "notes":        return <NotesWidget />;
-          case "focus":        return <FocusWidget />;
-          case "xplog":        return <XpLogWidget />;
-          case "goals":
-          default:             return <GoalsWidget doneTasks={doneTasks} totalTasks={tasks.length} user={user} />;
-        }
+  const stripWidgets = useMemo(
+    () => [
+      {
+        id: "tasks",
+        accent: WIDGET_COLORS.accent,
+        render: () => (
+          <DailyTasksWidget tasks={tasks} doneTasks={doneTasks} onToggleTask={onToggleTask} />
+        ),
       },
-    })),
+      {
+        id: "achievements",
+        accent: WIDGET_COLORS.accent,
+        render: () => <AchievementWidget badges={badgeSeed} />,
+      },
+      {
+        id: "ranking",
+        accent: WIDGET_COLORS.accent,
+        render: () => (
+          <RankingWidget
+            key={`ranking-${rankingTab}`}
+            rankingTab={rankingTab}
+            onRankingTabChange={setRankingTab}
+            rankingData={rankingData}
+          />
+        ),
+      },
+      {
+        id: "goals",
+        accent: WIDGET_COLORS.accent,
+        render: () => <GoalsWidget doneTasks={doneTasks} totalTasks={tasks.length} user={user} />,
+      },
+      {
+        id: "journey",
+        accent: WIDGET_COLORS.accent,
+        render: () => <JourneyWidget />,
+      },
+      {
+        id: "stats",
+        accent: WIDGET_COLORS.accent,
+        render: () => <StatsWidget user={user} doneTasks={doneTasks} totalTasks={tasks.length} />,
+      },
+      {
+        id: "streak",
+        accent: WIDGET_COLORS.accent,
+        render: () => <StreakWidget user={user} />,
+      },
+      {
+        id: "quiz",
+        accent: WIDGET_COLORS.accent,
+        render: () => <QuizWidget />,
+      },
+      {
+        id: "notes",
+        accent: WIDGET_COLORS.accent,
+        render: () => <NotesWidget />,
+      },
+      {
+        id: "focus",
+        accent: WIDGET_COLORS.accent,
+        render: () => <FocusWidget />,
+      },
+      {
+        id: "xplog",
+        accent: WIDGET_COLORS.accent,
+        render: () => <XpLogWidget />,
+      },
+    ],
     [doneTasks, onToggleTask, rankingData, rankingTab, tasks, user]
   );
 
-  const activeWidgets      = activeWidgetIds.map((id) => widgetRegistry.find((w) => w.id === id)).filter(Boolean);
-  const handleAddWidget    = (id) => setActiveWidgetIds((c) => (c.includes(id) ? c : [...c, id]));
-  const handleRemoveWidget = (id) => setActiveWidgetIds((c) => c.filter((x) => x !== id));
+  const visibleStripWidgets = useMemo(
+    () => stripWidgets.filter((widget) => activeWidgetIds.includes(widget.id)),
+    [activeWidgetIds, stripWidgets]
+  );
+
+  const panelWidgets = WIDGET_META;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activeWidgetIds));
+  }, [activeWidgetIds]);
+
+  useEffect(() => {
+    if (!isShowcaseGuided) return;
+    setIsCustomizing(false);
+  }, [guideState?.pulse, isShowcaseGuided]);
+
+  const handleAddWidget = (id) => {
+    if (!availableWidgetIds.includes(id)) return;
+    setActiveWidgetIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const handleRemoveWidget = (id) => {
+    setActiveWidgetIds((prev) => prev.filter((widgetId) => widgetId !== id));
+  };
 
   return (
-    <section className="relative">
-      <style>{`
-        @keyframes widget-panel-in {
-          from { opacity: 0; transform: translateY(12px) scale(.98); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .widget-panel { animation: widget-panel-in .22s cubic-bezier(.2,.8,.2,1); }
-      `}</style>
-
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <WidgetEyebrowTitle accent="#2563EB">Kişisel Vitrin</WidgetEyebrowTitle>
-        <button
-          type="button"
-          onClick={() => setIsCustomizing(true)}
-          className="hidden rounded-full border border-slate-200 bg-white px-4 py-2 text-[clamp(11.5px,0.78vw,13.5px)] font-bold tracking-[0.2px] text-slate-500 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:inline-flex"
-        >
-          Vitrin Düzenle
-        </button>
+    <section className="relative transition-all">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h2 className="text-[27px] font-bold tracking-[-0.04em] text-slate-950">Kişisel Vitrin</h2>
+        <div className="relative">
+          {isShowcaseGuided && (
+            <GuideCartoonPointer
+              routeKey={`showcase-pointer-${guideState?.pulse ?? "active"}`}
+              target="showcase"
+              side="left"
+              size={82}
+              className="right-[calc(100%+8px)] top-1/2 -translate-y-1/2"
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => setIsCustomizing(true)}
+            className={`action-btn inline-flex items-center gap-1.5 ${isShowcaseGuided ? "enigma-guide-button-toon" : ""}`}
+          >
+            Vitrin Düzenle
+          </button>
+        </div>
       </div>
 
-      {activeWidgets.length ? (
-        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
-          {activeWidgets.map((widget) => (
-            <WidgetSlot key={widget.id} widget={widget} isCustomizing={isCustomizing}>
-              {widget.render()}
-            </WidgetSlot>
+      {visibleStripWidgets.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.06fr_1.18fr_1.45fr_0.9fr] 2xl:grid-cols-[1.14fr_1.24fr_1.62fr_1fr] 2xl:gap-4">
+          {visibleStripWidgets.map((widget) => (
+            <div key={widget.id} className="min-h-[228px] xl:min-h-[244px]">
+              <WidgetShell widget={widget} isCustomizing={false}>
+                {widget.render()}
+              </WidgetShell>
+            </div>
           ))}
         </div>
       ) : (
@@ -841,7 +925,7 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user 
 
       {isCustomizing && (
         <WidgetPanel
-          widgets={widgetRegistry}
+          widgets={panelWidgets}
           activeWidgetIds={activeWidgetIds}
           onAdd={handleAddWidget}
           onRemove={handleRemoveWidget}
