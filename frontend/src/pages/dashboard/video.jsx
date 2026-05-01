@@ -223,12 +223,12 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     height: "100vh",
-    backgroundColor: "#f3f6fc",
+    backgroundColor: "#f8fbff",
     backgroundImage:
-      "radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%), radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%), radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px)",
-    backgroundSize: "auto, auto, 26px 26px",
+      "radial-gradient(circle at 12% 8%, rgba(37,99,235,0.16), transparent 30%), radial-gradient(circle at 84% 4%, rgba(124,58,237,0.12), transparent 28%), radial-gradient(circle at 90% 82%, rgba(5,150,105,0.08), transparent 26%), linear-gradient(180deg, #f8fbff 0%, #eef5ff 48%, #f7fbff 100%)",
+    backgroundSize: "auto",
     color: "#111827",
-    fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+    fontFamily: "inherit",
     overflow: "hidden",
   },
   header: {
@@ -237,11 +237,11 @@ const styles = {
     justifyContent: "space-between",
     padding: "0 24px",
     height: 60,
-    background: "rgba(255,255,255,0.84)",
-    borderBottom: "1px solid rgba(226,232,240,0.88)",
-    boxShadow: "0 1px 3px rgba(15,23,42,0.04)",
-    backdropFilter: "blur(14px)",
-    WebkitBackdropFilter: "blur(14px)",
+    background: "rgba(255,255,255,0.74)",
+    borderBottom: "1px solid rgba(219,229,243,0.78)",
+    boxShadow: "0 18px 48px rgba(37,99,235,0.08)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)",
     flexShrink: 0,
     zIndex: 50,
   },
@@ -251,10 +251,11 @@ const styles = {
     justifyContent: "space-between",
     padding: "0 24px",
     height: 46,
-    background: "rgba(255,255,255,0.9)",
-    borderTop: "1px solid rgba(226,232,240,0.88)",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
+    background: "rgba(255,255,255,0.78)",
+    borderTop: "1px solid rgba(219,229,243,0.78)",
+    boxShadow: "0 -18px 44px rgba(37,99,235,0.06)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)",
     flexShrink: 0,
   },
   main: {
@@ -273,14 +274,13 @@ const styles = {
 function GlobalStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
       * , *::before, *::after { box-sizing: border-box; }
       html, body, #root { margin: 0; padding: 0; height: 100%; }
-      body { font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif; }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #f1f5f9; }
-      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+      body { font-family: inherit; }
+      ::selection { background: rgba(37,99,235,0.16); color: #111827; }
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: rgba(238,245,255,0.82); }
+      ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.66); border-radius: 999px; }
 
       @keyframes fadein {
         from { opacity: 0; transform: translateY(10px); }
@@ -314,8 +314,8 @@ function GlobalStyles() {
         50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 8px rgba(34,211,238,0.28)); }
       }
 
-      .chapter-card { transition: box-shadow 0.2s, transform 0.2s; }
-      .chapter-card:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.10); transform: translateY(-1px); }
+      .chapter-card { transition: border-color 0.22s, box-shadow 0.22s, transform 0.22s, background 0.22s; }
+      .chapter-card:hover { border-color: rgba(147,197,253,0.92) !important; box-shadow: 0 14px 30px rgba(37,99,235,0.12), 0 2px 8px rgba(15,23,42,0.04); transform: translateY(-2px); }
 
       .ai-mode-pill {
         position: relative;
@@ -328,10 +328,10 @@ function GlobalStyles() {
         border: none;
         border-radius: 999px;
         cursor: pointer;
-        background: linear-gradient(115deg, #22d3ee 0%, #3b82f6 22%, #8b5cf6 48%, #ec4899 72%, #67e8f9 100%);
+        background: linear-gradient(115deg, #2563EB 0%, #7C3AED 44%, #059669 76%, #2563EB 100%);
         background-size: 220% 220%;
-        animation: ai-pill-border 6s linear infinite;
-        box-shadow: 0 10px 24px rgba(76, 110, 245, 0.12);
+        animation: ai-pill-border 7s linear infinite;
+        box-shadow: 0 12px 28px rgba(37,99,235,0.13);
         transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, filter 220ms ease;
         overflow: hidden;
         -webkit-tap-highlight-color: transparent;
@@ -350,15 +350,15 @@ function GlobalStyles() {
 
       .ai-mode-pill:hover {
         transform: translateY(-2px);
-        filter: saturate(1.12) brightness(1.02);
+        filter: saturate(1.08) brightness(1.02);
         box-shadow:
-          0 14px 32px rgba(76, 110, 245, 0.18),
-          0 0 0 4px rgba(125, 211, 252, 0.08);
+          0 16px 34px rgba(37,99,235,0.16),
+          0 0 0 4px rgba(124,58,237,0.08);
       }
 
       .ai-mode-pill:active {
         transform: translateY(0) scale(0.985);
-        box-shadow: 0 7px 18px rgba(76, 110, 245, 0.12);
+        box-shadow: 0 7px 18px rgba(37,99,235,0.12);
       }
 
       .ai-mode-pill__inner {
@@ -371,12 +371,12 @@ function GlobalStyles() {
         gap: 9px;
         padding: 8px 15px;
         border-radius: 999px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.94));
         color: #111827;
-        font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        font-family: inherit;
         font-weight: 500;
         font-size: 12px;
-        letter-spacing: 0.01em;
+        letter-spacing: 0;
         white-space: nowrap;
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
         overflow: hidden;
@@ -402,7 +402,7 @@ function GlobalStyles() {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(59,130,246,0.13), rgba(236,72,153,0.10) 55%, rgba(34,211,238,0.16));
+        background: linear-gradient(135deg, rgba(37,99,235,0.13), rgba(124,58,237,0.11) 55%, rgba(5,150,105,0.13));
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
         flex-shrink: 0;
       }
@@ -430,8 +430,8 @@ function GlobalStyles() {
 
       .ai-mode-pill.is-active {
         box-shadow:
-          0 14px 34px rgba(76, 110, 245, 0.2),
-          0 0 0 4px rgba(168, 85, 247, 0.08);
+          0 14px 34px rgba(37,99,235,0.18),
+          0 0 0 4px rgba(124,58,237,0.08);
       }
 
       .ai-mode-pill.is-active .ai-mode-pill__inner {
@@ -468,20 +468,23 @@ function GlobalStyles() {
         gap: 10px;
         padding: 10px 12px;
         border-radius: 7px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #dbe5f3;
         cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
+        transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.15s;
         font-size: 11px;
-        font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+        font-family: inherit;
         line-height: 1.55;
         text-align: left;
         width: 100%;
-        background: #fff;
+        background: rgba(255,255,255,0.82);
+        box-shadow: 0 4px 12px rgba(15,23,42,0.04);
       }
 
       .opt-base:hover:not(:disabled) {
         border-color: #93c5fd;
         background: #EFF6FF;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(37,99,235,0.08);
       }
 
       .opt-correct { border-color: #059669 !important; background: #ECFDF5 !important; color: #065f46; }
@@ -492,13 +495,14 @@ function GlobalStyles() {
         animation: fadein 0.3s ease both;
         margin-top: 10px;
         padding: 14px;
-        background: #FFFBEB;
-        border: 1px solid #D97706;
+        background: linear-gradient(180deg, #FFFBEB 0%, #fffaf0 100%);
+        border: 1px solid rgba(217,119,6,0.48);
         border-left: 3px solid #D97706;
-        border-radius: 8px;
+        border-radius: 12px;
         font-size: 11px;
         line-height: 1.75;
         color: #374151;
+        box-shadow: 0 10px 22px rgba(217,119,6,0.08);
       }
     `}</style>
   );
@@ -649,7 +653,7 @@ function Controls({
   return (
     <div
       style={{
-        background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%)",
+        background: "linear-gradient(to top, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.62) 46%, transparent 100%)",
         padding: "32px 18px 14px",
       }}
     >
@@ -659,13 +663,13 @@ function Controls({
         <button
           onClick={onPlay}
           style={{
-            background: "none",
-            border: "none",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.16)",
             color: "#fff",
             cursor: "pointer",
             display: "flex",
-            padding: 3,
-            borderRadius: 4,
+            padding: 5,
+            borderRadius: 999,
           }}
         >
           {playing ? <Icon name="pause" size={17} color="#ffffff" /> : <Icon name="play" size={17} color="#ffffff" />}
@@ -674,12 +678,13 @@ function Controls({
         <button
           onClick={onMute}
           style={{
-            background: "none",
-            border: "none",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.12)",
             color: "rgba(255,255,255,0.6)",
             cursor: "pointer",
             display: "flex",
-            padding: 3,
+            padding: 4,
+            borderRadius: 999,
           }}
         >
           {muted || volume === 0 ? <Icon name="volume_off" size={14} color="#94a3b8" /> : <Icon name="sound" size={14} color="#94a3b8" />}
@@ -702,7 +707,7 @@ function Controls({
           style={{
             fontSize: 11,
             color: "rgba(255,255,255,0.5)",
-            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+            fontFamily: "inherit",
           }}
         >
           <span style={{ color: "#fff" }}>{fmt(currentTime)}</span> / {fmt(duration)}
@@ -717,10 +722,11 @@ function Controls({
             letterSpacing: "1.5px",
             textTransform: "uppercase",
             color: chapter.accent,
-            background: `${chapter.accent}22`,
-            border: `1px solid ${chapter.accent}44`,
-            padding: "3px 9px",
-            borderRadius: 3,
+            background: `${chapter.accent}24`,
+            border: `1px solid ${chapter.accent}55`,
+            padding: "4px 10px",
+            borderRadius: 999,
+            boxShadow: `0 8px 20px ${chapter.accent}22`,
           }}
         >
           {chapter.phase}
@@ -729,12 +735,13 @@ function Controls({
         <button
           onClick={onFullscreen}
           style={{
-            background: "none",
-            border: "none",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.12)",
             color: "rgba(255,255,255,0.5)",
             cursor: "pointer",
             display: "flex",
-            padding: 3,
+            padding: 4,
+            borderRadius: 999,
           }}
         >
           <Icon name="fullscreen" size={14} color="#94a3b8" />
@@ -750,8 +757,11 @@ function ChapterSidebar({ currentTime, onSeek }) {
       style={{
         width: 152,
         minWidth: 152,
-        background: "#fff",
-        borderRight: "1px solid #e2e8f0",
+        background: "rgba(255,255,255,0.78)",
+        borderRight: "1px solid rgba(219,229,243,0.82)",
+        boxShadow: "inset -1px 0 0 rgba(255,255,255,0.72)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
         overflowY: "auto",
         padding: "10px 7px",
         display: "flex",
@@ -782,11 +792,14 @@ function ChapterSidebar({ currentTime, onSeek }) {
             onClick={() => onSeek(chapter.start)}
             className="chapter-card"
             style={{
-              borderRadius: 8,
+              borderRadius: 12,
               overflow: "hidden",
               cursor: "pointer",
-              border: `1px solid ${isActive ? `${chapter.accent}55` : "#e2e8f0"}`,
-              background: isActive ? chapter.accentBg : "#fff",
+              border: `1px solid ${isActive ? `${chapter.accent}66` : "rgba(219,229,243,0.92)"}`,
+              background: isActive
+                ? `linear-gradient(180deg, ${chapter.accentBg} 0%, rgba(255,255,255,0.96) 100%)`
+                : "rgba(255,255,255,0.82)",
+              boxShadow: isActive ? `0 12px 24px ${chapter.accent}18` : "0 4px 12px rgba(15,23,42,0.03)",
               transition: "all 0.2s",
             }}
           >
@@ -941,11 +954,12 @@ function TabSummary({
       {/* Geri + başlık */}
       <div
         style={{
-          border: "1px solid #dbe5f3",
-          borderRadius: 12,
-          background: "linear-gradient(145deg, #ffffff 0%, #f8faff 100%)",
+          border: "1px solid rgba(219,229,243,0.92)",
+          borderRadius: 14,
+          background: "linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(248,251,255,0.96) 100%)",
           padding: "10px 11px",
           marginBottom: 10,
+          boxShadow: "0 10px 24px rgba(37,99,235,0.07)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -961,7 +975,7 @@ function TabSummary({
               alignItems: "center",
               gap: 4,
               fontSize: 10,
-              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+              fontFamily: "inherit",
               fontWeight: 700,
             }}
           >
@@ -978,8 +992,8 @@ function TabSummary({
               color: "#7C3AED",
               letterSpacing: "1.2px",
               textTransform: "uppercase",
-              border: "1px solid #ddd6fe",
-              background: "#f5f3ff",
+              border: "1px solid rgba(124,58,237,0.22)",
+              background: "linear-gradient(180deg, #F5F3FF 0%, #ffffff 100%)",
               borderRadius: 999,
               padding: "4px 8px",
             }}
@@ -1013,9 +1027,10 @@ function TabSummary({
           gap: 10,
           padding: "10px 10px 8px",
           minHeight: 0,
-          border: "1px solid #dbe5f3",
-          borderRadius: 12,
-          background: "linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%)",
+          border: "1px solid rgba(219,229,243,0.92)",
+          borderRadius: 14,
+          background: "linear-gradient(180deg, rgba(251,253,255,0.96) 0%, rgba(248,251,255,0.98) 100%)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.82)",
         }}
       >
         {messages.length === 0 && (
@@ -1054,17 +1069,17 @@ function TabSummary({
                 maxWidth: "100%",
                 padding: "9px 12px",
                 borderRadius: msg.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px",
-                background: msg.role === "user" ? "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)" : "#ffffff",
+                background: msg.role === "user" ? "linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)" : "rgba(255,255,255,0.94)",
                 color: msg.role === "user" ? "#fff" : "#1e293b",
                 fontSize: 11,
                 lineHeight: 1.65,
-                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+                fontFamily: "inherit",
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
-                border: msg.role === "user" ? "1px solid #7c3aed" : "1px solid #dbe5f3",
+                border: msg.role === "user" ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(219,229,243,0.92)",
                 boxShadow: msg.role === "user"
-                  ? "0 8px 18px rgba(124,58,237,0.20)"
-                  : "0 4px 10px rgba(15,23,42,0.06)",
+                  ? "0 10px 22px rgba(37,99,235,0.18)"
+                  : "0 6px 14px rgba(15,23,42,0.05)",
               }}
             >
               {msg.content}
@@ -1089,7 +1104,8 @@ function TabSummary({
               style={{
                 padding: "9px 14px",
                 borderRadius: "12px 12px 12px 3px",
-                background: "#F1F5F9",
+                background: "#EEF5FF",
+                border: "1px solid #DBE5F3",
                 display: "flex",
                 gap: 4,
                 alignItems: "center",
@@ -1116,7 +1132,7 @@ function TabSummary({
       {/* Giriş alanı */}
       <div
         style={{
-          borderTop: "1px solid #e2e8f0",
+          borderTop: "1px solid rgba(219,229,243,0.82)",
           paddingTop: 10,
           paddingBottom: 4,
           display: "flex",
@@ -1131,11 +1147,12 @@ function TabSummary({
             alignItems: "flex-end",
             width: "100%",
             minHeight: 42,
-            background: "linear-gradient(180deg, #ffffff 0%, #f8faff 100%)",
+            background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
             border: "1.5px solid #dbe5f3",
-            borderRadius: 12,
+            borderRadius: 14,
             padding: "6px 8px 6px 12px",
-            transition: "border-color 0.15s",
+            transition: "border-color 0.15s, box-shadow 0.15s",
+            boxShadow: "0 8px 18px rgba(15,23,42,0.05)",
           }}
           onFocusCapture={(e) => { e.currentTarget.style.borderColor = "#7C3AED88"; }}
           onBlurCapture={(e) => { e.currentTarget.style.borderColor = "#dbe5f3"; }}
@@ -1159,7 +1176,7 @@ function TabSummary({
               border: "none",
               outline: "none",
               resize: "none",
-              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+              fontFamily: "inherit",
               fontSize: 11,
               color: "#1e293b",
               lineHeight: 1.6,
@@ -1255,14 +1272,14 @@ function TabQuestion({ chapter }) {
               style={{
                 width: 22,
                 height: 22,
-                borderRadius: 4,
-                border: `1px solid ${index === questionIndex ? chapter.accent : "#e2e8f0"}`,
-                background: index === questionIndex ? chapter.accentBg : "#fff",
+                borderRadius: 6,
+                border: `1px solid ${index === questionIndex ? chapter.accent : "#dbe5f3"}`,
+                background: index === questionIndex ? `linear-gradient(180deg, ${chapter.accentBg} 0%, #ffffff 100%)` : "rgba(255,255,255,0.84)",
                 color: index === questionIndex ? chapter.accent : "#94a3b8",
                 fontSize: 9,
                 fontWeight: 700,
                 cursor: "pointer",
-                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+                fontFamily: "inherit",
               }}
             >
               {index + 1}
@@ -1273,11 +1290,12 @@ function TabQuestion({ chapter }) {
 
       <div
         style={{
-          background: "#F8F9FB",
-          border: "1px solid #e2e8f0",
+          background: "linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)",
+          border: "1px solid #dbe5f3",
           borderLeft: `3px solid ${chapter.accent}`,
-          borderRadius: 8,
+          borderRadius: 12,
           padding: "12px 14px",
+          boxShadow: "0 8px 18px rgba(15,23,42,0.04)",
         }}
       >
         <div
@@ -1347,12 +1365,13 @@ function TabQuestion({ chapter }) {
           <div
             style={{
               padding: "10px 14px",
-              borderRadius: 7,
+              borderRadius: 12,
               background: isCorrect ? "#ECFDF5" : "#FEF2F2",
-              border: `1px solid ${isCorrect ? "#059669" : "#DC2626"}`,
+              border: `1px solid ${isCorrect ? "rgba(5,150,105,0.46)" : "rgba(220,38,38,0.42)"}`,
               display: "flex",
               alignItems: "center",
               gap: 8,
+              boxShadow: `0 8px 18px ${isCorrect ? "rgba(5,150,105,0.08)" : "rgba(220,38,38,0.08)"}`,
             }}
           >
             {isCorrect ? <Icon name="check" size={16} color="#059669" /> : <Icon name="xmark" size={16} color="#DC2626" />}
@@ -1366,20 +1385,21 @@ function TabQuestion({ chapter }) {
             <button
               onClick={() => setShowSolution(true)}
               style={{
-                background: "#FFFBEB",
-                border: "1px solid #D97706",
+                background: "linear-gradient(180deg, #FFFBEB 0%, #ffffff 100%)",
+                border: "1px solid rgba(217,119,6,0.48)",
                 color: "#92400e",
                 padding: "9px 12px",
-                borderRadius: 6,
+                borderRadius: 10,
                 cursor: "pointer",
                 fontSize: 11,
                 fontWeight: 700,
-                fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+                fontFamily: "inherit",
                 display: "flex",
                 alignItems: "center",
                 gap: 7,
                 justifyContent: "center",
-                transition: "background .15s",
+                transition: "background .15s, box-shadow .15s, transform .15s",
+                boxShadow: "0 8px 18px rgba(217,119,6,0.08)",
               }}
             >
               <Icon name="info" size={13} color="#92400e" />
@@ -1409,15 +1429,15 @@ function TabQuestion({ chapter }) {
         <button
           onClick={() => resetQuestion(questionIndex + 1)}
           style={{
-            background: chapter.accentBg,
+            background: `linear-gradient(180deg, ${chapter.accentBg} 0%, #ffffff 100%)`,
             border: `1px solid ${chapter.accent}44`,
             color: chapter.accent,
             padding: "9px",
-            borderRadius: 6,
+            borderRadius: 10,
             cursor: "pointer",
             fontSize: 11,
             fontWeight: 700,
-            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+            fontFamily: "inherit",
             marginTop: 2,
           }}
         >
@@ -1429,14 +1449,14 @@ function TabQuestion({ chapter }) {
         <button
           onClick={() => resetQuestion(0)}
           style={{
-            background: "#F8F9FB",
-            border: "1px solid #e2e8f0",
+            background: "linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)",
+            border: "1px solid #dbe5f3",
             color: "#64748b",
             padding: "9px",
-            borderRadius: 6,
+            borderRadius: 10,
             cursor: "pointer",
             fontSize: 11,
-            fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+            fontFamily: "inherit",
             marginTop: 2,
           }}
         >
@@ -1514,16 +1534,17 @@ function TabFlashcards({ chapter }) {
               inset: 0,
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
-              background: "#F8F9FB",
-              border: "1px solid #e2e8f0",
+              background: "linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 100%)",
+              border: "1px solid #dbe5f3",
               borderTop: `3px solid ${chapter.accent}`,
-              borderRadius: 8,
+              borderRadius: 12,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               padding: "16px",
               textAlign: "center",
+              boxShadow: "0 12px 28px rgba(37,99,235,0.08)",
             }}
           >
             <div
@@ -1552,13 +1573,14 @@ function TabFlashcards({ chapter }) {
               background: chapter.accentBg,
               border: `1px solid ${chapter.accent}44`,
               borderTop: `3px solid ${chapter.accent}`,
-              borderRadius: 8,
+              borderRadius: 12,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               padding: "16px",
               textAlign: "center",
+              boxShadow: `0 12px 28px ${chapter.accent}12`,
             }}
           >
             <div
@@ -1594,15 +1616,15 @@ function TabFlashcards({ chapter }) {
             disabled={item.disabled}
             style={{
               flex: 1,
-              background: "none",
-              border: "1px solid #e2e8f0",
+              background: item.disabled ? "rgba(248,251,255,0.68)" : "rgba(255,255,255,0.86)",
+              border: "1px solid #dbe5f3",
               color: item.disabled ? "#cbd5e1" : "#374151",
-              borderRadius: 6,
+              borderRadius: 10,
               padding: "7px",
               cursor: item.disabled ? "not-allowed" : "pointer",
               fontSize: 11,
-              fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
-              transition: "border-color 0.15s",
+              fontFamily: "inherit",
+              transition: "border-color 0.15s, background 0.15s",
             }}
           >
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -1651,21 +1673,21 @@ function ContentPanel({ chapter, visible, onToggle }) {
           zIndex: 20,
           width: 18,
           height: 52,
-          background: "#fff",
-          border: "1px solid #e2e8f0",
+          background: "rgba(255,255,255,0.9)",
+          border: "1px solid #dbe5f3",
           borderRight: "none",
           borderRadius: "6px 0 0 6px",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "-2px 0 8px rgba(0,0,0,0.07)",
+          boxShadow: "-8px 0 18px rgba(37,99,235,0.10)",
           padding: 0,
           color: "#64748b",
           transition: "background 0.15s, color 0.15s",
         }}
         onMouseEnter={(e) => { e.currentTarget.style.background = "#EFF6FF"; e.currentTarget.style.color = "#2563EB"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#64748b"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.9)"; e.currentTarget.style.color = "#64748b"; }}
       >
         <span style={{ transition: "transform 0.3s", transform: visible ? "rotate(0deg)" : "rotate(180deg)", display: "inline-flex" }}>
           <Icon name="next" size={10} color="#64748b" />
@@ -1689,8 +1711,11 @@ function ContentPanel({ chapter, visible, onToggle }) {
             width: PANEL_WIDTH,
             height: "100%",
             minWidth: PANEL_WIDTH,
-            background: "#fff",
-            borderLeft: "1px solid #e2e8f0",
+            background: "rgba(255,255,255,0.84)",
+            borderLeft: "1px solid rgba(219,229,243,0.84)",
+            boxShadow: "-20px 0 48px rgba(37,99,235,0.08)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
@@ -1698,7 +1723,14 @@ function ContentPanel({ chapter, visible, onToggle }) {
           }}
         >
           {/* Panel başlık */}
-          <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid #e2e8f0", background: chapter.accentBg }}>
+          <div
+            style={{
+              padding: "18px 20px 14px",
+              borderBottom: "1px solid rgba(219,229,243,0.82)",
+              background: `linear-gradient(145deg, ${chapter.accentBg} 0%, rgba(255,255,255,0.96) 100%)`,
+              boxShadow: "0 12px 28px rgba(37,99,235,0.06)",
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
               <div style={{ width: 16, height: 2, background: chapter.accent, borderRadius: 1 }} />
               <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: chapter.accent }}>
@@ -1710,7 +1742,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
                 fontWeight: 700,
                 fontSize: 15,
                 color: "#111827",
-                letterSpacing: "-0.3px",
+                letterSpacing: 0,
                 lineHeight: 1.3,
                 margin: 0,
               }}
@@ -1723,7 +1755,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
           </div>
 
           {/* Pill Tab Butonları */}
-          <div style={{ padding: "12px 14px", borderBottom: "1px solid #e2e8f0", background: "#fff", display: "flex", gap: 6 }}>
+          <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(219,229,243,0.82)", background: "rgba(255,255,255,0.78)", display: "flex", gap: 6 }}>
             {tabs.map((item) => {
               const isActive = tab === item.id;
               const colors = TAB_COLORS[item.id];
@@ -1735,15 +1767,16 @@ function ContentPanel({ chapter, visible, onToggle }) {
                     flex: 1,
                     padding: "7px 8px",
                     borderRadius: 999,
-                    border: `1.5px solid ${isActive ? colors.active : "#e2e8f0"}`,
-                    background: isActive ? colors.activeBg : "#F8F9FB",
+                    border: `1.5px solid ${isActive ? colors.active : "#dbe5f3"}`,
+                    background: isActive ? `linear-gradient(180deg, ${colors.activeBg} 0%, #ffffff 100%)` : "rgba(248,251,255,0.92)",
                     color: isActive ? colors.active : "#94a3b8",
-                    fontFamily: '"Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif',
+                    fontFamily: "inherit",
                     fontWeight: 700,
                     fontSize: 10,
                     letterSpacing: "0.04em",
                     cursor: "pointer",
                     transition: "all 0.18s",
+                    boxShadow: isActive ? `0 8px 18px ${colors.active}14` : "none",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -1783,7 +1816,7 @@ function ContentPanel({ chapter, visible, onToggle }) {
             {tab === "flashcards" && <TabFlashcards chapter={chapter} key={chapter.id} />}
           </div>
 
-          <div style={{ padding: "14px 20px 0", background: "#fff" }}>
+          <div style={{ padding: "14px 20px 0", background: "rgba(255,255,255,0.78)" }}>
             <button
               onClick={() => { setAiMode(true); setTab("summary"); }}
               className={`ai-mode-pill${aiMode ? " is-active" : ""}`}
@@ -1801,13 +1834,13 @@ function ContentPanel({ chapter, visible, onToggle }) {
           <div
             style={{
               height: 18,
-              background: "#fff",
+              background: "rgba(255,255,255,0.78)",
               borderTop: "1px solid rgba(255,255,255,0)",
             }}
           />
 
           {/* Stat kutucukları */}
-          <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0" }}>
+          <div style={{ padding: "12px 20px", borderTop: "1px solid rgba(219,229,243,0.82)" }}>
             <div style={{ display: "flex", gap: 8 }}>
               {[
                 { value: chapter.questions.length, label: "Soru", color: TAB_COLORS.question.active, bg: TAB_COLORS.question.activeBg },
@@ -1818,11 +1851,12 @@ function ContentPanel({ chapter, visible, onToggle }) {
                   key={stat.label}
                   style={{
                     flex: 1,
-                    background: stat.bg,
+                    background: `linear-gradient(180deg, ${stat.bg} 0%, #ffffff 100%)`,
                     border: `1px solid ${stat.color}33`,
-                    borderRadius: 8,
+                    borderRadius: 12,
                     padding: "8px 6px",
                     textAlign: "center",
+                    boxShadow: `0 8px 18px ${stat.color}10`,
                   }}
                 >
                   <div style={{ fontWeight: 700, fontSize: 14, color: stat.color }}>{stat.value}</div>
@@ -1902,13 +1936,13 @@ export default function Video() {
           <Link to="/" className="flex flex-col items-center gap-2 no-underline">
             <div className="flex items-center gap-3">
               <div
-                className="w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-tighter"
+                className="w-9 h-9 flex items-center justify-center bg-[#2563EB] text-white font-bold text-[11px] tracking-normal shadow-[0_12px_26px_rgba(37,99,235,0.20)]"
                 style={styles.logoHex}
               >
                 C:E
               </div>
               <div>
-                <p className="font-bold text-[15px] tracking-tight text-[#111827]">Code:Enigma</p>
+                <p className="font-bold text-[15px] tracking-normal text-[#111827]">Code:Enigma</p>
                 <p className="text-[9px] font-medium tracking-[1.8px] uppercase text-slate-400 mt-px">
                   Uzaktan Eğitim Platformu
                 </p>
@@ -1957,7 +1991,7 @@ export default function Video() {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              background: "#0f172a",
+              background: "#0b1220",
               position: "relative",
               minWidth: 0,
               cursor: "pointer",
@@ -1971,7 +2005,7 @@ export default function Video() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background: `radial-gradient(ellipse at 30% 40%, ${currentChapter.accent}18 0%, #0f172a 65%)`,
+                background: `radial-gradient(ellipse at 28% 36%, ${currentChapter.accent}30 0%, rgba(11,18,32,0.10) 34%, transparent 58%), radial-gradient(ellipse at 78% 18%, rgba(124,58,237,0.16) 0%, transparent 36%), linear-gradient(145deg, #020617 0%, #0b1220 48%, #111827 100%)`,
                 transition: "background 0.6s ease",
                 position: "relative",
                 overflow: "hidden",
@@ -1981,8 +2015,10 @@ export default function Video() {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
+                  backgroundImage: "linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)",
+                  backgroundSize: "32px 32px",
+                  maskImage: "linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.18))",
+                  WebkitMaskImage: "linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.18))",
                   pointerEvents: "none",
                 }}
               />
@@ -1997,10 +2033,11 @@ export default function Video() {
                   letterSpacing: "2px",
                   textTransform: "uppercase",
                   color: currentChapter.accent,
-                  background: `${currentChapter.accent}22`,
-                  border: `1px solid ${currentChapter.accent}44`,
-                  padding: "3px 10px",
-                  borderRadius: 3,
+                  background: `${currentChapter.accent}24`,
+                  border: `1px solid ${currentChapter.accent}55`,
+                  padding: "4px 11px",
+                  borderRadius: 999,
+                  boxShadow: `0 10px 24px ${currentChapter.accent}22`,
                 }}
               >
                 {currentChapter.phase}
@@ -2008,15 +2045,17 @@ export default function Video() {
 
               <div
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  backdropFilter: "blur(2px)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.045))",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid rgba(255,255,255,0.13)",
                   borderLeft: `3px solid ${currentChapter.accent}`,
-                  borderRadius: 12,
+                  borderRadius: 18,
                   padding: "28px 36px",
                   maxWidth: 520,
                   width: "78%",
-                  transition: "border-color 0.4s",
+                  transition: "border-color 0.4s, box-shadow 0.4s",
+                  boxShadow: "0 26px 70px rgba(2,6,23,0.42), inset 0 1px 0 rgba(255,255,255,0.08)",
                 }}
               >
                 <div
@@ -2037,7 +2076,7 @@ export default function Video() {
                     fontSize: 18,
                     color: "#f1f5f9",
                     marginBottom: 14,
-                    letterSpacing: "-0.3px",
+                    letterSpacing: 0,
                     lineHeight: 1.3,
                   }}
                 >
@@ -2046,7 +2085,7 @@ export default function Video() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.45)",
+                    color: "rgba(226,232,240,0.72)",
                     lineHeight: 1.8,
                     fontWeight: 300,
                   }}
@@ -2061,15 +2100,17 @@ export default function Video() {
                   width: 62,
                   height: 62,
                   borderRadius: "50%",
-                  background: "rgba(255,255,255,0.08)",
-                  backdropFilter: "blur(8px)",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: `linear-gradient(145deg, ${currentChapter.accent} 0%, #111827 100%)`,
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255,255,255,0.22)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   opacity: playing ? 0 : 1,
                   transition: "opacity 0.2s",
                   pointerEvents: "none",
+                  boxShadow: `0 20px 48px ${currentChapter.accent}33`,
                 }}
               >
                 <Icon name="play" size={22} color="#ffffff" />

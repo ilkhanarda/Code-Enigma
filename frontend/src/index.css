@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  background: #dbeafe;
+}
+
+html {
+  min-height: 100%;
+  background: #dbeafe;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  background: #dbeafe;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #dbeafe;
+}

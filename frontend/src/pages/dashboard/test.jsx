@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import { QUESTIONS } from "../../data/questions/guvenirlik.js";
 import Icon from "../../components/ui/icons8-icon.jsx";
+import { DashboardShell } from "../../components/dashboard/dashboard-design.jsx";
 
 const TOTAL_SECONDS = 30 * 60;
 
@@ -112,7 +112,7 @@ function QuestionPalette({ questions, answers, flagged, current, onSelect, stats
       ];
 
   return (
-    <aside className="flex w-[220px] flex-shrink-0 flex-col gap-4">
+    <aside className="flex w-full flex-shrink-0 flex-col gap-4 xl:w-[220px]">
       {/* Stats summary */}
       <div className="surface-wrap rounded-2xl border border-slate-200/70 bg-white p-4">
         <SectionLabel text="Test Durumu" />
@@ -460,39 +460,7 @@ export default function TestPage() {
   };
 
   return (
-    <div className="dashboard-grid-bg flex min-h-screen text-[#111827]">
-      <style>{`
-        .dashboard-grid-bg * {
-          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
-        }
-        .dashboard-grid-bg {
-          background:
-            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
-            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
-            #f3f6fc;
-          background-image:
-            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
-          background-size: 26px 26px;
-        }
-        .glass-header {
-          border-bottom: 1px solid rgba(226,232,240,0.88);
-          background: rgba(255,255,255,0.84);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-        }
-        .surface-wrap {
-          border: 1px solid #dbe5f3;
-          background: #ffffff;
-          box-shadow:
-            0 10px 32px rgba(15,23,42,0.07),
-            0 2px 8px rgba(15,23,42,0.03);
-        }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-      `}</style>
-
-      <DashboardNavbar />
-
-      <div className="flex-1 min-w-0">
+    <DashboardShell>
 
       {/* ══ HEADER ══ */}
       <header className="glass-header sticky top-0 z-40 px-4 py-3 sm:px-6 sm:py-4 xl:px-8">
@@ -548,7 +516,7 @@ export default function TestPage() {
       </header>
 
       {/* ══ BODY ══ */}
-      <div className="mx-auto flex w-full max-w-[1200px] gap-4 px-4 py-5 sm:gap-5 sm:px-6 sm:py-6 xl:px-8">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-4 py-5 sm:gap-5 sm:px-6 sm:py-6 xl:flex-row xl:px-8">
 
         {/* ─ MAIN QUESTION AREA ─ */}
         <main className="min-w-0 flex-1">
@@ -741,7 +709,6 @@ export default function TestPage() {
           </div>
         </div>
       )}
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

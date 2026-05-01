@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import Icon from "../../components/ui/icons8-icon.jsx";
+import { DashboardShell, PageHeader } from "../../components/dashboard/dashboard-design.jsx";
 
 const ALL_TOPICS = [
   { title: "Temel Kavramlar",     category: "Cebir",        level: "Başlangıç", progress: 84, peerAverage: 68, items: 12, instructor: "Dr. Ayşe Kaya",  color: "#2563EB", bg: "#EFF6FF", icon: "goals",      trend: "up"   },
@@ -235,84 +235,19 @@ export default function Topics() {
   }, []);
 
   return (
-    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
-      <style>{`
-        .dashboard-grid-bg * {
-          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
-        }
-        .dashboard-grid-bg {
-          background:
-            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
-            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
-            #f3f6fc;
-          background-image:
-            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
-          background-size: 26px 26px;
-        }
-        .glass-header {
-          border-bottom: 1px solid rgba(226,232,240,0.88);
-          background: rgba(255,255,255,0.84);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-        }
-        .surface-wrap {
-          border: 1px solid #dbe5f3;
-          background: #ffffff;
-          box-shadow:
-            0 10px 32px rgba(15,23,42,0.07),
-            0 2px 8px rgba(15,23,42,0.03);
-        }
-        .surface-pill {
-          border: 1px solid #dbe5f3;
-          background: rgba(255,255,255,0.92);
-          box-shadow: 0 6px 16px rgba(15,23,42,0.05);
-        }
-        .topic-grid-card {
-          transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
-        }
-        .topic-grid-card:hover {
-          transform: translateY(-4px);
-          border-color: #bfdbfe;
-          box-shadow: 0 18px 36px rgba(37,99,235,.15);
-        }
-      `}</style>
-
-      <div className="flex min-h-screen">
-        <DashboardNavbar />
-
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-          {/* HEADER */}
-          <header className="glass-header sticky top-0 z-40 px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="h-px w-5 bg-blue-400 rounded" />
-                  <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-blue-500">Konu Kütüphanesi</span>
-                </div>
-                <h1 className="text-[26px] font-bold tracking-[-0.4px] leading-tight">
-                  <span className="inline-flex items-center gap-1">Konular <Icon name="topics" size={16} color="#2563EB" /></span>
-                </h1>
-                <p className="mt-1 text-[11px] text-slate-400">
-                  Toplam {ALL_TOPICS.length} konu · {stats.started} başlanmış · {stats.done} tamamlanmış · ortalama %{stats.avg}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {[
-                  { value: stats.started, label: "Başlandı",    color: "#2563EB" },
-                  { value: stats.done,    label: "Tamamlandı",  color: "#059669" },
-                  { value: `%${stats.avg}`, label: "Ortalama",  color: "#7C3AED" },
-                ].map((s) => (
-                  <div key={s.label} className="surface-pill flex min-w-[72px] flex-col items-center justify-center rounded-xl px-4 py-2.5">
-                    <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>{s.value}</div>
-                    <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[1.5px] text-slate-400">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Search + Sort */}
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+    <DashboardShell>
+      <PageHeader
+        eyebrow="Konu Kütüphanesi"
+        title="Konular"
+        description={`Toplam ${ALL_TOPICS.length} konu · ${stats.started} başlanmış · ${stats.done} tamamlanmış · ortalama %${stats.avg}`}
+        icon="topics"
+        stats={[
+          { value: stats.started, label: "Başlandı", color: "#2563EB" },
+          { value: stats.done, label: "Tamamlandı", color: "#059669" },
+          { value: `%${stats.avg}`, label: "Ortalama", color: "#7C3AED" },
+        ]}
+      >
+        <div className="mt-4 flex flex-wrap items-center gap-3">
               <div className="surface-pill flex min-w-[240px] flex-1 items-center gap-2 rounded-xl px-3.5 py-2.5 focus-within:border-blue-300">
                 <Icon name="search" size={14} color="#94a3b8" />
                 <input
@@ -367,7 +302,7 @@ export default function Topics() {
                 </button>
               ))}
             </div>
-          </header>
+      </PageHeader>
 
           {/* MAIN */}
           <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
@@ -395,8 +330,6 @@ export default function Topics() {
               </div>
             )}
           </main>
-        </div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

@@ -1,6 +1,6 @@
-import { useMemo, useState, useEffect } from "react";
-import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
+import { useMemo, useState } from "react";
 import Icon from "../../components/ui/icons8-icon.jsx";
+import { DashboardShell, PageHeader } from "../../components/dashboard/dashboard-design.jsx";
 
 function classify(score) {
   if (score < 25) return { severity: "Kritik", color: "#DC2626", bg: "#FEF2F2" };
@@ -114,82 +114,27 @@ export default function Gaps() {
     return { avg, critical, hoursNeeded };
   }, [enriched]);
 
-  useEffect(() => {
-    if (sortedGaps.length > 0 && !sortedGaps.find((g) => g.topic === selectedTopic)) {
-      setSelectedTopic(sortedGaps[0].topic);
-    }
-  }, [sortedGaps, selectedTopic]);
-
-  const selected = enriched.find((g) => g.topic === selectedTopic) || enriched[0];
+  const effectiveSelectedTopic =
+    sortedGaps.find((g) => g.topic === selectedTopic)?.topic ||
+    sortedGaps[0]?.topic ||
+    enriched[0].topic;
+  const selected = enriched.find((g) => g.topic === effectiveSelectedTopic) || enriched[0];
 
   return (
-    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
-      <style>{`
-        .dashboard-grid-bg * {
-          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
-        }
-        .dashboard-grid-bg {
-          background-color: #f3f6fc;
-          background-image:
-            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
-            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
-            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
-          background-size: auto, auto, 26px 26px;
-        }
-        .glass-header {
-          border-bottom: 1px solid rgba(226,232,240,0.88);
-          background: rgba(255,255,255,0.84);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-        }
-        .surface-wrap {
-          border: 1px solid #dbe5f3;
-          background: #ffffff;
-          box-shadow:
-            0 10px 32px rgba(15,23,42,0.07),
-            0 2px 8px rgba(15,23,42,0.03);
-        }
-        .surface-pill {
-          border: 1px solid #dbe5f3;
-          background: rgba(255,255,255,0.92);
-          box-shadow: 0 6px 16px rgba(15,23,42,0.05);
-        }
-      `}</style>
-
-      <div className="flex min-h-screen">
-        <DashboardNavbar />
-
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-          {/* HEADER */}
-          <header className="glass-header sticky top-0 z-40 px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="h-px w-5 bg-amber-400 rounded" />
-                  <span className="text-[10px] font-bold uppercase tracking-[2.5px] text-amber-500">Analiz Raporu</span>
-                </div>
-                <h1 className="inline-flex items-center gap-2 text-[26px] font-bold tracking-[-0.4px] leading-tight">Eksiklerim <Icon name="warning" size={22} color="#DC2626" /></h1>
-                <p className="mt-1 text-[11px] text-slate-400">
-                  Son 30 günün verisine göre hazırlandı · {GAPS.length} odak alanı tespit edildi
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {[
-                  { value: `%${stats.avg}`,    label: "Ort. Skor", color: "#D97706" },
-                  { value: stats.critical,     label: "Öncelikli", color: "#DC2626" },
-                  { value: `${stats.hoursNeeded}sa`, label: "Önerilen", color: "#2563EB" },
-                ].map((s) => (
-                  <div key={s.label} className="surface-pill flex min-w-[72px] flex-col items-center justify-center rounded-xl px-4 py-2.5">
-                    <div className="text-[17px] font-bold tracking-tight" style={{ color: s.color }}>{s.value}</div>
-                    <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[1.5px] text-slate-400">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Severity filter chips */}
-            <div className="mt-4 flex flex-wrap items-center gap-1.5">
+    <DashboardShell>
+      <PageHeader
+        eyebrow="Analiz Raporu"
+        title="Eksiklerim"
+        description={`Son 30 günün verisine göre hazırlandı · ${GAPS.length} odak alanı tespit edildi`}
+        icon="warning"
+        iconColor="#DC2626"
+        stats={[
+          { value: `%${stats.avg}`, label: "Ort. Skor", color: "#D97706" },
+          { value: stats.critical, label: "Öncelikli", color: "#DC2626" },
+          { value: `${stats.hoursNeeded}sa`, label: "Önerilen", color: "#2563EB" },
+        ]}
+      >
+        <div className="mt-4 flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-[9px] font-bold uppercase tracking-[1.5px] text-slate-400">Öncelik</span>
               {["Tümü", "Kritik", "Yüksek", "Orta", "Hafif"].map((s) => {
                 const fc = FILTER_COLORS[s];
@@ -216,7 +161,7 @@ export default function Gaps() {
                 );
               })}
             </div>
-          </header>
+      </PageHeader>
 
           {/* MAIN */}
           <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
@@ -233,7 +178,7 @@ export default function Gaps() {
                     <GapRow
                       key={g.topic}
                       g={g}
-                      selected={selectedTopic === g.topic}
+                      selected={effectiveSelectedTopic === g.topic}
                       onSelect={() => setSelectedTopic(g.topic)}
                     />
                   ))}
@@ -350,8 +295,6 @@ export default function Gaps() {
               </aside>
             </div>
           </main>
-        </div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

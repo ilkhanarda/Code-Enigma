@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Icon from "../../components/ui/icons8-icon.jsx";
 import GuideCartoonPointer from "../../components/dashboard/guide-cartoon-pointer.jsx";
 
 const STORAGE_KEY = "code-enigma:dashboard-widgets";
-const DEFAULT_ACTIVE_WIDGETS = ["tasks", "achievements", "ranking", "goals"];
+const NOTES_STORAGE_KEY = "code-enigma:dashboard-widget-notes";
+const DEFAULT_ACTIVE_WIDGETS = ["tasks", "achievements", "ranking"];
 const WIDGET_COLORS = {
   accent: "#2563EB",
   accentStrong: "#1D4ED8",
@@ -34,7 +36,9 @@ const WIDGET_META = [
   { id: "xplog",        title: "XP Geçmişi",         description: "Son 7 günün XP kazanımları.",         size: "wide",   accent: WIDGET_COLORS.accent, icon: "bullish" },
 ];
 
-const WIDGET_IDS = new Set(WIDGET_META.map((w) => w.id));
+const SHOWCASE_MAX_UNITS = 5;
+const WIDGET_META_BY_ID = new Map(WIDGET_META.map((widget) => [widget.id, widget]));
+const WIDGET_IDS = new Set(WIDGET_META_BY_ID.keys());
 
 const badgeSeed = [
   { icon: "graduation", title: "İlk Ders Tamamlandı", bg: WIDGET_COLORS.accentSoft, color: WIDGET_COLORS.accent, locked: false },
@@ -83,9 +87,46 @@ const heatSeed = Array.from({ length: 35 }, () => ({
 
 function formatNumber(v) { return new Intl.NumberFormat("tr-TR").format(v); }
 
+function getWidgetUnits(size) {
+  return size === "wide" ? 2 : 1;
+}
+
+function getUsedWidgetUnits(widgetIds, widgetMetaById) {
+  return widgetIds.reduce((sum, id) => {
+    const widget = widgetMetaById.get(id);
+    if (!widget) return sum;
+    return sum + getWidgetUnits(widget.size);
+  }, 0);
+}
+
+function clampWidgetIdsByCapacity(widgetIds, widgetMetaById, maxUnits = SHOWCASE_MAX_UNITS) {
+  const nextIds = [];
+  let usedUnits = 0;
+
+  widgetIds.forEach((id) => {
+    const widget = widgetMetaById.get(id);
+    if (!widget) return;
+    const units = getWidgetUnits(widget.size);
+    if (usedUnits + units > maxUnits) return;
+    nextIds.push(id);
+    usedUnits += units;
+  });
+
+  return nextIds;
+}
+
 function sanitizeWidgetIds(ids) {
   if (!Array.isArray(ids)) return DEFAULT_ACTIVE_WIDGETS;
   return Array.from(new Set(ids)).filter((id) => WIDGET_IDS.has(id));
+}
+
+function hasStoredActiveWidgets() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
 }
 
 function loadActiveWidgets() {
@@ -94,6 +135,27 @@ function loadActiveWidgets() {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     return raw === null ? DEFAULT_ACTIVE_WIDGETS : sanitizeWidgetIds(JSON.parse(raw));
   } catch { return DEFAULT_ACTIVE_WIDGETS; }
+}
+
+function sanitizeNotes(notes) {
+  if (!Array.isArray(notes)) return quickNotesSeed;
+  return notes
+    .filter((note) => note && typeof note.text === "string" && note.text.trim())
+    .map((note, index) => ({
+      id: note.id ?? `note-${index}`,
+      text: note.text.trim(),
+      color: note.color || WIDGET_COLORS.surface,
+    }));
+}
+
+function loadQuickNotes() {
+  if (typeof window === "undefined") return quickNotesSeed;
+  try {
+    const raw = window.localStorage.getItem(NOTES_STORAGE_KEY);
+    return raw === null ? quickNotesSeed : sanitizeNotes(JSON.parse(raw));
+  } catch {
+    return quickNotesSeed;
+  }
 }
 
 function ProgressBar({ value, color, height = "6px" }) {
@@ -118,19 +180,34 @@ function Eyebrow({ accent, children }) {
   );
 }
 
+function WidgetHeader({ title, right }) {
+  return (
+    <div className="dashboard-widget-header flex min-h-[34px] items-start justify-between gap-2.5">
+      <Eyebrow accent={WIDGET_COLORS.accent}>{title}</Eyebrow>
+      {right ? <div className="shrink-0">{right}</div> : null}
+    </div>
+  );
+}
+
+function WidgetBody({ className = "", children }) {
+  return <div className={`dashboard-widget-body mt-3 flex min-h-0 flex-1 flex-col ${className}`}>{children}</div>;
+}
+
 function WidgetShell({ widget, isCustomizing, children }) {
   return (
     <article
-      className={`group relative h-full overflow-hidden rounded-[28px] border border-white/70 bg-white/66 p-4 shadow-[0_18px_50px_rgba(37,99,235,0.08)] backdrop-blur-2xl transition-all duration-300 xl:p-5 ${
+      className={`dashboard-widget-shell group relative h-full overflow-visible rounded-[28px] border border-white/70 bg-white/66 p-3.5 shadow-[0_18px_50px_rgba(37,99,235,0.08)] backdrop-blur-2xl transition-all duration-300 sm:p-4 ${
         isCustomizing
           ? "ring-1 ring-blue-200/80 ring-offset-2 ring-offset-[#eef5ff] hover:-translate-y-0.5"
           : "hover:-translate-y-0.5 hover:border-blue-200/85 hover:bg-white/78 hover:shadow-[0_24px_52px_rgba(37,99,235,.14)]"
       }`}
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: `radial-gradient(circle at top right, ${widget.accent}1f, transparent 50%)` }}
-      />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]">
+        <div
+          className="absolute inset-0"
+          style={{ background: `radial-gradient(circle at top right, ${widget.accent}1f, transparent 50%)` }}
+        />
+      </div>
       <div className={isCustomizing ? "pointer-events-none h-full select-none" : "h-full"}>
         {children}
       </div>
@@ -171,35 +248,35 @@ function GoalsWidget({ doneTasks, totalTasks, user }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Günlük Hedef</Eyebrow>
-      </div>
-      <div className="flex min-h-0 flex-1 items-center justify-center py-2">
-        <div
-          className="relative flex items-center justify-center rounded-full"
-          style={{
-            width: "clamp(72px,6.5vw,94px)",
-            height: "clamp(72px,6.5vw,94px)",
-            padding: "clamp(5px,0.6vw,8px)",
-            background: `conic-gradient(${WIDGET_COLORS.accent} 0deg ${daily * 3.6}deg, #E2E8F0 ${daily * 3.6}deg 360deg)`,
-          }}
-        >
-          <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-md">
-            <span className="text-[clamp(18px,1.2vw,22px)] font-bold text-[#111827]">%{daily}</span>
+      <WidgetHeader title="Günlük Hedef" />
+      <WidgetBody className="justify-between">
+        <div className="flex min-h-0 flex-1 items-center justify-center py-1.5">
+          <div
+            className="dashboard-widget-goal-ring relative flex items-center justify-center rounded-full"
+            style={{
+              width: "clamp(72px,6.5vw,94px)",
+              height: "clamp(72px,6.5vw,94px)",
+              padding: "clamp(5px,0.6vw,8px)",
+              background: `conic-gradient(${WIDGET_COLORS.accent} 0deg ${daily * 3.6}deg, #E2E8F0 ${daily * 3.6}deg 360deg)`,
+            }}
+          >
+            <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-md">
+              <span className="text-[clamp(18px,1.2vw,22px)] font-bold text-[#111827]">%{daily}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="mt-auto space-y-1.5">
-        {rows.map((r) => (
-          <div key={r.label}>
-            <div className="mb-0.5 flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-slate-400">{r.label}</span>
-              <span className="text-[13px] font-bold" style={{ color: r.color }}>{r.value}</span>
+        <div className="space-y-1.5">
+          {rows.map((r) => (
+            <div key={r.label}>
+              <div className="mb-0.5 flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-slate-400">{r.label}</span>
+                <span className="text-[13px] font-bold" style={{ color: r.color }}>{r.value}</span>
+              </div>
+              <ProgressBar value={r.progress} color={r.color} height="4px" />
             </div>
-            <ProgressBar value={r.progress} color={r.color} height="4px" />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -207,49 +284,49 @@ function GoalsWidget({ doneTasks, totalTasks, user }) {
 // ── Widget: Daily Tasks (1:1) ─────────────────────────────────────────────────
 function DailyTasksWidget({ tasks, doneTasks, onToggleTask }) {
   const pct = tasks.length ? Math.round((doneTasks / tasks.length) * 100) : 0;
-  const visibleTasks = tasks.slice(0, 4);
+  const visibleTasks = tasks.slice(0, 3);
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Görevler</Eyebrow>
-        <span className="text-[14px] font-bold text-blue-600">{doneTasks}/{tasks.length}</span>
-      </div>
-      <div className="mt-1.5">
+      <WidgetHeader
+        title="Görevler"
+        right={<span className="text-[14px] font-bold text-blue-600">{doneTasks}/{tasks.length}</span>}
+      />
+      <WidgetBody>
         <ProgressBar
           value={pct}
           color={WIDGET_COLORS.accent}
           height="4px"
         />
-      </div>
-      <div className="mt-2.5 flex flex-1 flex-col gap-2">
-        {visibleTasks.map((task) => (
-          <button
-            key={task.id}
-            type="button"
-            onClick={() => onToggleTask(task.id)}
+        <div className="mt-2.5 flex flex-1 flex-col gap-2">
+          {visibleTasks.map((task) => (
+            <button
+              key={task.id}
+              type="button"
+              onClick={() => onToggleTask(task.id)}
               className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-all ${
-              task.done
-                ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.09)]"
-                : "border-white/70 bg-white/72 backdrop-blur-md hover:border-blue-200/80 hover:bg-white/86"
-            }`}
-          >
-            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
-              <Icon
-                name={task.done ? "check_box" : "unchecked_box"}
-                size={15}
-                color={task.done ? WIDGET_COLORS.accent : WIDGET_COLORS.textSubtle}
-              />
-            </div>
-            <span className={`min-w-0 flex-1 text-[14px] leading-[1.4] ${task.done ? "text-slate-700 line-through" : "text-slate-600"}`}>
-              {task.title}
-            </span>
-            <span className={`text-[13px] font-bold ${task.done ? "text-blue-600" : "text-slate-400"}`}>
-              +{task.xp}
-            </span>
-          </button>
-        ))}
-      </div>
+                task.done
+                  ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.09)]"
+                  : "border-white/70 bg-white/72 backdrop-blur-md hover:border-blue-200/80 hover:bg-white/86"
+              }`}
+            >
+              <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
+                <Icon
+                  name={task.done ? "check_box" : "unchecked_box"}
+                  size={15}
+                  color={task.done ? WIDGET_COLORS.accent : WIDGET_COLORS.textSubtle}
+                />
+              </div>
+              <span className={`min-w-0 flex-1 text-[14px] leading-[1.4] ${task.done ? "text-slate-700 line-through" : "text-slate-600"}`}>
+                {task.title}
+              </span>
+              <span className={`text-[13px] font-bold ${task.done ? "text-blue-600" : "text-slate-400"}`}>
+                +{task.xp}
+              </span>
+            </button>
+          ))}
+        </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -257,15 +334,15 @@ function DailyTasksWidget({ tasks, doneTasks, onToggleTask }) {
 // ── Widget: Achievements (2:1) ────────────────────────────────────────────────
 function AchievementWidget({ badges }) {
   const unlocked = badges.filter((b) => !b.locked).length;
-  const visibleBadges = badges.slice(0, 8);
+  const visibleBadges = badges.slice(0, 6);
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Başarımlar</Eyebrow>
-        <span className="text-[14px] font-bold text-blue-600">{unlocked}/{badges.length}</span>
-      </div>
-      <div className="mt-3 grid flex-1 grid-cols-4 gap-2">
+      <WidgetHeader
+        title="Başarımlar"
+        right={<span className="text-[14px] font-bold text-blue-600">{unlocked}/{badges.length}</span>}
+      />
+      <WidgetBody className="grid grid-cols-3 gap-2">
         {visibleBadges.map((b) => (
           <div
             key={b.title}
@@ -279,7 +356,7 @@ function AchievementWidget({ badges }) {
             <div className="mt-1 text-center text-[12px] font-semibold leading-[1.25] text-slate-600">{b.title}</div>
           </div>
         ))}
-      </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -293,47 +370,48 @@ function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Sıralama</Eyebrow>
-        <div className="flex gap-1.5">
-          {[["haftalik","Haftalık"],["sinif","Sınıf"],["arkadaslar","Arkadaş"]].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onRankingTabChange(key)}
-              className={`rounded-full px-2.5 py-1.5 text-[13px] font-semibold tracking-[0.2px] transition-all ${
-                rankingTab === key ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border border-white/65 bg-white/68 text-slate-500 backdrop-blur-sm hover:border-blue-100 hover:bg-white/82"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-        <div className="mt-2.5 flex min-h-0 flex-1 flex-col">
-          <div className="flex flex-1 flex-col gap-2">
-            {rankingRows.map((row, index) => (
-              <div
-                key={`${rankingTab}-${row.rank}-${row.name}`}
-                className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 ${
-                  row.me ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border-white/70 bg-white/72 backdrop-blur-sm"
+      <WidgetHeader
+        title="Sıralama"
+        right={(
+          <div className="flex gap-1.5">
+            {[["haftalik","Haftalık"],["sinif","Sınıf"],["arkadaslar","Arkadaş"]].map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => onRankingTabChange(key)}
+                className={`rounded-full px-2.5 py-1.5 text-[13px] font-semibold tracking-[0.2px] transition-all ${
+                  rankingTab === key ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border border-white/65 bg-white/68 text-slate-500 backdrop-blur-sm hover:border-blue-100 hover:bg-white/82"
                 }`}
               >
-                <span className="flex w-6 items-center justify-center text-[14px] font-bold text-slate-400">
-                  {index + 1}.
-                </span>
-                <div className="flex h-[24px] w-[24px] flex-shrink-0 items-center justify-center rounded-lg" style={{ background: row.bg }}>
-                  <Icon name={row.avatar} size={12} />
-                </div>
-                <span className={`min-w-0 flex-1 truncate text-[14px] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
-                  {row.name}
-                </span>
-                <span className={`text-[13px] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
-                  {row.points}
-                </span>
-              </div>
+                {label}
+              </button>
             ))}
           </div>
+        )}
+      />
+      <WidgetBody className="justify-between">
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
+          {rankingRows.map((row, index) => (
+            <div
+              key={`${rankingTab}-${row.rank}-${row.name}`}
+              className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 ${
+                row.me ? "border-blue-200/80 bg-blue-50/65 shadow-[0_10px_22px_rgba(37,99,235,0.1)]" : "border-white/70 bg-white/72 backdrop-blur-sm"
+              }`}
+            >
+              <span className="flex w-6 items-center justify-center text-[14px] font-bold text-slate-400">
+                {index + 1}.
+              </span>
+              <div className="flex h-[24px] w-[24px] flex-shrink-0 items-center justify-center rounded-lg" style={{ background: row.bg }}>
+                <Icon name={row.avatar} size={12} />
+              </div>
+              <span className={`min-w-0 flex-1 truncate text-[14px] font-semibold ${row.me ? "text-blue-700" : "text-slate-700"}`}>
+                {row.name}
+              </span>
+              <span className={`text-[13px] font-bold ${row.me ? "text-blue-600" : "text-slate-500"}`}>
+                {row.points}
+              </span>
+            </div>
+          ))}
         </div>
         <div className="mt-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 px-3 py-2 shadow-[0_12px_24px_rgba(37,99,235,0.11)] backdrop-blur-sm">
           <div className="flex items-center justify-between">
@@ -347,6 +425,7 @@ function RankingWidget({ rankingTab, onRankingTabChange, rankingData }) {
             <span className="text-[13px] font-bold text-blue-700">{me?.points || "2 750 pts"}</span>
           </div>
         </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -361,13 +440,13 @@ function JourneyWidget() {
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent={WIDGET_COLORS.accent}>Yolculuk</Eyebrow>
-      <div className="mt-4 flex flex-1 flex-col gap-2.5">
-        {journeySeed.map((step, i) => {
+      <WidgetHeader title="Yolculuk" />
+      <WidgetBody className="gap-2.5">
+        {journeySeed.slice(0, 3).map((step, i) => {
           const t = tone[step.tone];
           return (
             <div key={step.title} className="relative">
-              {i < journeySeed.length - 1 && (
+              {i < 2 && (
                 <div className="absolute left-[12px] top-8 h-3.5 w-px bg-slate-200" />
               )}
               <div className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 ${t.card}`}>
@@ -383,7 +462,7 @@ function JourneyWidget() {
             </div>
           );
         })}
-      </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -399,8 +478,8 @@ function StatsWidget({ user, doneTasks, totalTasks }) {
 
   return (
     <div className="flex h-full flex-col">
-      <Eyebrow accent={WIDGET_COLORS.accent}>İstatistikler</Eyebrow>
-      <div className="mt-4 grid flex-1 grid-cols-2 gap-3">
+      <WidgetHeader title="İstatistikler" />
+      <WidgetBody className="grid grid-cols-2 gap-3">
         {stats.map((s) => (
           <div key={s.label} className="flex flex-col justify-between rounded-[16px] border border-white/70 bg-white/72 p-4 shadow-[0_10px_22px_rgba(37,99,235,0.08)] backdrop-blur-sm">
             <div className="text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.2px]" style={{ color: s.color }}>
@@ -410,61 +489,68 @@ function StatsWidget({ user, doneTasks, totalTasks }) {
             <ProgressBar value={s.progress} color={s.color} />
           </div>
         ))}
-      </div>
+      </WidgetBody>
     </div>
   );
 }
 
 // ── Widget: Streak (2:1) ──────────────────────────────────────────────────────
 function StreakWidget({ user }) {
-  const streak    = user?.streak || 12;
+  const streak    = user?.streak ?? 12;
   const maxStreak = 30;
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Çalışma Serisi</Eyebrow>
-        <span className="inline-flex items-center gap-1 text-[clamp(14px,0.86vw,16.5px)] font-bold text-blue-600"><Icon name="streak" size={14} color={WIDGET_COLORS.accent} /> {streak} gün</span>
-      </div>
-      <div className="mt-3 flex-1">
-        <div className="grid grid-cols-7 gap-2">
-          {["P","S","Ç","P","C","C","P"].map((d, i) => (
-            <div key={i} className="text-center text-[clamp(13px,0.72vw,14.5px)] font-bold text-slate-300">{d}</div>
-          ))}
-          {heatSeed.map((cell, i) => (
-            <div
-              key={i}
-              className="aspect-square rounded-[4px]"
-              style={{
-                background: cell.active
-                  ? cell.intensity === 3 ? WIDGET_COLORS.accent : cell.intensity === 2 ? "#93C5FD" : "#DBEAFE"
-                  : "#F1F5F9",
-              }}
-            />
-          ))}
+    <div className="flex h-full flex-col overflow-hidden">
+      <WidgetHeader
+        title="Çalışma Serisi"
+        right={(
+          <span className="inline-flex items-center gap-1 text-[clamp(14px,0.86vw,16.5px)] font-bold text-blue-600">
+            <Icon name="streak" size={14} color={WIDGET_COLORS.accent} /> {streak} gün
+          </span>
+        )}
+      />
+      <WidgetBody className="justify-between">
+        <div className="flex-1">
+          <div className="grid grid-cols-7 gap-2">
+            {["P","S","Ç","P","C","C","P"].map((d, i) => (
+              <div key={i} className="text-center text-[clamp(13px,0.72vw,14.5px)] font-bold text-slate-300">{d}</div>
+            ))}
+            {heatSeed.map((cell, i) => (
+              <div
+                key={i}
+                className="aspect-square rounded-[4px]"
+                style={{
+                  background: cell.active
+                    ? cell.intensity === 3 ? WIDGET_COLORS.accent : cell.intensity === 2 ? "#93C5FD" : "#DBEAFE"
+                    : "#F1F5F9",
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="mt-4">
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">Rekora {maxStreak - streak} gün</span>
-          <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{streak}/{maxStreak}</span>
+        <div className="mt-3">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">Rekora {maxStreak - streak} gün</span>
+            <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{streak}/{maxStreak}</span>
+          </div>
+          <ProgressBar value={Math.round((streak / maxStreak) * 100)} color={WIDGET_COLORS.accent} />
         </div>
-        <ProgressBar value={Math.round((streak / maxStreak) * 100)} color={WIDGET_COLORS.accent} />
-      </div>
+      </WidgetBody>
     </div>
   );
 }
 
 // ── Widget: Quiz (2:1) ────────────────────────────────────────────────────────
 function QuizWidget() {
+  const visibleQuizzes = upcomingQuizzes.slice(0, 3);
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Sınav Takvimi</Eyebrow>
-        <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{upcomingQuizzes.length} yaklaşan</span>
-      </div>
-      <div className="mt-4 flex flex-1 flex-col gap-2">
-        {upcomingQuizzes.map((q) => (
+      <WidgetHeader
+        title="Sınav Takvimi"
+        right={<span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{upcomingQuizzes.length} yaklaşan</span>}
+      />
+      <WidgetBody className="gap-2">
+        {visibleQuizzes.map((q) => (
           <div key={q.subject} className="flex items-center gap-2.5 rounded-[14px] border border-white/70 bg-white/72 px-3 py-2.5 backdrop-blur-sm">
             <div
               className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[clamp(13px,0.72vw,14.5px)] font-bold text-white"
@@ -479,62 +565,188 @@ function QuizWidget() {
             </span>
           </div>
         ))}
-      </div>
+      </WidgetBody>
     </div>
   );
 }
 
 // ── Widget: Notes (1:1) ───────────────────────────────────────────────────────
 function NotesWidget() {
-  const [notes, setNotes] = useState(quickNotesSeed);
-  const [input, setInput] = useState("");
+  const [notes, setNotes] = useState(loadQuickNotes);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [draftNote, setDraftNote] = useState("");
 
-  const addNote = () => {
-    const text = input.trim();
+  const closeEditor = useCallback(() => {
+    setIsEditorOpen(false);
+    setEditingNoteId(null);
+    setDraftNote("");
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+    } catch {
+      /* storage blocked */
+    }
+  }, [notes]);
+
+  useEffect(() => {
+    if (!isEditorOpen || typeof window === "undefined") return;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") closeEditor();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [closeEditor, isEditorOpen]);
+
+  const openNewNote = () => {
+    setEditingNoteId(null);
+    setDraftNote("");
+    setIsEditorOpen(true);
+  };
+
+  const openExistingNote = (note) => {
+    setEditingNoteId(note.id);
+    setDraftNote(note.text);
+    setIsEditorOpen(true);
+  };
+
+  const removeNote = (id) => {
+    setNotes((prev) => prev.filter((note) => note.id !== id));
+    if (editingNoteId === id) closeEditor();
+  };
+
+  const saveNote = () => {
+    const text = draftNote.trim();
     if (!text) return;
-    const colors = [WIDGET_COLORS.surface, WIDGET_COLORS.surface, WIDGET_COLORS.surface];
-    setNotes((prev) => [{ id: Date.now(), text, color: colors[prev.length % colors.length] }, ...prev]);
-    setInput("");
+
+    if (editingNoteId !== null) {
+      setNotes((prev) => prev.map((note) => (note.id === editingNoteId ? { ...note, text } : note)));
+    } else {
+      setNotes((prev) => [{ id: Date.now(), text, color: WIDGET_COLORS.surface }, ...prev]);
+    }
+
+    closeEditor();
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <Eyebrow accent={WIDGET_COLORS.accent}>Notlar</Eyebrow>
-      <div className="mt-4 flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addNote()}
-          placeholder="Not ekle..."
-          className="flex-1 rounded-xl border border-white/70 bg-white/72 px-3 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] text-slate-600 shadow-[0_8px_18px_rgba(37,99,235,0.06)] outline-none backdrop-blur-sm focus:border-blue-300 focus:bg-white/88"
-        />
-        <button
-          type="button"
-          onClick={addNote}
-          className="rounded-xl border border-white/60 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-white shadow-[0_12px_26px_rgba(37,99,235,0.2)] hover:brightness-105"
-        >
-          <Icon name="plus" size={12} color="#ffffff" />
-        </button>
-      </div>
-      <div className="mt-3 flex flex-1 flex-col gap-2 overflow-hidden">
-        {notes.slice(0, 4).map((n) => (
-          <div
-            key={n.id}
-            className="flex items-center gap-2.5 rounded-[14px] border border-white/70 bg-white/72 px-3 py-2.5 backdrop-blur-sm"
-            style={{ background: n.color }}
-          >
-            <span className="min-w-0 flex-1 truncate text-[clamp(13.5px,0.78vw,15.5px)] text-slate-700">{n.text}</span>
+    <>
+      <div className="flex h-full flex-col">
+        <WidgetHeader title="Notlar" />
+        <WidgetBody>
+          <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setNotes((prev) => prev.filter((x) => x.id !== n.id))}
-              className="text-[clamp(13.5px,0.78vw,15.5px)] text-slate-300 hover:text-blue-500"
+              onClick={openNewNote}
+              className="flex-1 rounded-xl border border-white/70 bg-white/72 px-3 py-2.5 text-left text-[clamp(13.5px,0.78vw,15.5px)] text-slate-400 shadow-[0_8px_18px_rgba(37,99,235,0.06)] backdrop-blur-sm transition-colors hover:border-blue-200 hover:bg-white/88"
             >
-              <Icon name="close" size={12} color={WIDGET_COLORS.textSubtle} />
+              Not ekle...
+            </button>
+            <button
+              type="button"
+              onClick={openNewNote}
+              className="rounded-xl border border-blue-200/90 bg-white px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-blue-600 shadow-[0_10px_22px_rgba(37,99,235,0.08)] transition-colors hover:border-blue-300 hover:bg-blue-50/40"
+            >
+              <Icon name="plus-math" size={12} color="#7C3AED" />
             </button>
           </div>
-        ))}
+          <div className="mt-3 flex flex-1 flex-col gap-2 overflow-hidden">
+            {notes.slice(0, 3).map((n) => (
+              <div
+                key={n.id}
+                className="flex items-center gap-2.5 rounded-[14px] border border-white/70 bg-white/72 px-3 py-2.5 backdrop-blur-sm"
+                style={{ background: n.color }}
+              >
+                <button
+                  type="button"
+                  onClick={() => openExistingNote(n)}
+                  className="min-w-0 flex-1 truncate text-left text-[clamp(13.5px,0.78vw,15.5px)] text-slate-700 hover:text-blue-600"
+                >
+                  {n.text}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeNote(n.id)}
+                  aria-label="Notu sil"
+                  className="text-[clamp(13.5px,0.78vw,15.5px)] text-slate-300 hover:text-blue-500"
+                >
+                  <Icon name="close" size={12} color={WIDGET_COLORS.textSubtle} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </WidgetBody>
       </div>
-    </div>
+
+      {isEditorOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/25 p-4 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={closeEditor}
+                aria-label="Not panelini kapat"
+                className="absolute inset-0"
+              />
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={editingNoteId !== null ? "Notu düzenle" : "Yeni not ekle"}
+                className="relative z-10 flex h-[min(88vw,88vh,430px)] w-[min(88vw,88vh,430px)] flex-col rounded-[30px] border border-white/75 bg-white/88 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.24)] backdrop-blur-2xl sm:p-6"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <Eyebrow accent={WIDGET_COLORS.accent}>
+                      {editingNoteId !== null ? "Notu Düzenle" : "Yeni Not"}
+                    </Eyebrow>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeEditor}
+                    aria-label="Kapat"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/70 bg-white/84 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+                  >
+                    <Icon name="close" size={14} color="#64748b" />
+                  </button>
+                </div>
+
+                <textarea
+                  autoFocus
+                  value={draftNote}
+                  onChange={(event) => setDraftNote(event.target.value)}
+                  onKeyDown={(event) => {
+                    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") saveNote();
+                  }}
+                  placeholder="Notunu yaz..."
+                  className="mt-4 min-h-0 flex-1 resize-none rounded-[20px] border border-blue-100/80 bg-white/76 p-4 text-[15px] leading-6 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] outline-none backdrop-blur-sm placeholder:text-slate-300 focus:border-blue-300 focus:bg-white"
+                />
+
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  {editingNoteId !== null ? (
+                    <button
+                      type="button"
+                      onClick={() => removeNote(editingNoteId)}
+                      className="rounded-full border border-slate-200 bg-white/82 px-4 py-2 text-[12px] font-bold uppercase tracking-[1.1px] text-slate-500 transition-colors hover:border-red-200 hover:text-red-500"
+                    >
+                      Sil
+                    </button>
+                  ) : <span />}
+                  <button
+                    type="button"
+                    onClick={saveNote}
+                    disabled={!draftNote.trim()}
+                    className="rounded-full border border-blue-200/80 bg-blue-50/80 px-5 py-2 text-[12px] font-bold uppercase tracking-[1.1px] text-blue-600 shadow-[0_12px_24px_rgba(37,99,235,0.12)] transition-colors hover:bg-blue-100/80 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
+                  >
+                    Kaydet
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
+    </>
   );
 }
 
@@ -570,43 +782,46 @@ function FocusWidget() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>Odak</Eyebrow>
-        <span
-          className="rounded-full px-2.5 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold"
-          style={{ background: WIDGET_COLORS.accentSoft, color: phaseColor }}
-        >
-          {phase === "work" ? "Çalışma" : "Mola"} · {sessions} oturum
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <div
-          className="relative flex h-28 w-28 items-center justify-center rounded-full p-[8px]"
-          style={{ background: `conic-gradient(${phaseColor} 0deg ${pct * 3.6}deg, #E2E8F0 ${pct * 3.6}deg 360deg)` }}
-        >
-          <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-sm">
-            <span className="text-[clamp(22px,1.9vw,28px)] font-bold tabular-nums text-[#111827]">{mm}:{ss}</span>
+      <WidgetHeader
+        title="Odak"
+        right={(
+          <span
+            className="rounded-full px-2.5 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold"
+            style={{ background: WIDGET_COLORS.accentSoft, color: phaseColor }}
+          >
+            {phase === "work" ? "Çalışma" : "Mola"} · {sessions} oturum
+          </span>
+        )}
+      />
+      <WidgetBody className="justify-between">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4">
+          <div
+            className="relative flex h-30 w-30 items-center justify-center rounded-full p-[8px]"
+            style={{ background: `conic-gradient(${phaseColor} 0deg ${pct * 3.6}deg, #E2E8F0 ${pct * 3.6}deg 360deg)` }}
+          >
+            <div className="flex h-full w-full items-center justify-center rounded-full border border-white/70 bg-white/78 backdrop-blur-sm">
+              <span className="text-[clamp(22px,1.9vw,28px)] font-bold tabular-nums text-[#111827]">{mm}:{ss}</span>
+            </div>
+          </div>
+          <div className="flex gap-2.5">
+            <button
+              type="button"
+              onClick={() => setRunning((r) => !r)}
+              className="rounded-xl px-[18px] py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-white"
+              style={{ background: phaseColor }}
+            >
+              {running ? "Duraklat" : "Başlat"}
+            </button>
+            <button
+              type="button"
+              onClick={reset}
+              className="rounded-xl border border-white/70 bg-white/74 px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm"
+            >
+              <Icon name="rotateright" size={13} color="#64748b" />
+            </button>
           </div>
         </div>
-        <div className="flex gap-2.5">
-          <button
-            type="button"
-            onClick={() => setRunning((r) => !r)}
-            className="rounded-xl px-[18px] py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-white"
-            style={{ background: phaseColor }}
-          >
-            {running ? "Duraklat" : "Başlat"}
-          </button>
-          <button
-            type="button"
-            onClick={reset}
-            className="rounded-xl border border-white/70 bg-white/74 px-3.5 py-2.5 text-[clamp(13.5px,0.78vw,15.5px)] font-bold text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm"
-          >
-            <Icon name="refresh" size={13} color="#64748b" />
-          </button>
-        </div>
-      </div>
-      <ProgressBar value={pct} color={phaseColor} />
+      </WidgetBody>
     </div>
   );
 }
@@ -618,18 +833,18 @@ function XpLogWidget() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between">
-        <Eyebrow accent={WIDGET_COLORS.accent}>XP Geçmişi</Eyebrow>
-        <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">+{formatNumber(totalXp)} bu hafta</span>
-      </div>
-      <div className="mt-4 flex flex-1 items-end gap-2">
+      <WidgetHeader
+        title="XP Geçmişi"
+        right={<span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">+{formatNumber(totalXp)} bu hafta</span>}
+      />
+      <WidgetBody className="items-end">
         {xpLogSeed.map((d) => {
           const h       = Math.round((d.xp / maxXp) * 100);
           const isToday = d.day === "Paz";
           return (
             <div key={d.day} className="flex flex-1 flex-col items-center gap-1.5">
               <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold" style={{ color: isToday ? WIDGET_COLORS.accent : "#CBD5E1" }}>{d.xp}</span>
-              <div className="w-full overflow-hidden rounded-t-md" style={{ height: "56px" }}>
+              <div className="dashboard-widget-xp-bar w-full overflow-hidden rounded-t-md" style={{ height: "56px" }}>
                 <div
                   className="w-full rounded-t-md transition-all duration-500"
                   style={{ height: `${h}%`, marginTop: `${100 - h}%`, background: isToday ? WIDGET_COLORS.accent : "#DBEAFE" }}
@@ -639,7 +854,7 @@ function XpLogWidget() {
             </div>
           );
         })}
-      </div>
+      </WidgetBody>
     </div>
   );
 }
@@ -666,64 +881,153 @@ function EmptyState({ onOpenCustomizer }) {
 }
 
 // ── Widget Panel ──────────────────────────────────────────────────────────────
-function WidgetPanel({ widgets, activeWidgetIds, onAdd, onRemove, onClose }) {
+function WidgetPanel({
+  widgets,
+  activeWidgetIds,
+  usedUnits,
+  maxUnits,
+  quotaNotice,
+  onAdd,
+  onRemove,
+  onClose,
+}) {
   const activeTitles = widgets.filter((w) => activeWidgetIds.includes(w.id)).map((w) => w.title);
+  const usagePercent = maxUnits > 0 ? Math.min(100, Math.round((usedUnits / maxUnits) * 100)) : 0;
+  const groupedWidgets = [
+    {
+      key: "wide",
+      title: "2x1 Widget'lar",
+      description: "Her biri 2 kota kullanır.",
+      items: widgets.filter((widget) => widget.size === "wide"),
+    },
+    {
+      key: "square",
+      title: "1x1 Widget'lar",
+      description: "Her biri 1 kota kullanır.",
+      items: widgets.filter((widget) => widget.size === "square"),
+    },
+  ];
 
   return (
     <>
-      <button type="button" onClick={onClose} aria-label="Kapat"
-        className="fixed inset-0 z-[60] bg-slate-950/14 backdrop-blur-[3px]" />
-      <div className="widget-panel fixed inset-x-4 top-20 z-[70] mx-auto w-[min(100%,1080px)] rounded-[30px] border border-white/75 bg-white/72 p-6 shadow-[0_24px_70px_rgba(15,23,42,.18)] backdrop-blur-2xl md:right-10 md:left-auto md:mx-0">
-        <div className="flex items-center justify-between">
-          <Eyebrow accent={WIDGET_COLORS.accent}>Vitrin Düzenleyici</Eyebrow>
-          <button type="button" onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/70 bg-white/78 text-[clamp(15px,1vw,18px)] text-slate-500 shadow-[0_8px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm hover:text-blue-600">
-            <Icon name="close" size={14} color="#64748b" />
-          </button>
-        </div>
-        <div className="mt-5 rounded-[22px] border border-white/70 bg-white/62 p-5 backdrop-blur-md">
-          <div className="flex items-center justify-between">
-            <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.4px] text-slate-400">Aktif</span>
-            <span className="text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">{activeWidgetIds.length}/{widgets.length}</span>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2.5">
-            {activeTitles.length
-              ? activeTitles.map((t) => (
-                  <span key={t} className="rounded-full border border-blue-200/80 bg-blue-50/78 px-2.5 py-1 text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600 backdrop-blur-sm">{t}</span>
-                ))
-              : <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">Henüz aktif widget yok.</span>}
-          </div>
-        </div>
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {widgets.map((widget) => {
-            const isActive = activeWidgetIds.includes(widget.id);
-            return (
-              <div key={widget.id}
-                className={`rounded-[22px] border px-5 py-4 transition-all backdrop-blur-sm ${isActive ? "border-blue-200/80 bg-blue-50/70 shadow-[0_12px_28px_rgba(37,99,235,0.11)]" : "border-white/70 bg-white/72"}`}>
-                <div className="flex items-center gap-3.5">
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[clamp(15px,1vw,18px)]"
-                    style={{ background: `${widget.accent}12`, color: widget.accent }}>
-                    <Icon name={widget.icon} size={16} color={widget.accent} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[clamp(14px,0.86vw,16.5px)] font-bold text-[#111827]">{widget.title}</span>
-                      <span className="text-[clamp(13px,0.72vw,14.5px)] text-slate-400">{widget.size === "wide" ? "2:1" : "1:1"}</span>
-                      {isActive && <span className="rounded-full border border-white/65 bg-white/82 px-2 py-0.5 text-[clamp(13px,0.72vw,14.5px)] font-bold text-blue-600">Aktif</span>}
-                    </div>
-                    <p className="mt-1 text-[clamp(13px,0.72vw,14.5px)] leading-relaxed text-slate-400">{widget.description}</p>
-                  </div>
-                  <button type="button"
-                    onClick={() => (isActive ? onRemove(widget.id) : onAdd(widget.id))}
-                    className={`rounded-full px-3.5 py-2 text-[clamp(13px,0.72vw,14.5px)] font-bold uppercase tracking-[1.2px] transition-all ${
-                      isActive ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 hover:bg-blue-100/90" : "border border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)] hover:brightness-105"
-                    }`}>
-                    {isActive ? "Çıkar" : "Ekle"}
-                  </button>
-                </div>
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Kapat"
+        className="fixed inset-0 z-[60] bg-slate-950/26 backdrop-blur-[4px]"
+      />
+      <div className="widget-panel fixed inset-x-3 bottom-3 top-6 z-[70] mx-auto h-[calc(100vh-2.25rem)] overflow-hidden rounded-[30px] border border-white/75 bg-white/74 shadow-[0_28px_84px_rgba(15,23,42,.22)] backdrop-blur-2xl md:inset-x-auto md:bottom-auto md:right-8 md:top-16 md:h-[82vh] md:w-[min(92vw,1100px)]">
+        <div className="flex h-full min-h-0 flex-col">
+          <header className="flex shrink-0 items-start justify-between gap-4 border-b border-white/70 px-5 py-4 sm:px-6">
+            <div>
+              <Eyebrow accent={WIDGET_COLORS.accent}>Vitrin Düzenleyici</Eyebrow>
+              <p className="mt-2 text-[13px] leading-relaxed text-slate-500">
+                Widgetları ekleyip çıkararak vitrinini kişiselleştir.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/70 bg-white/84 text-slate-500 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-colors hover:text-blue-600"
+            >
+              <Icon name="close" size={14} color="#64748b" />
+            </button>
+          </header>
+
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-5 py-5 sm:px-6">
+            <div className="rounded-[22px] border border-white/70 bg-white/70 p-4 shadow-[0_12px_28px_rgba(37,99,235,0.06)] backdrop-blur-md">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-bold uppercase tracking-[1.3px] text-slate-400">Kota Kullanımı</span>
+                <span className="text-[13px] font-bold text-blue-600">{usedUnits}/{maxUnits}</span>
               </div>
-            );
-          })}
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-300"
+                  style={{ width: `${usagePercent}%` }}
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2.5">
+                {activeTitles.length
+                  ? activeTitles.map((title) => (
+                      <span key={title} className="rounded-full border border-blue-200/80 bg-blue-50/80 px-2.5 py-1 text-[12px] font-semibold text-blue-700">
+                        {title}
+                      </span>
+                    ))
+                  : <span className="text-[13px] text-slate-400">Henüz aktif widget yok.</span>}
+              </div>
+              {quotaNotice ? (
+                <p className="mt-3 text-[13px] font-semibold text-amber-600">{quotaNotice}</p>
+              ) : null}
+            </div>
+
+            <div className="mt-5 space-y-4">
+              {groupedWidgets.map((group) => (
+                <section key={group.key} className="rounded-[22px] border border-white/70 bg-white/68 p-4 backdrop-blur-md">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-[14px] font-bold tracking-[0.3px] text-slate-800">{group.title}</h3>
+                    <span className="text-[12px] font-semibold text-slate-400">{group.description}</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {group.items.map((widget) => {
+                      const isActive = activeWidgetIds.includes(widget.id);
+                      const widgetUnits = getWidgetUnits(widget.size);
+                      const cannotAdd = !isActive && usedUnits + widgetUnits > maxUnits;
+
+                      return (
+                        <div
+                          key={widget.id}
+                          className={`rounded-[20px] border px-4 py-3.5 transition-all ${
+                            isActive
+                              ? "border-blue-200/90 bg-blue-50/80 shadow-[0_12px_28px_rgba(37,99,235,0.12)]"
+                              : "border-white/70 bg-white/80 hover:border-blue-100"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 flex-1 items-start gap-3">
+                              <div
+                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                                style={{ background: `${widget.accent}12`, color: widget.accent }}
+                              >
+                                <Icon name={widget.icon} size={16} color={widget.accent} />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-[14px] font-bold text-[#111827]">{widget.title}</span>
+                                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+                                    {widget.size === "wide" ? "2x1" : "1x1"}
+                                  </span>
+                                  {isActive && (
+                                    <span className="rounded-full border border-blue-200/80 bg-white px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+                                      Aktif
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="mt-1 text-[13px] leading-relaxed text-slate-500">{widget.description}</p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              disabled={cannotAdd}
+                              onClick={() => (isActive ? onRemove(widget.id) : onAdd(widget.id))}
+                              className={`shrink-0 rounded-full px-3.5 py-2 text-[12px] font-bold uppercase tracking-[1.1px] transition-all ${
+                                isActive
+                                  ? "border border-blue-200/80 bg-blue-50/75 text-blue-600 hover:bg-blue-100/90"
+                                  : cannotAdd
+                                    ? "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400"
+                                    : "border border-white/65 bg-gradient-to-br from-blue-600/95 via-blue-500/95 to-cyan-500/95 text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)] hover:brightness-105"
+                              }`}
+                            >
+                              {isActive ? "Çıkar" : cannotAdd ? "Dolu" : "Ekle"}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -735,16 +1039,20 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user,
   const availableWidgetIds = WIDGET_META.map((widget) => widget.id);
   const [rankingTab, setRankingTab] = useState("haftalik");
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [quotaNotice, setQuotaNotice] = useState("");
   const isShowcaseGuided = guideState?.target === "showcase";
   const [activeWidgetIds, setActiveWidgetIds] = useState(() => {
     const loaded = loadActiveWidgets().filter((id) => availableWidgetIds.includes(id));
-    if (loaded.length) {
+    const fallback = clampWidgetIdsByCapacity([...DEFAULT_ACTIVE_WIDGETS], WIDGET_META_BY_ID);
+    if (hasStoredActiveWidgets()) {
+      if (!loaded.length) return [];
       const isAutoExpandedAll =
         loaded.length === availableWidgetIds.length &&
         availableWidgetIds.every((id) => loaded.includes(id));
-      return isAutoExpandedAll ? [...DEFAULT_ACTIVE_WIDGETS] : loaded;
+      const initialIds = isAutoExpandedAll ? [...DEFAULT_ACTIVE_WIDGETS] : loaded;
+      return clampWidgetIdsByCapacity(initialIds, WIDGET_META_BY_ID);
     }
-    return [...DEFAULT_ACTIVE_WIDGETS];
+    return fallback;
   });
 
   const rankingData = useMemo(() => ({
@@ -859,34 +1167,154 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user,
     [doneTasks, onToggleTask, rankingData, rankingTab, tasks, user]
   );
 
-  const visibleStripWidgets = useMemo(
-    () => stripWidgets.filter((widget) => activeWidgetIds.includes(widget.id)),
-    [activeWidgetIds, stripWidgets]
+  const visibleStripWidgets = useMemo(() => {
+    const stripWidgetMap = new Map(stripWidgets.map((widget) => [widget.id, widget]));
+    return activeWidgetIds
+      .map((id) => stripWidgetMap.get(id))
+      .filter(Boolean);
+  }, [activeWidgetIds, stripWidgets]);
+  const usedWidgetUnits = useMemo(
+    () => getUsedWidgetUnits(activeWidgetIds, WIDGET_META_BY_ID),
+    [activeWidgetIds]
   );
 
   const panelWidgets = WIDGET_META;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activeWidgetIds));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(activeWidgetIds));
+    } catch {
+      /* storage blocked */
+    }
   }, [activeWidgetIds]);
 
   useEffect(() => {
     if (!isShowcaseGuided) return;
-    setIsCustomizing(false);
+    const closeTimer = window.setTimeout(() => setIsCustomizing(false), 0);
+    return () => window.clearTimeout(closeTimer);
   }, [guideState?.pulse, isShowcaseGuided]);
 
   const handleAddWidget = (id) => {
     if (!availableWidgetIds.includes(id)) return;
-    setActiveWidgetIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    if (activeWidgetIds.includes(id)) return;
+    const nextIds = clampWidgetIdsByCapacity([...activeWidgetIds, id], WIDGET_META_BY_ID);
+    if (nextIds.length === activeWidgetIds.length) {
+      setQuotaNotice(`Kota dolu (${SHOWCASE_MAX_UNITS}/${SHOWCASE_MAX_UNITS}). Yeni widget eklemek için önce birini çıkar.`);
+      return;
+    }
+    setQuotaNotice("");
+    setActiveWidgetIds(nextIds);
   };
 
   const handleRemoveWidget = (id) => {
+    setQuotaNotice("");
     setActiveWidgetIds((prev) => prev.filter((widgetId) => widgetId !== id));
   };
 
   return (
-    <section className="relative transition-all">
+    <section className="relative overflow-visible pb-4 transition-all">
+      <style>{`
+        @media (min-width: 1280px) and (max-width: 1535.98px) {
+          .dashboard-widget-showcase-grid [class*="text-[clamp(22px"] { font-size: 21px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[clamp(18px"] { font-size: 15.75px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[clamp(14px"] { font-size: 11.5px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[clamp(13.5px"] { font-size: 11.25px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[clamp(13px"] { font-size: 10.75px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[14px]"] { font-size: 11.5px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[13px]"] { font-size: 10.75px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[12px]"] { font-size: 10.25px !important; }
+          .dashboard-widget-showcase-grid [class*="text-[11px]"] { font-size: 9.75px !important; }
+          .dashboard-widget-showcase-grid {
+            gap: 0.625rem !important;
+            margin-left: -0.35rem;
+            margin-right: -0.35rem;
+          }
+          .dashboard-widget-showcase-grid .dashboard-widget-shell {
+            padding: 0.78rem !important;
+            border-radius: 24px !important;
+          }
+          .dashboard-widget-showcase-grid .dashboard-widget-shell > .pointer-events-none {
+            border-radius: 24px !important;
+          }
+          .dashboard-widget-showcase-grid .dashboard-widget-header {
+            min-height: 27px !important;
+            gap: 0.5rem !important;
+          }
+          .dashboard-widget-showcase-grid .dashboard-widget-body { margin-top: 0.55rem !important; }
+          .dashboard-widget-showcase-grid [class~="gap-4"] { gap: 0.78rem !important; }
+          .dashboard-widget-showcase-grid [class~="gap-3"] { gap: 0.65rem !important; }
+          .dashboard-widget-showcase-grid [class~="gap-2.5"] { gap: 0.55rem !important; }
+          .dashboard-widget-showcase-grid [class~="gap-2"] { gap: 0.45rem !important; }
+          .dashboard-widget-showcase-grid [class~="gap-1.5"] { gap: 0.32rem !important; }
+          .dashboard-widget-showcase-grid [class~="p-4"] { padding: 0.68rem !important; }
+          .dashboard-widget-showcase-grid [class~="px-3.5"] { padding-left: 0.65rem !important; padding-right: 0.65rem !important; }
+          .dashboard-widget-showcase-grid [class~="px-3"] { padding-left: 0.6rem !important; padding-right: 0.6rem !important; }
+          .dashboard-widget-showcase-grid [class~="px-2.5"] { padding-left: 0.52rem !important; padding-right: 0.52rem !important; }
+          .dashboard-widget-showcase-grid [class~="px-2"] { padding-left: 0.42rem !important; padding-right: 0.42rem !important; }
+          .dashboard-widget-showcase-grid [class~="py-2.5"] { padding-top: 0.55rem !important; padding-bottom: 0.55rem !important; }
+          .dashboard-widget-showcase-grid [class~="py-2"] { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
+          .dashboard-widget-showcase-grid [class~="py-1.5"] { padding-top: 0.32rem !important; padding-bottom: 0.32rem !important; }
+          .dashboard-widget-showcase-grid [class~="py-1"] { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+          .dashboard-widget-showcase-grid [class~="mt-3"] { margin-top: 0.55rem !important; }
+          .dashboard-widget-showcase-grid [class~="mt-2.5"] { margin-top: 0.45rem !important; }
+          .dashboard-widget-showcase-grid [class~="mt-1"] { margin-top: 0.25rem !important; }
+          .dashboard-widget-showcase-grid [class~="mb-1"] { margin-bottom: 0.25rem !important; }
+          .dashboard-widget-showcase-grid [class~="space-y-1.5"] > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 0.32rem !important;
+          }
+          .dashboard-widget-showcase-grid [class~="h-28"] { height: 5.45rem !important; }
+          .dashboard-widget-showcase-grid [class~="w-28"] { width: 5.45rem !important; }
+          .dashboard-widget-showcase-grid [class~="h-7"] { height: 1.5rem !important; }
+          .dashboard-widget-showcase-grid [class~="w-7"] { width: 1.5rem !important; }
+          .dashboard-widget-showcase-grid [class~="h-5"] { height: 1.1rem !important; }
+          .dashboard-widget-showcase-grid [class~="w-5"] { width: 1.1rem !important; }
+          .dashboard-widget-showcase-grid [class~="h-3"] { height: 0.65rem !important; }
+          .dashboard-widget-showcase-grid [class~="w-3"] { width: 0.65rem !important; }
+          .dashboard-widget-showcase-grid [class~="w-6"] { width: 1.3rem !important; }
+          .dashboard-widget-showcase-grid [class~="h-[24px]"],
+          .dashboard-widget-showcase-grid [class~="w-[24px]"] { width: 1.35rem !important; height: 1.35rem !important; }
+          .dashboard-widget-showcase-grid [class~="h-[22px]"],
+          .dashboard-widget-showcase-grid [class~="w-[22px]"] { width: 1.25rem !important; height: 1.25rem !important; }
+          .dashboard-widget-showcase-grid .dashboard-widget-goal-ring {
+            width: 70px !important;
+            height: 70px !important;
+            padding: 5px !important;
+          }
+          .dashboard-widget-showcase-grid .dashboard-widget-xp-bar { height: 48px !important; }
+          .dashboard-widget-showcase-grid img {
+            width: 11px !important;
+            height: 11px !important;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          .dashboard-widget-showcase-grid {
+            --widget-unit: clamp(210px, 15.5vw, 285px);
+            grid-template-columns: repeat(5, var(--widget-unit));
+            grid-auto-rows: var(--widget-unit);
+            justify-content: space-between;
+            align-items: stretch;
+            margin-left: 0;
+            margin-right: 0;
+          }
+
+          .dashboard-widget-showcase-grid > .dashboard-widget-slot {
+            min-height: 0;
+            height: 100%;
+            min-width: 0;
+            aspect-ratio: auto;
+          }
+
+          .dashboard-widget-showcase-grid > .dashboard-widget-slot-square {
+            grid-column: span 1 / span 1;
+          }
+
+          .dashboard-widget-showcase-grid > .dashboard-widget-slot-wide {
+            grid-column: span 2 / span 2;
+          }
+        }
+      `}</style>
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-[27px] font-bold tracking-[-0.04em] text-slate-950">Kişisel Vitrin</h2>
         <div className="relative">
@@ -905,19 +1333,31 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user,
             className={`action-btn inline-flex items-center gap-1.5 ${isShowcaseGuided ? "enigma-guide-button-toon" : ""}`}
           >
             Vitrin Düzenle
+            <Icon name="slider" size={20} color="#64748B" />
           </button>
         </div>
       </div>
 
       {visibleStripWidgets.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.06fr_1.18fr_1.45fr_0.9fr] 2xl:grid-cols-[1.14fr_1.24fr_1.62fr_1fr] 2xl:gap-4">
-          {visibleStripWidgets.map((widget) => (
-            <div key={widget.id} className="min-h-[228px] xl:min-h-[244px]">
-              <WidgetShell widget={widget} isCustomizing={false}>
-                {widget.render()}
-              </WidgetShell>
-            </div>
-          ))}
+        <div className="overflow-visible pb-4 pt-1">
+          <div
+            className="dashboard-widget-showcase-grid grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2"
+          >
+            {visibleStripWidgets.map((widget) => (
+              <div
+                key={widget.id}
+                className={`dashboard-widget-slot h-full min-h-[228px] md:min-h-[248px] xl:min-h-0 ${
+                  WIDGET_META_BY_ID.get(widget.id)?.size === "wide"
+                    ? "dashboard-widget-slot-wide col-span-1 sm:col-span-2"
+                    : "dashboard-widget-slot-square col-span-1"
+                }`}
+              >
+                <WidgetShell widget={widget} isCustomizing={false}>
+                  {widget.render()}
+                </WidgetShell>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <EmptyState onOpenCustomizer={() => setIsCustomizing(true)} />
@@ -927,6 +1367,9 @@ export default function DashboardWidgets({ tasks, onToggleTask, doneTasks, user,
         <WidgetPanel
           widgets={panelWidgets}
           activeWidgetIds={activeWidgetIds}
+          usedUnits={usedWidgetUnits}
+          maxUnits={SHOWCASE_MAX_UNITS}
+          quotaNotice={quotaNotice}
           onAdd={handleAddWidget}
           onRemove={handleRemoveWidget}
           onClose={() => setIsCustomizing(false)}

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DashboardNavbar from "../../components/dashboard/dashboard-navbar.jsx";
 import Icon from "../../components/ui/icons8-icon.jsx";
 import { useUser } from "../../context/UserContext.jsx";
+import { DashboardShell } from "../../components/dashboard/dashboard-design.jsx";
 
 /* ═══════════════════════════════════════
    DATA
@@ -113,8 +113,8 @@ function TopProgressBar({ value }) {
 function TopicFlowSidebar({ steps, topicName }) {
   return (
     <aside
-      className="surface-wrap flex w-[230px] shrink-0 flex-col rounded-[22px] border border-slate-200 bg-white xl:sticky xl:top-[132px] self-start"
-      style={{ minHeight: "calc(100vh - 160px)" }}
+      className="surface-wrap flex w-full shrink-0 flex-col rounded-[22px] border border-white/70 bg-white/78 xl:sticky xl:top-[132px] xl:w-[230px] self-start"
+      style={{ minHeight: "min(520px, calc(100vh - 160px))" }}
     >
       {/* Header */}
       <div className="border-b border-slate-100 px-4 pt-5 pb-4">
@@ -276,44 +276,7 @@ export default function Topic() {
   const { user } = useUser();
 
   return (
-    <div className="dashboard-grid-bg min-h-screen text-[#111827]">
-      <style>{`
-        .dashboard-grid-bg * {
-          font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
-        }
-        .dashboard-grid-bg {
-          background:
-            radial-gradient(circle at 15% -8%, rgba(59,130,246,0.18), transparent 30%),
-            radial-gradient(circle at 90% 5%, rgba(14,165,233,0.14), transparent 26%),
-            #f3f6fc;
-          background-image:
-            radial-gradient(circle at 1px 1px, rgba(148,163,184,0.16) 1px, transparent 1px);
-          background-size: 26px 26px;
-        }
-        .glass-header {
-          border-bottom: 1px solid rgba(226,232,240,0.88);
-          background: rgba(255,255,255,0.84);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-        }
-        .surface-wrap {
-          border: 1px solid #dbe5f3;
-          background: #ffffff;
-          box-shadow:
-            0 10px 32px rgba(15,23,42,0.07),
-            0 2px 8px rgba(15,23,42,0.03);
-        }
-        .surface-pill {
-          border: 1px solid #dbe5f3;
-          background: rgba(255,255,255,0.92);
-          box-shadow: 0 6px 16px rgba(15,23,42,0.05);
-        }
-      `}</style>
-
-      <div className="flex min-h-screen">
-        <DashboardNavbar />
-
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
+    <DashboardShell>
 
           {/* ══ HEADER ══ */}
           <header className="glass-header sticky top-0 z-40 px-4 py-3.5 sm:px-6 xl:px-8">
@@ -385,7 +348,7 @@ export default function Topic() {
           {/* ══ MAIN ══ */}
           <main className="flex-1 overflow-x-hidden px-4 py-5 sm:px-6 sm:py-6 xl:px-8">
             {/* Layout: LEFT sidebar (flow) + RIGHT content (videos) */}
-            <div className="flex gap-6 items-start">
+            <div className="grid gap-6 xl:grid-cols-[230px_minmax(0,1fr)] xl:items-start">
 
               {/* ── LEFT: Topic Flow Sidebar ── */}
               <TopicFlowSidebar steps={TOPIC_FLOW} topicName={CURRENT_TOPIC_NAME} />
@@ -413,9 +376,6 @@ export default function Topic() {
               </section>
             </div>
           </main>
-
-        </div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

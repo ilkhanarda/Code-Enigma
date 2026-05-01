@@ -298,28 +298,70 @@ function SectionLabel({
   );
 }
 
-function BottomStat({ stat, withDivider }) {
-  const showCoin = stat.icon === "coin";
+function BottomStatsSummary({ stats }) {
+  const [primaryStat, ...detailStats] = stats;
+
   return (
-    <div
-      className={`px-5 py-4 ${withDivider ? "xl:border-r xl:border-white/70" : ""}`}
-    >
-      <div className="min-w-0">
-        <p className="text-[14px] font-medium leading-[1.45] text-slate-500">
-          {stat.label}
-        </p>
-        <div className="mt-4 flex items-center gap-2.5">
-          {showCoin && (
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-100/90">
-              <Icon name={stat.icon} size={12} color="#F59E0B" />
-            </div>
-          )}
-          <p className="text-[clamp(23px,1.8vw,29px)] font-semibold tracking-[-0.03em] text-[#0f172a]">
-            {stat.value}
-          </p>
+    <article className="relative h-full overflow-hidden rounded-[32px] border border-white/75 bg-[linear-gradient(145deg,rgba(255,255,255,0.76),rgba(238,246,255,0.72))] px-5 py-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)] backdrop-blur-2xl sm:px-7 sm:py-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#2563EB,#38BDF8,#7C3AED)]" />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.34]"
+        style={{
+          backgroundImage:
+            "linear-gradient(90deg, rgba(37,99,235,0.10) 1px, transparent 1px), linear-gradient(rgba(37,99,235,0.08) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+
+      <div className="relative z-10 flex h-full flex-col gap-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[1.5px] text-blue-600">
+              Haftalık Özet
+            </p>
+            <h3 className="mt-2 text-[20px] font-bold leading-[1.18] tracking-[-0.035em] text-slate-950 sm:text-[24px]">
+              Ritmin güçlü ilerliyor
+            </h3>
+          </div>
+            <div>
+              <p className="text-[13px] font-medium leading-5 text-slate-500">{primaryStat.label}</p>
+              <p className="mt-1 text-[clamp(34px,5vw,52px)] font-bold leading-none tracking-[-0.055em] text-slate-950">
+                {primaryStat.value}
+              </p>
+          </div>
+        </div>
+
+        <div className="mt-auto grid gap-2.5 sm:grid-cols-3">
+          {detailStats.map((stat) => {
+            const isCoin = stat.icon === "coin";
+            const iconColor = isCoin ? "#F59E0B" : "#2563EB";
+
+            return (
+              <div
+                key={stat.label}
+                className="flex min-h-[76px] items-center gap-3 rounded-2xl border border-white/75 bg-white/58 px-3.5 py-3 shadow-[0_10px_22px_rgba(37,99,235,0.06)]"
+              >
+                <span
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+                    isCoin ? "border-amber-200 bg-amber-100/80" : "border-blue-100 bg-blue-50/90"
+                  }`}
+                >
+                  <Icon name={stat.icon} size={15} color={iconColor} />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[18px] font-bold leading-tight tracking-[-0.03em] text-slate-950">
+                    {stat.value}
+                  </span>
+                  <span className="block truncate text-[11px] font-semibold leading-4 text-slate-500">
+                    {stat.label}
+                  </span>
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -384,7 +426,7 @@ function NotificationDropdown() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`relative flex h-14 w-14 items-center justify-center rounded-full border border-white/65 bg-white/68 backdrop-blur-xl transition-all duration-200
+        className={`relative flex h-12 w-12 items-center justify-center rounded-full border border-white/65 bg-white/68 backdrop-blur-xl transition-all duration-200 sm:h-14 sm:w-14
           ${open
             ? "border-blue-200/85 bg-white/85 text-blue-600 shadow-[0_18px_40px_rgba(37,99,235,.16)]"
             : "text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.06)] hover:border-blue-200/80 hover:bg-white/82 hover:text-blue-600 hover:shadow-[0_16px_34px_rgba(37,99,235,.12)]"
@@ -459,11 +501,21 @@ function NotificationDropdown() {
   );
 }
 
-function AiAskSearchBar({ onSubmit, disabled = false }) {
+function AiAskSearchBar({
+  open = false,
+  messages = [],
+  loading = false,
+  input = "",
+  onInputChange,
+  onSubmit,
+  onClose,
+  disabled = false,
+}) {
   const [query, setQuery] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [placeholderText, setPlaceholderText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const messagesRef = useRef(null);
 
   useEffect(() => {
     if (query) return undefined;
@@ -499,11 +551,26 @@ function AiAskSearchBar({ onSubmit, disabled = false }) {
     return () => clearTimeout(timer);
   }, [isDeleting, placeholderIndex, placeholderText, query]);
 
+  useEffect(() => {
+    if (!open || !messagesRef.current) return;
+    messagesRef.current.scrollTo({
+      top: messagesRef.current.scrollHeight,
+      behavior: messages.length > 0 ? "smooth" : "auto",
+    });
+  }, [open, messages, loading]);
+
+  const activeInput = open ? input : query;
+  const canSend = Boolean(activeInput.trim()) && !disabled;
+
   const handleSubmit = () => {
-    const normalizedQuery = query.trim();
+    const normalizedQuery = activeInput.trim();
     if (!normalizedQuery || disabled) return;
     onSubmit?.(normalizedQuery);
-    setQuery("");
+    if (open) {
+      onInputChange?.("");
+    } else {
+      setQuery("");
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -513,164 +580,154 @@ function AiAskSearchBar({ onSubmit, disabled = false }) {
   };
 
   return (
-    <div className="flex h-[60px] w-full items-center gap-2.5 rounded-full border border-slate-200/80 bg-white/92 px-3.5 shadow-[0_12px_26px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-      <Icon name="ai" size={18} color="#4F46E5" className="shrink-0" />
-
-      <div className="relative min-w-0 flex-1">
-        {!query && (
-          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-[14px] font-medium text-slate-400">
-            {placeholderText}
-            <span className="ai-caret">|</span>
-          </span>
-        )}
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          aria-label="AI Mentor'a Sor"
-          className="h-full w-full bg-transparent py-2 text-[14px] font-medium text-slate-700 outline-none"
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={disabled || !query.trim()}
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white shadow-[0_10px_20px_rgba(37,99,235,0.26)] transition-all hover:bg-blue-600 hover:shadow-[0_12px_24px_rgba(37,99,235,0.3)] disabled:cursor-not-allowed disabled:bg-blue-300 disabled:shadow-none"
-        aria-label="AI Mentor'a gönder"
-      >
-        <Icon name="next" size={15} color="#ffffff" />
-      </button>
-    </div>
-  );
-}
-
-function AiChatPanel({
-  visible,
-  messages,
-  loading,
-  input,
-  onInputChange,
-  onSend,
-  onClose,
-}) {
-  const messagesRef = useRef(null);
-
-  useEffect(() => {
-    if (!visible || !messagesRef.current) return;
-    messagesRef.current.scrollTo({
-      top: messagesRef.current.scrollHeight,
-      behavior: messages.length > 0 ? "smooth" : "auto",
-    });
-  }, [visible, messages, loading]);
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      onSend?.();
-    }
-  };
-
-  if (!visible) return null;
-
-  return (
-    <section className="mt-3 overflow-hidden rounded-[28px] border border-blue-100/80 bg-white/94 shadow-[0_14px_34px_rgba(37,99,235,0.14)] backdrop-blur-xl">
-      <header className="flex items-center justify-between border-b border-blue-50/90 bg-blue-50/40 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
-            <Icon name="ai" size={15} color="#2563EB" />
-          </span>
-          <div>
-            <p className="text-[12px] font-bold text-slate-900">AI Mentor</p>
-            <p className="text-[10px] text-slate-500">Sorunu yaz, birlikte çözelim.</p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-white hover:text-slate-700"
-          aria-label="AI mesaj panelini kapat"
-        >
-          <Icon name="close" size={12} color="#64748B" />
-        </button>
-      </header>
-
+    <section
+      className={`ai-ask-shell grid w-full overflow-hidden border backdrop-blur-xl transition-[grid-template-rows,border-radius,box-shadow,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        open
+          ? "grid-rows-[1fr_auto] rounded-[24px] border-blue-100/80 bg-white/94 shadow-[0_18px_42px_rgba(37,99,235,0.14)] sm:rounded-[28px]"
+          : "grid-rows-[0fr_auto] rounded-full border-slate-200/80 bg-white/92 shadow-[0_12px_26px_rgba(15,23,42,0.08)]"
+      }`}
+      aria-expanded={open}
+      aria-label="AI Mentor mesaj alanı"
+    >
       <div
-        ref={messagesRef}
-        className="max-h-[320px] min-h-[190px] space-y-2.5 overflow-y-auto bg-[linear-gradient(180deg,#fbfdff_0%,#f6f9ff_100%)] px-4 py-3"
+        className={`ai-ask-panel-content min-h-0 overflow-hidden transition-[opacity,transform] duration-300 ease-out ${
+          open ? "translate-y-0 opacity-100 delay-75" : "pointer-events-none -translate-y-2 opacity-0"
+        }`}
+        aria-hidden={!open}
       >
-        {messages.length === 0 && !loading && (
-          <div className="rounded-2xl border border-blue-100/80 bg-white/86 px-4 py-5 text-center">
-            <div className="mb-2 flex justify-center">
-              <Icon name="search" size={16} color="#94A3B8" />
-            </div>
-            <p className="text-[12px] font-semibold text-slate-700">
-              AI Mentor ile konuşma başlat
-            </p>
-            <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Üstteki arama alanından ya da aşağıdaki kutudan mesaj gönderebilirsin.
-            </p>
-          </div>
-        )}
-
-        {messages.map((message, index) => {
-          const isUser = message.role === "user";
-          return (
-            <div
-              key={`${message.role}-${index}`}
-              className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-[12px] leading-5 shadow-sm ${
-                  isUser
-                    ? "rounded-br-md bg-gradient-to-br from-blue-600 to-blue-500 text-white"
-                    : "rounded-bl-md border border-blue-100/80 bg-white text-slate-700"
-                }`}
-              >
-                <p className="whitespace-pre-wrap break-words">{message.content}</p>
-              </div>
-            </div>
-          );
-        })}
-
-        {loading && (
-          <div className="flex justify-start">
-            <div className="inline-flex items-center gap-1 rounded-2xl rounded-bl-md border border-blue-100 bg-white px-3 py-2">
-              {[0, 1, 2].map((index) => (
-                <span
-                  key={index}
-                  className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"
-                  style={{ animationDelay: `${index * 0.15}s` }}
-                />
-              ))}
+        <header className="flex items-center justify-between border-b border-blue-50/90 bg-blue-50/40 px-3 py-2.5 sm:px-4 sm:py-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+              <Icon name="ai" size={15} color="#2563EB" />
+            </span>
+            <div>
+              <p className="text-[12px] font-bold text-slate-900">AI Mentor</p>
+              <p className="text-[10px] text-slate-500">Sorunu yaz, birlikte çözelim.</p>
             </div>
           </div>
-        )}
-      </div>
-
-      <div className="border-t border-blue-50/80 bg-white px-4 py-3">
-        <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/30 px-3 py-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(event) => onInputChange?.(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Mesajını yaz..."
-            aria-label="AI mesajı yaz"
-            className="h-8 flex-1 bg-transparent text-[13px] font-medium text-slate-700 outline-none placeholder:text-slate-400"
-          />
           <button
             type="button"
-            onClick={() => onSend?.()}
-            disabled={loading || !input.trim()}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-300"
-            aria-label="AI mesajını gönder"
+            onClick={onClose}
+            tabIndex={open ? 0 : -1}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-white hover:text-slate-700"
+            aria-label="AI mesaj panelini kapat"
           >
-            <Icon name="next" size={13} color="#FFFFFF" />
+            <Icon name="close" size={12} color="#64748B" />
+          </button>
+        </header>
+
+        <div
+          ref={messagesRef}
+          className="max-h-[320px] min-h-[170px] space-y-2.5 overflow-y-auto bg-[linear-gradient(180deg,#fbfdff_0%,#f6f9ff_100%)] px-3 py-2.5 sm:min-h-[190px] sm:px-4 sm:py-3"
+        >
+          {messages.length === 0 && !loading && (
+            <div className="rounded-2xl border border-blue-100/80 bg-white/86 px-4 py-5 text-center">
+              <div className="mb-2 flex justify-center">
+                <Icon name="search" size={16} color="#94A3B8" />
+              </div>
+              <p className="text-[12px] font-semibold text-slate-700">
+                AI Mentor ile konuşma başlat
+              </p>
+              <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                Aşağıdaki mesaj alanından sorunu yazabilirsin.
+              </p>
+            </div>
+          )}
+
+          {messages.map((message, index) => {
+            const isUser = message.role === "user";
+            return (
+              <div
+                key={`${message.role}-${index}`}
+                className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-[12px] leading-5 shadow-sm ${
+                    isUser
+                      ? "rounded-br-md bg-gradient-to-br from-blue-600 to-blue-500 text-white"
+                      : "rounded-bl-md border border-blue-100/80 bg-white text-slate-700"
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                </div>
+              </div>
+            );
+          })}
+
+          {loading && (
+            <div className="flex justify-start">
+              <div className="inline-flex items-center gap-1 rounded-2xl rounded-bl-md border border-blue-100 bg-white px-3 py-2">
+                {[0, 1, 2].map((index) => (
+                  <span
+                    key={index}
+                    className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"
+                    style={{ animationDelay: `${index * 0.15}s` }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={`transition-[padding,border-color,background-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          open ? "border-t border-blue-50/80 bg-white px-2.5 py-2.5 sm:px-3 sm:py-3" : "px-3 sm:px-3.5"
+        }`}
+      >
+        <div
+          className={`flex items-center gap-2 transition-[height,border-radius,border-color,background-color,box-shadow,padding] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:gap-2.5 ${
+            open
+              ? "h-[46px] rounded-2xl border border-blue-200/90 bg-white px-3 shadow-[0_10px_22px_rgba(37,99,235,0.08)] sm:h-[48px] sm:px-3.5"
+              : "h-[54px] rounded-full bg-transparent sm:h-[60px]"
+          }`}
+        >
+          <Icon name="ai" size={18} color={open ? "#2563EB" : "#4F46E5"} className="shrink-0" />
+
+          <div className="relative min-w-0 flex-1">
+            {!open && !query && (
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-[13px] font-medium text-slate-400 sm:text-[14px]">
+                {placeholderText}
+                <span className="ai-caret">|</span>
+              </span>
+            )}
+            <input
+              type="text"
+              value={activeInput}
+              onChange={(event) => {
+                if (open) {
+                  onInputChange?.(event.target.value);
+                  return;
+                }
+                setQuery(event.target.value);
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={open ? "Mesajını yaz..." : undefined}
+              aria-label={open ? "AI mesajı yaz" : "AI Mentor'a Sor"}
+              className="h-full w-full bg-transparent py-2 text-[13px] font-medium text-slate-700 outline-none placeholder:text-slate-400 sm:text-[14px]"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSend}
+            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1 transition-colors disabled:cursor-not-allowed sm:h-11 sm:w-11 ${
+              canSend
+                ? "bg-blue-50 text-blue-600 ring-blue-500/70"
+                : "bg-white text-slate-400 ring-slate-200"
+            }`}
+            aria-label={open ? "AI mesajını gönder" : "AI Mentor'a gönder"}
+          >
+            <Icon name="next" size={open ? 13 : 15} color={canSend ? "#2563EB" : "#94A3B8"} />
           </button>
         </div>
-        <p className="mt-2 text-[10px] leading-4 text-slate-400">
+
+        <p
+          className={`overflow-hidden text-[9px] leading-4 text-slate-400 transition-[max-height,opacity,margin] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:text-[10px] ${
+            open ? "mt-2 max-h-8 opacity-100" : "mt-0 max-h-0 opacity-0"
+          }`}
+        >
           Enigma AI hata yapabilir. Cevapları iki kez kontrol et.
         </p>
       </div>
@@ -688,7 +745,7 @@ function AiSuggestionPopup({ recommendation, loading, visible, onAction, onDismi
 
   return (
     <div
-      className="ai-suggestion-entry mt-3 flex items-start gap-3 rounded-[28px] border border-blue-100/80 bg-white/92 px-4 py-3.5 shadow-[0_14px_32px_rgba(37,99,235,0.12)] backdrop-blur-xl"
+      className="ai-suggestion-entry mt-3 flex items-start gap-2.5 rounded-[24px] border border-blue-100/80 bg-white/92 px-3 py-3 shadow-[0_14px_32px_rgba(37,99,235,0.12)] backdrop-blur-xl sm:gap-3 sm:rounded-[28px] sm:px-4 sm:py-3.5"
       role="status"
       aria-live="polite"
     >
@@ -699,7 +756,7 @@ function AiSuggestionPopup({ recommendation, loading, visible, onAction, onDismi
         <p className="text-[11px] font-bold uppercase tracking-[1.1px] text-blue-500">
           AI Mentor
         </p>
-        <p className="mt-1 text-[13px] leading-5 text-slate-700">{message}</p>
+        <p className="mt-1 text-[12px] leading-5 text-slate-700 sm:text-[13px]">{message}</p>
         {hasAction && (
           <button
             type="button"
@@ -733,7 +790,7 @@ function TopicCard({ topic, patternVariant = 0, onOpen }) {
 
   return (
     <article
-      className={`group flex h-full min-h-[272px] flex-col overflow-hidden rounded-[28px] border border-white/70 bg-white/66 shadow-[0_18px_50px_rgba(37,99,235,0.09)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200/85 hover:bg-white/76 hover:shadow-[0_24px_52px_rgba(37,99,235,.14)] ${
+      className={`group flex h-full min-h-[248px] flex-col overflow-hidden rounded-[24px] border border-white/70 bg-white/66 shadow-[0_18px_50px_rgba(37,99,235,0.09)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200/85 hover:bg-white/76 hover:shadow-[0_24px_52px_rgba(37,99,235,.14)] sm:min-h-[272px] sm:rounded-[28px] ${
         isInteractive ? "cursor-pointer focus-within:ring-2 focus-within:ring-blue-300 focus-within:ring-offset-1" : ""
       }`}
       role={isInteractive ? "button" : undefined}
@@ -773,10 +830,10 @@ function TopicCard({ topic, patternVariant = 0, onOpen }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[20px] font-bold leading-[1.25] tracking-[-0.03em] text-slate-950">
+            <h2 className="text-[18px] font-bold leading-[1.25] tracking-[-0.03em] text-slate-950 sm:text-[20px]">
               {topic.title}
             </h2>
             <p className="mt-1.5 text-[13px] font-medium leading-[1.45] text-slate-500">
@@ -1035,6 +1092,9 @@ export default function Dashboard() {
           margin-left: 2px;
           animation: ai-caret-blink .9s linear infinite;
         }
+        .ai-ask-shell {
+          transform: translateZ(0);
+        }
         @keyframes ai-suggestion-entry {
           0% { opacity: 0; transform: translateY(-16px) scale(0.96); }
           62% { opacity: 1; transform: translateY(2px) scale(1.01); }
@@ -1043,13 +1103,19 @@ export default function Dashboard() {
         .ai-suggestion-entry {
           animation: ai-suggestion-entry .58s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        @media (prefers-reduced-motion: reduce) {
+          .ai-ask-shell,
+          .ai-ask-panel-content {
+            transition: none !important;
+          }
+        }
         .xp-toast { animation: xp-rise 1.8s cubic-bezier(.2,.8,.2,1) forwards; }
       `}</style>
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-20 top-[-130px] h-[360px] w-[360px] rounded-full bg-indigo-300/20 blur-3xl" />
-        <div className="absolute right-[-120px] top-[-110px] h-[340px] w-[340px] rounded-full bg-cyan-200/30 blur-3xl" />
-        <div className="absolute bottom-[-180px] right-[16%] h-[320px] w-[320px] rounded-full bg-amber-100/35 blur-3xl" />
+        <div className="absolute -left-20 top-[-130px] h-[280px] w-[280px] rounded-full bg-indigo-300/20 blur-3xl sm:h-[360px] sm:w-[360px]" />
+        <div className="absolute right-[-120px] top-[-110px] h-[260px] w-[260px] rounded-full bg-cyan-200/30 blur-3xl sm:h-[340px] sm:w-[340px]" />
+        <div className="absolute bottom-[-180px] right-[16%] h-[240px] w-[240px] rounded-full bg-amber-100/35 blur-3xl sm:h-[320px] sm:w-[320px]" />
       </div>
 
       {/* ── XP TOASTS ── */}
@@ -1057,7 +1123,7 @@ export default function Dashboard() {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="xp-toast flex items-center gap-2 rounded-2xl border border-white/70 bg-white/76 px-4 py-2.5 shadow-[0_18px_50px_rgba(37,99,235,0.18)] backdrop-blur-xl"
+            className="xp-toast flex max-w-[calc(100vw-1.25rem)] items-center gap-2 rounded-2xl border border-white/70 bg-white/76 px-4 py-2.5 shadow-[0_18px_50px_rgba(37,99,235,0.18)] backdrop-blur-xl"
           >
             <Icon name="guarantee" size={16} color={DASHBOARD_COLORS.accent} />
             <div className="flex flex-col">
@@ -1068,57 +1134,61 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <EnigmaAssistant
-        playerName={welcomeName}
-        strongTopic={strongestTopic}
-        weakTopic={weakestTopic}
-        activeTarget={activeGuideTarget}
-        onSuggestionClick={focusGuideTarget}
-      />
+      <div className="hidden md:block">
+        <EnigmaAssistant
+          playerName={welcomeName}
+          strongTopic={strongestTopic}
+          weakTopic={weakestTopic}
+          activeTarget={activeGuideTarget}
+          onSuggestionClick={focusGuideTarget}
+        />
+      </div>
 
       <div className="relative z-10 flex min-h-screen">
         <DashboardNavbar />
 
         <div className="flex min-h-screen flex-1 flex-col overflow-x-hidden pb-24 md:pb-0">
           <main className="flex-1 overflow-x-hidden p-2.5 sm:p-4 xl:p-6">
-            <div className="mx-auto flex w-full max-w-[1740px] 2xl:max-w-[1840px] flex-col gap-8 xl:gap-10">
-              <section className="px-2 sm:px-3 xl:px-4 2xl:px-5">
-                <div className="grid gap-6 xl:grid-cols-[minmax(380px,1.2fr)_minmax(0,1fr)] xl:items-stretch 2xl:grid-cols-[minmax(460px,1.35fr)_minmax(0,1fr)]">
-                  <div className="min-w-0 xl:max-w-none xl:pr-4 2xl:pr-6">
+            <div className="mx-auto flex w-full max-w-[1740px] 2xl:max-w-[1840px] flex-col gap-6 sm:gap-8 xl:gap-10">
+              <section className="relative px-2 sm:px-3 xl:px-4 2xl:px-5">
+                <div className="absolute right-2 top-0 z-20 sm:right-3 xl:hidden">
+                  <NotificationDropdown />
+                </div>
+                <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(380px,1.2fr)_minmax(0,1fr)] xl:items-stretch 2xl:grid-cols-[minmax(460px,1.35fr)_minmax(0,1fr)]">
+                  <div className="min-w-0 pt-[76px] sm:pt-[92px] xl:max-w-none xl:pt-0 xl:pr-4 2xl:pr-6">
                     <div className="flex h-full flex-col justify-center">
-                      <p className="text-[14px] font-medium text-slate-500">
+                      <p className="text-[13px] font-medium text-slate-500 sm:text-[14px]">
                         {dashboardDate}
                       </p>
-                      <h1 className="mt-2 text-[clamp(30px,2.3vw,36px)] font-bold leading-[1.15] tracking-[-0.035em] text-slate-950">
+                      <h1 className="mt-2 text-[clamp(24px,8vw,36px)] font-bold leading-[1.15] tracking-[-0.035em] text-slate-950">
                         Hoşgeldin, {welcomeName} 👋
                       </h1>
-                      <p className="mt-2.5 max-w-xl text-[15px] leading-6 text-slate-600">
+                      <p className="mt-2 max-w-xl text-[14px] leading-6 text-slate-600 sm:mt-2.5 sm:text-[15px]">
                         Bugün yeni bir şey öğrenmek için harika bir gün!
                       </p>
                     </div>
                   </div>
 
                   <div className="min-w-0">
-                    <div className="flex h-full flex-col items-end justify-center">
+                    <div className="flex h-full flex-col justify-center">
                       <div className="w-full">
-                        <div className="flex w-full items-center gap-3">
-                          <div className="min-w-0 flex-1">
+                        <div className="flex w-full flex-col items-start gap-2.5 xl:flex-row xl:items-center xl:gap-3">
+                          <div className="order-2 min-w-0 w-full flex-1 xl:order-1">
                             <AiAskSearchBar
+                              open={aiChatOpen}
+                              messages={aiChatMessages}
+                              loading={aiChatLoading}
+                              input={aiChatInput}
+                              onInputChange={setAiChatInput}
                               onSubmit={sendDashboardAiMessage}
+                              onClose={() => setAiChatOpen(false)}
                               disabled={aiChatLoading}
                             />
                           </div>
-                          <NotificationDropdown />
+                          <div className="hidden xl:order-2 xl:block xl:self-auto">
+                            <NotificationDropdown />
+                          </div>
                         </div>
-                        <AiChatPanel
-                          visible={aiChatOpen}
-                          messages={aiChatMessages}
-                          loading={aiChatLoading}
-                          input={aiChatInput}
-                          onInputChange={setAiChatInput}
-                          onSend={sendDashboardAiMessage}
-                          onClose={() => setAiChatOpen(false)}
-                        />
                         <AiSuggestionPopup
                           recommendation={recommendation}
                           loading={recommendationLoading}
@@ -1155,10 +1225,10 @@ export default function Dashboard() {
                 ref={topicsRef}
                 className="relative px-2 sm:px-3 xl:px-4 2xl:px-5"
               >
-                <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5 sm:gap-4">
                   <div>
-                    <h2 className="text-[26px] font-bold tracking-[-0.04em] text-slate-950">Günün Dersleri</h2>
-                    <p className="mt-2 text-[14px] leading-6 text-slate-500">
+                    <h2 className="text-[23px] font-bold tracking-[-0.04em] text-slate-950 sm:text-[26px]">Günün Dersleri</h2>
+                    <p className="mt-1.5 text-[13px] leading-6 text-slate-500 sm:mt-2 sm:text-[14px]">
                       Bugün odaklanman önerilen 3 ders burada.
                     </p>
                   </div>
@@ -1169,7 +1239,7 @@ export default function Dashboard() {
                         target="topics"
                         side="left"
                         size={80}
-                        className="right-[calc(100%+10px)] top-1/2 -translate-y-1/2"
+                        className="right-[calc(100%+10px)] top-1/2 hidden -translate-y-1/2 md:block"
                       />
                     )}
                     <button
@@ -1198,17 +1268,17 @@ export default function Dashboard() {
               <section className="grid gap-5 px-2 sm:px-3 lg:grid-cols-[minmax(280px,1fr)_minmax(0,1.45fr)] xl:grid-cols-[minmax(300px,0.98fr)_minmax(0,1.78fr)_minmax(260px,0.95fr)] 2xl:grid-cols-[minmax(340px,1fr)_minmax(0,1.95fr)_minmax(320px,1fr)] xl:auto-rows-fr xl:px-4 2xl:px-5">
                 <article
                   ref={missionRef}
-                  className="relative h-full rounded-[32px] border border-white/70 bg-white/62 px-7 py-6 shadow-[0_18px_50px_rgba(37,99,235,0.09)] backdrop-blur-2xl"
+                  className="relative h-full rounded-[28px] border border-white/70 bg-white/62 px-5 py-5 shadow-[0_18px_50px_rgba(37,99,235,0.09)] backdrop-blur-2xl sm:rounded-[32px] sm:px-7 sm:py-6"
                 >
-                  <div className="flex items-start gap-5">
+                  <div className="flex items-start gap-4 sm:gap-5">
                     <div className="flex h-11 w-11 items-center justify-center rounded-full">
                       <Icon name="goal" size={58} color="#ef4444" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-[24px] font-bold leading-[1.18] tracking-[-0.03em] text-[#0f172a]">
+                      <h3 className="text-[22px] font-bold leading-[1.2] tracking-[-0.03em] text-[#0f172a] sm:text-[24px]">
                         Hedefe Çok Yakınsın!
                       </h3>
-                      <p className="mt-2.5 text-[15px] leading-[1.65] text-slate-600">
+                      <p className="mt-2 text-[14px] leading-[1.65] text-slate-600 sm:mt-2.5 sm:text-[15px]">
                         Bugünkü planını tamamla ve serini koru.
                       </p>
                     </div>
@@ -1220,7 +1290,7 @@ export default function Dashboard() {
                         target="mission"
                         side="left"
                         size={78}
-                        className="right-[calc(100%+6px)] top-1/2 -translate-y-1/2"
+                        className="right-[calc(100%+6px)] top-1/2 hidden -translate-y-1/2 md:block"
                       />
                     )}
                     <button
@@ -1234,24 +1304,14 @@ export default function Dashboard() {
                   </div>
                 </article>
 
-                <article className="h-full rounded-[32px] border border-white/70 bg-white/62 p-5 shadow-[0_18px_50px_rgba(37,99,235,0.08)] backdrop-blur-2xl sm:p-6">
-                  <div className="grid h-full gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-1">
-                    {bottomStats.map((stat, index) => (
-                      <BottomStat
-                        key={stat.label}
-                        stat={stat}
-                        withDivider={index !== bottomStats.length - 1}
-                      />
-                    ))}
-                  </div>
-                </article>
+                <BottomStatsSummary stats={bottomStats} />
 
-                <article className="h-full rounded-[32px] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.7),rgba(255,250,238,0.78))] px-7 py-6 shadow-[0_18px_44px_rgba(180,138,69,0.1)] backdrop-blur-2xl lg:col-span-2 xl:col-span-1">
-                  <div className="flex h-full items-center justify-between gap-5">
-                    <p className="max-w-[230px] text-[22px] font-medium leading-[1.38] tracking-[-0.02em] text-[#0f172a]">
+                <article className="h-full rounded-[28px] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.7),rgba(255,250,238,0.78))] px-5 py-5 shadow-[0_18px_44px_rgba(180,138,69,0.1)] backdrop-blur-2xl sm:rounded-[32px] sm:px-7 sm:py-6 lg:col-span-2 xl:col-span-1">
+                  <div className="flex h-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-5">
+                    <p className="max-w-none text-[18px] font-medium leading-[1.38] tracking-[-0.02em] text-[#0f172a] sm:max-w-[230px] sm:text-[22px]">
                       Küçük adımlar, büyük başarılar getirir.
                     </p>
-                    <div className="relative flex h-28 w-28 items-center justify-center">
+                    <div className="relative mx-auto flex h-24 w-24 items-center justify-center sm:mx-0 sm:h-28 sm:w-28">
                       <Icon name="trophy" size={76} color="#f59e0b" />
                       <span className="absolute -left-1 top-5 text-[12px] text-amber-400">✦</span>
                       <span className="absolute right-1 top-2 text-[10px] text-amber-300">✦</span>
