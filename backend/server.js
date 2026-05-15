@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const { Ollama } = require('ollama');
 const { createAiRouter } = require('./routes/ai');
+const { buildDashboardMentorPrompt } = require('./prompts/dashboardMentorPrompt');
+const { buildVideoTeacherPrompt } = require('./prompts/videoTeacherPrompt');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -73,6 +75,10 @@ app.post('/api/chat', async (req, res) => {
     ]
       .filter(Boolean)
       .join('\n');
+    const systemPrompt =
+      bolum.phase === 'Dashboard'
+        ? buildDashboardMentorPrompt({ contextSummary: bolumBilgisi })
+        : buildVideoTeacherPrompt({ contextSummary: bolumBilgisi });
 
     console.log(`[${zaman}] Yeni istek geldi`);
     console.log(`[${zaman}] Kullanıcı mesajı: ${kullaniciMesaji}`);
@@ -85,17 +91,7 @@ app.post('/api/chat', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `Senin adın Enigma.
-Her zaman yalnızca Türkçe cevap ver.
-Asla İngilizce cevap verme.
-Kullanıcı başka dilde yazsa bile cevabı Türkçe ver.
-Matematik, fen, teknik veya zor sorularda da sadece Türkçe kullan.
-"Let's", "step by step", "comparison", "solution" gibi İngilizce kalıplar kullanma.
-Cevaplarını sade, kısa, öğretici ve öğrenci seviyesine uygun ver.
-Bilmediğin bilgiyi uydurma.
-Gerekirse maddeler halinde açıkla.
-Kullanıcı video ders izlerken sana soru soruyor. Yanıtlarında varsa aşağıdaki bölüm bağlamını kullan:
-${bolumBilgisi || 'Bölüm bağlamı gönderilmedi.'}`
+          content: systemPrompt
         },
         ...oncekiMesajlar
           .filter((mesaj) => mesaj && (mesaj.role === 'user' || mesaj.role === 'assistant') && mesaj.content)
